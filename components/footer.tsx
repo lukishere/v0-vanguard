@@ -38,7 +38,7 @@ export function Footer() {
   ]
 
   const contactInfo = [
-    { icon: Mail, text: "negocios@vanguard.es", href: "mailto:negocios@vanguard.es" },
+    { icon: Mail, text: "sales@vanguard-ia.tech", href: "mailto:sales@vanguard-ia.tech" },
     { icon: Phone, text: "+34 627 961 956", href: "tel:+34627961956" },
     { icon: MapPin, text: "Barcelona, España", href: "#" },
   ]
@@ -126,14 +126,14 @@ export function Footer() {
 
         <div className="border-t border-gray-200 mt-12 pt-6 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-500 text-sm">
-            © {currentYear} VANGUARD. {language === "en" ? "All rights reserved." : "Todos los derechos reservados."}
+            © {currentYear} VANGUARD-IA. {language === "en" ? "All rights reserved." : "Todos los derechos reservados."}
           </p>
           <p className="text-gray-500 text-sm mt-2 md:mt-0">
             <a
-              href="https://www.vanguard.es"
+              href="https://www.vanguard-ia.tech"
               className="hover:text-vanguard-blue transition-all duration-300 vanguard-button-hover"
             >
-              www.vanguard.es
+              www.vanguard-ia.tech
             </a>
           </p>
         </div>

@@ -12,9 +12,9 @@ import { CursorTrail } from "@/components/cursor-trail"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "VANGUARD - Innovation and creativity to transform your business",
+  title: "VANGUARD-IA - Innovation and creativity to transform your business",
   description: "Specialized consultancy in AI, IT, web branding, infrastructure, and security",
-    generator: 'v0.dev'
+  generator: 'v0.dev'
 }
 
 export default function RootLayout({
@@ -23,9 +23,14 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
           <LanguageProvider>
             <div className="flex flex-col min-h-screen">
               <Header />

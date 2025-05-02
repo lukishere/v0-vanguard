@@ -52,8 +52,8 @@ export default function Home() {
       company: "TechNova Solutions",
       review:
         language === "en"
-          ? "VANGUARD's AI implementation transformed our data processing capabilities. We've seen a 40% increase in efficiency and significant cost reduction in just three months."
-          : "La implementación de IA de VANGUARD transformó nuestras capacidades de procesamiento de datos. Hemos visto un aumento del 40% en eficiencia y una reducción significativa de costos en solo tres meses.",
+          ? "VANGUARD-IA's AI implementation transformed our data processing capabilities. We've seen a 40% increase in efficiency and significant cost reduction in just three months."
+          : "La implementación de IA de VANGUARD-IA transformó nuestras capacidades de procesamiento de datos. Hemos visto un aumento del 40% en eficiencia y una reducción significativa de costos en solo tres meses.",
       rating: 5,
       businessType: "tech",
     },
@@ -63,8 +63,8 @@ export default function Home() {
       company: "Global Financial Group",
       review:
         language === "en"
-          ? "The security infrastructure VANGUARD designed for us has proven robust against multiple threat vectors. Their ongoing support and proactive monitoring have been invaluable."
-          : "La infraestructura de seguridad que VANGUARD diseñó para nosotros ha demostrado ser robusta contra múltiples vectores de amenazas. Su soporte continuo y monitoreo proactivo han sido invaluables.",
+          ? "The security infrastructure VANGUARD-IA designed for us has proven robust against multiple threat vectors. Their ongoing support and proactive monitoring have been invaluable."
+          : "La infraestructura de seguridad que VANGUARD-IA diseñó para nosotros ha demostrado ser robusta contra múltiples vectores de amenazas. Su soporte continuo y monitoreo proactivo han sido invaluables.",
       rating: 5,
       businessType: "finance",
     },
@@ -74,8 +74,8 @@ export default function Home() {
       company: "HealthPlus Systems",
       review:
         language === "en"
-          ? "Our web presence has completely transformed since working with VANGUARD. The branding strategy they developed perfectly captures our mission and has resonated strongly with our target audience."
-          : "Nuestra presencia web se ha transformado completamente desde que trabajamos con VANGUARD. La estrategia de marca que desarrollaron captura perfectamente nuestra misión y ha resonado fuertemente con nuestra audiencia objetivo.",
+          ? "Our web presence has completely transformed since working with VANGUARD-IA. The branding strategy they developed perfectly captures our mission and has resonated strongly with our target audience."
+          : "Nuestra presencia web se ha transformado completamente desde que trabajamos con VANGUARD-IA. La estrategia de marca que desarrollaron captura perfectamente nuestra misión y ha resonado fuertemente con nuestra audiencia objetivo.",
       rating: 5,
       businessType: "healthcare",
     },
@@ -129,8 +129,8 @@ export default function Home() {
             <div className="relative">
               <div className="aspect-video rounded-lg overflow-hidden shadow-md">
                 <Image
-                  src="/images/vanguard-hero.jpeg"
-                  alt="VANGUARD - Innovation and Creativity"
+                  src="/images/v-hero-new.jpg"
+                  alt="VANGUARD-IA - Innovation and Creativity"
                   width={800}
                   height={450}
                   className="w-full h-full object-cover"

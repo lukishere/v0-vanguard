@@ -29,24 +29,41 @@ export default function ContactPage() {
     e.preventDefault()
     setFormState({ ...formState, loading: true })
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    setFormState({
-      name: "",
-      email: "",
-      message: "",
-      submitted: true,
-      loading: false,
-    })
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formState.name,
+          email: formState.email,
+          message: formState.message,
+        }),
+      })
+      if (response.ok) {
+        setFormState({
+          name: '',
+          email: '',
+          message: '',
+          submitted: true,
+          loading: false,
+        })
+      } else {
+        // Optionally handle error state here
+        setFormState({ ...formState, loading: false })
+        alert('There was an error sending your message. Please try again later.')
+      }
+    } catch (error) {
+      setFormState({ ...formState, loading: false })
+      alert('There was an error sending your message. Please try again later.')
+    }
   }
 
   const contactInfo = [
     {
       icon: Mail,
       title: t("contact.email"),
-      content: "negocios@vanguard.es",
-      href: "mailto:negocios@vanguard.es",
+      content: "sales@vanguard-ia.tech",
+      href: "mailto:sales@vanguard-ia.tech",
     },
     {
       icon: Phone,
