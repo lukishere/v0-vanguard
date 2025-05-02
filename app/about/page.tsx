@@ -10,12 +10,12 @@ export default function AboutPage() {
 
   const content = {
     en: {
-      title: "About VANGUARD",
+      title: "About VANGUARD-IA",
       subtitle: "Innovation and creativity to transform your business",
       mission: {
         title: "Our Mission",
         content:
-          "At VANGUARD, our mission is to empower businesses through innovative technology solutions that drive growth, efficiency, and competitive advantage. We are committed to delivering exceptional value to our clients by combining cutting-edge expertise with a deep understanding of business challenges.",
+          "At VANGUARD-IA, our mission is to empower businesses through innovative technology solutions that drive growth, efficiency, and competitive advantage. We are committed to delivering exceptional value to our clients by combining cutting-edge expertise with a deep understanding of business challenges.",
       },
       vision: {
         title: "Our Vision",
@@ -88,12 +88,12 @@ export default function AboutPage() {
       },
     },
     es: {
-      title: "Sobre VANGUARD",
+      title: "Sobre VANGUARD-IA",
       subtitle: "Innovación y creatividad para transformar tu negocio",
       mission: {
         title: "Nuestra Misión",
         content:
-          "En VANGUARD, nuestra misión es potenciar a las empresas a través de soluciones tecnológicas innovadoras que impulsen el crecimiento, la eficiencia y la ventaja competitiva. Estamos comprometidos a ofrecer un valor excepcional a nuestros clientes combinando experiencia de vanguardia con una profunda comprensión de los desafíos empresariales.",
+          "En VANGUARD-IA, nuestra misión es potenciar a las empresas a través de soluciones tecnológicas innovadoras que impulsen el crecimiento, la eficiencia y la ventaja competitiva. Estamos comprometidos a ofrecer un valor excepcional a nuestros clientes combinando experiencia de vanguardia con una profunda comprensión de los desafíos empresariales.",
       },
       vision: {
         title: "Nuestra Visión",

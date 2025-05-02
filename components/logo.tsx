@@ -22,7 +22,7 @@ export function Logo({ className = "", variant = "default" }: LogoProps) {
       <div className="relative">
         <Image
           src="/images/vanguard-logo.png"
-          alt="VANGUARD Logo"
+          alt="VANGUARD-IA Logo"
           width={40}
           height={40}
           className={`object-contain transition-transform duration-300 ${isHovered ? "scale-110" : ""}`}
@@ -33,7 +33,7 @@ export function Logo({ className = "", variant = "default" }: LogoProps) {
           variant === "white" ? "text-white" : "text-vanguard-blue"
         } ${isHovered ? "tracking-wider" : ""}`}
       >
-        VANGUARD
+        VANGUARD-IA
       </span>
     </Link>
   )

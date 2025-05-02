@@ -13,7 +13,7 @@ export default function PrivacyPage() {
         {
           title: "Introduction",
           content:
-            "At VANGUARD, we respect your privacy and are committed to protecting your personal data. This privacy policy will inform you about how we look after your personal data when you visit our website and tell you about your privacy rights and how the law protects you.",
+            "At VANGUARD-IA, we respect your privacy and are committed to protecting your personal data. This privacy policy will inform you about how we look after your personal data when you visit our website and tell you about your privacy rights and how the law protects you.",
         },
         {
           title: "Information We Collect",
@@ -124,7 +124,7 @@ export default function PrivacyPage() {
         {
           title: "Contact Us",
           content:
-            "If you have any questions about this privacy policy or our privacy practices, please contact us at negocios@vanguard.es.",
+            "If you have any questions about this privacy policy or our privacy practices, please contact us at sales@vanguard-ia.tech",
         },
       ],
     },
@@ -135,7 +135,7 @@ export default function PrivacyPage() {
         {
           title: "Introducción",
           content:
-            "En VANGUARD, respetamos su privacidad y estamos comprometidos a proteger sus datos personales. Esta política de privacidad le informará sobre cómo cuidamos sus datos personales cuando visita nuestro sitio web y le informará sobre sus derechos de privacidad y cómo la ley lo protege.",
+            "En VANGUARD-IA, respetamos su privacidad y estamos comprometidos a proteger sus datos personales. Esta política de privacidad le informará sobre cómo cuidamos sus datos personales cuando visita nuestro sitio web y le informará sobre sus derechos de privacidad y cómo la ley lo protege.",
         },
         {
           title: "Información que Recopilamos",
@@ -247,7 +247,7 @@ export default function PrivacyPage() {
         {
           title: "Contáctenos",
           content:
-            "Si tiene alguna pregunta sobre esta política de privacidad o nuestras prácticas de privacidad, contáctenos en negocios@vanguard.es.",
+            "Si tiene alguna pregunta sobre esta política de privacidad o nuestras prácticas de privacidad, contáctenos en sales@vanguard-ia.tech",
         },
       ],
     },

@@ -15,6 +15,7 @@ export function AIFeatureShowcase() {
   const [response, setResponse] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [hasInteracted, setHasInteracted] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const examples = [
     language === "en" ? "How can AI help my business?" : "¿Cómo puede la IA ayudar a mi negocio?",
@@ -28,6 +29,7 @@ export function AIFeatureShowcase() {
 
     setIsLoading(true)
     setHasInteracted(true)
+    setError(null)
 
     try {
       const response = await fetch("/api/chat", {
@@ -41,17 +43,20 @@ export function AIFeatureShowcase() {
       })
 
       if (!response.ok) {
-        throw new Error("Failed to get response")
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Failed to get response")
       }
 
       const data = await response.json()
       setResponse(data.response)
     } catch (error) {
       console.error("Error getting AI response:", error)
-      setResponse(
-        language === "en"
-          ? "I'm sorry, I'm having trouble connecting right now. Please try again later."
-          : "Lo siento, estoy teniendo problemas para conectarme en este momento. Por favor, inténtelo de nuevo más tarde.",
+      setError(
+        error instanceof Error 
+          ? error.message 
+          : language === "en"
+            ? "I'm sorry, I'm having trouble connecting right now. Please try again later."
+            : "Lo siento, estoy teniendo problemas para conectarme en este momento. Por favor, inténtelo de nuevo más tarde."
       )
     } finally {
       setIsLoading(false)
@@ -60,6 +65,7 @@ export function AIFeatureShowcase() {
 
   const handleExampleClick = (example: string) => {
     setQuery(example)
+    setError(null)
   }
 
   return (
@@ -75,7 +81,10 @@ export function AIFeatureShowcase() {
           <div className="flex flex-col gap-2">
             <Input
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => {
+                setQuery(e.target.value)
+                setError(null)
+              }}
               placeholder={language === "en" ? "Ask about our services..." : "Pregunte sobre nuestros servicios..."}
               className="w-full"
             />
@@ -98,40 +107,24 @@ export function AIFeatureShowcase() {
           <Button type="submit" className="w-full bg-vanguard-blue hover:bg-vanguard-blue/90" disabled={isLoading}>
             {isLoading ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                {language === "en" ? "Processing..." : "Procesando..."}
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                {language === "en" ? "Thinking..." : "Pensando..."}
               </>
-            ) : language === "en" ? (
-              "Get Response"
             ) : (
-              "Obtener Respuesta"
+              language === "en" ? "Ask" : "Preguntar"
             )}
           </Button>
+          {error && (
+            <div className="text-red-500 text-sm mt-2">
+              {error}
+            </div>
+          )}
+          {hasInteracted && !isLoading && !error && response && (
+            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+              {response}
+            </div>
+          )}
         </form>
-
-        {(response || isLoading) && (
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-100">
-            <h4 className="text-sm font-medium text-gray-700 mb-2">{language === "en" ? "Response:" : "Respuesta:"}</h4>
-            {isLoading ? (
-              <div className="flex items-center gap-2 text-gray-500">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span>{language === "en" ? "Generating response..." : "Generando respuesta..."}</span>
-              </div>
-            ) : (
-              <p className="text-gray-700">{response}</p>
-            )}
-          </div>
-        )}
-
-        {!hasInteracted && !isLoading && (
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100 text-center">
-            <p className="text-vanguard-blue">
-              {language === "en"
-                ? "Ask about our services using the examples above."
-                : "Pregunte sobre nuestros servicios usando los ejemplos anteriores."}
-            </p>
-          </div>
-        )}
       </CardContent>
     </Card>
   )

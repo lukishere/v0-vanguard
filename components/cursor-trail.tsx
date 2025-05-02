@@ -1,10 +1,11 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 
 export function CursorTrail() {
   const [trail, setTrail] = useState<{ x: number; y: number; id: number }[]>([])
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const lastUpdateRef = useRef(0)
 
   useEffect(() => {
     const updateMousePosition = (e: MouseEvent) => {
@@ -20,8 +21,12 @@ export function CursorTrail() {
 
   useEffect(() => {
     if (mousePosition.x === 0 && mousePosition.y === 0) return
+    
+    const now = Date.now()
+    if (now - lastUpdateRef.current < 16) return // Throttle to ~60fps
+    lastUpdateRef.current = now
 
-    const newTrail = { x: mousePosition.x, y: mousePosition.y, id: Date.now() }
+    const newTrail = { x: mousePosition.x, y: mousePosition.y, id: now }
     setTrail((prev) => [...prev, newTrail].slice(-5)) // Keep only the last 5 positions
 
     const timer = setTimeout(() => {
