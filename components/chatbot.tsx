@@ -93,11 +93,29 @@ export function Chatbot() {
         body: JSON.stringify({ messages: apiMessages }),
       })
 
+      const contentType = response.headers.get("content-type") || "";
       if (!response.ok) {
-        throw new Error("Failed to get response")
+        let errorMsg = "Failed to get response";
+        if (contentType.includes("application/json")) {
+          const errorData = await response.json();
+          errorMsg = errorData.error || errorMsg;
+        } else {
+          errorMsg = language === "en"
+            ? "Server error: Unexpected response format. Please try again later."
+            : "Error del servidor: Formato de respuesta inesperado. Por favor, inténtelo de nuevo más tarde.";
+        }
+        throw new Error(errorMsg);
       }
 
-      const data = await response.json()
+      if (!contentType.includes("application/json")) {
+        throw new Error(
+          language === "en"
+            ? "Unexpected server response. Please try again later."
+            : "Respuesta inesperada del servidor. Por favor, inténtelo de nuevo más tarde."
+        );
+      }
+
+      const data = await response.json();
 
       // Add AI response
       setMessages((prev) => [...prev, { text: data.response, isUser: false }])

@@ -5,9 +5,9 @@ import "./globals.css"
 import { LanguageProvider } from "@/contexts/language-context"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
-import { ThemeProvider } from "@/components/theme-provider"
 import { Chatbot } from "@/components/chatbot"
 import { CursorTrail } from "@/components/cursor-trail"
+import { ParticleBackground } from "@/components/particle-background"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -25,22 +25,16 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <LanguageProvider>
-            <div className="flex flex-col min-h-screen">
-              <Header />
-              <main className="flex-grow">{children}</main>
-              <Footer />
-              <Chatbot />
-              <CursorTrail />
-            </div>
-          </LanguageProvider>
-        </ThemeProvider>
+        <LanguageProvider>
+          <div className="flex flex-col min-h-screen">
+            <ParticleBackground />
+            <Header />
+            <main className="flex-grow">{children}</main>
+            <Footer />
+            <Chatbot />
+            <CursorTrail />
+          </div>
+        </LanguageProvider>
       </body>
     </html>
   )

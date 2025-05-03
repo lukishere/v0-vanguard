@@ -3,6 +3,7 @@
 import { useLanguage } from "@/contexts/language-context"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { CTAButton } from "@/components/cta-button"
+import AnimatedTextHeader from "@/components/animated-text-header"
 
 export default function FAQPage() {
   const { language } = useLanguage()
@@ -90,7 +91,18 @@ export default function FAQPage() {
     <div className="py-12 relative overflow-hidden">
       <div className="vanguard-container">
         <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold text-vanguard-blue mb-4">{currentContent.title}</h1>
+          <h1 className="text-3xl font-bold text-vanguard-blue mb-4">
+            <AnimatedTextHeader
+              phrases={[
+                currentContent.title,
+                currentContent.subtitle,
+                language === "en"
+                  ? "Support & Information"
+                  : "Soporte e Información"
+              ]}
+              className="text-vanguard-blue"
+            />
+          </h1>
           <p className="text-xl text-gray-600">{currentContent.subtitle}</p>
         </div>
 

@@ -26,12 +26,14 @@ export function BlogCard({ title, description, image, date, slug, keywords = [] 
   return (
     <Card className="vanguard-card border-0 overflow-hidden group">
       <div className="relative h-48 w-full overflow-hidden">
-        <Image
-          src={image || "/placeholder.svg"}
-          alt={title}
-          fill
-          className="object-cover transition-transform duration-700 group-hover:scale-110"
-        />
+        <a href={generateGoogleNewsUrl()} target="_blank" rel="noopener noreferrer">
+          <Image
+            src={image || "/placeholder.svg"}
+            alt={title}
+            fill
+            className="object-cover transition-transform duration-700 group-hover:scale-110"
+          />
+        </a>
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         <div className="absolute top-2 right-2 bg-white/90 text-vanguard-blue text-xs font-medium py-1 px-2 rounded">
           {date}
@@ -39,12 +41,7 @@ export function BlogCard({ title, description, image, date, slug, keywords = [] 
       </div>
       <CardHeader className="pb-2">
         <CardTitle className="text-vanguard-blue">
-          <Link
-            href={`/blog/${slug}`}
-            className="hover:text-vanguard-blue/80 transition-all duration-300 vanguard-button-hover inline-block"
-          >
-            {title}
-          </Link>
+          {title}
         </CardTitle>
         <div className="vanguard-divider w-12 transition-all duration-300 group-hover:w-16"></div>
       </CardHeader>

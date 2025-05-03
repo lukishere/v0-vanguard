@@ -3,7 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Star, Building2, Briefcase, Database, Globe, ShieldCheck } from "lucide-react"
 
-type BusinessType = "tech" | "finance" | "healthcare" | "retail" | "manufacturing"
+export type BusinessType = "tech" | "finance" | "healthcare" | "retail" | "manufacturing"
 
 interface ClientReviewProps {
   name: string

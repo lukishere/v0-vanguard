@@ -39,7 +39,7 @@ export function Header() {
     { href: "/", label: t("nav.home") },
     { href: "/about", label: t("nav.about") },
     { href: "/services", label: t("nav.services") },
-    { href: "/blog", label: t("nav.blog") },
+    { href: "/news", label: t("nav.news") },
     { href: "/contact", label: t("nav.contact") },
   ]
 
