@@ -4,6 +4,7 @@ import { useLanguage } from "@/contexts/language-context"
 import { CTAButton } from "@/components/cta-button"
 import { AIBackground } from "@/components/ai-background"
 import { CircuitPattern } from "@/components/circuit-pattern"
+import AnimatedTextHeader from "@/components/animated-text-header"
 
 export default function AboutPage() {
   const { language, t } = useLanguage()
@@ -173,14 +174,22 @@ export default function AboutPage() {
   return (
     <>
       {/* Hero Section */}
-      <section className="bg-gray-50 py-20 relative overflow-hidden">
-        <AIBackground variant="light" opacity={0.2} />
+      <section className="vanguard-section bg-white">
         <div className="vanguard-container">
-          <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl font-bold text-vanguard-blue mb-6">{currentContent.title}</h1>
-            <p className="text-xl text-gray-600 mb-8">{currentContent.subtitle}</p>
-            <CTAButton type="contact" />
-          </div>
+          <h1 className="text-4xl md:text-5xl font-bold text-vanguard-blue mb-6">
+            <AnimatedTextHeader
+              phrases={[
+                currentContent.title,
+                currentContent.subtitle,
+                language === "en"
+                  ? "Our Mission: Empowering Businesses"
+                  : "Nuestra Misión: Potenciar Empresas"
+              ]}
+              className="text-vanguard-blue"
+            />
+          </h1>
+          <div className="vanguard-divider"></div>
+          <CTAButton type="contact" />
         </div>
       </section>
 

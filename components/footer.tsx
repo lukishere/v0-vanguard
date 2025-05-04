@@ -47,7 +47,7 @@ export function Footer() {
     { label: t("nav.home"), href: "/" },
     { label: t("nav.about"), href: "/about" },
     { label: t("nav.services"), href: "/services" },
-    { label: t("nav.blog"), href: "/blog" },
+    { label: t("nav.news"), href: "/news" },
     { label: t("nav.contact"), href: "/contact" },
     { label: language === "en" ? "Privacy Policy" : "Política de Privacidad", href: "/privacy" },
     { label: language === "en" ? "Terms of Service" : "Términos de Servicio", href: "/terms" },
@@ -63,8 +63,8 @@ export function Footer() {
             <Logo />
             <p className="text-gray-600 max-w-xs">
               {language === "en"
-                ? "Specialized consultancy in AI, Computer Services, web branding, infrastructure, and security."
-                : "Consultoría especializada en IA, Servicios Informáticos, branding web, infraestructura y seguridad."}
+                ? "Specialized consultancy in AI, Apps, Computer Services, Web branding, Infrastructure, and Security."
+                : "Consultoría especializada en IA, Apps, Servicios Informáticos, Branding web, Infraestructura y Seguridad."}
             </p>
             <div className="flex space-x-4">
               {socialLinks.map((social) => (

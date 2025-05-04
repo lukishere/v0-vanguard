@@ -8,6 +8,8 @@ import { ClientReview } from "@/components/client-review"
 import { AIFeatureShowcase } from "@/components/ai-feature-showcase"
 import { Brain, Server, Globe, Database, Shield } from "lucide-react"
 import Image from "next/image"
+import type { BusinessType } from "@/components/client-review"
+import AnimatedTextHeader from "@/components/animated-text-header"
 
 export default function Home() {
   const { t, language } = useLanguage()
@@ -81,31 +83,31 @@ export default function Home() {
     },
   ]
 
-  const blogPosts = [
+  const newsPosts = [
     {
-      title: "The Future of AI in Business",
+      title: "Google's Latest AI Breakthroughs",
       description:
-        "Explore how artificial intelligence is transforming business operations and creating new opportunities.",
+        "Discover how Google is pushing the boundaries of artificial intelligence with their latest research and developments.",
       image: "/placeholder.svg?height=400&width=600",
       date: "April 2, 2025",
-      slug: "future-of-ai-in-business",
-      keywords: ["artificial intelligence", "AI business applications", "machine learning", "business automation"],
+      slug: "google-ai-breakthroughs",
+      keywords: ["Google AI", "artificial intelligence", "machine learning", "AI research"],
     },
     {
-      title: "Securing Your Digital Infrastructure",
-      description: "Learn about the latest security threats and how to protect your business from cyber attacks.",
+      title: "ChatGPT's Evolution and Impact",
+      description: "Explore how ChatGPT is transforming industries and revolutionizing human-AI interaction.",
       image: "/placeholder.svg?height=400&width=600",
       date: "March 28, 2025",
-      slug: "securing-digital-infrastructure",
-      keywords: ["cybersecurity", "digital security", "cyber threats", "network protection", "data security"],
+      slug: "chatgpt-evolution",
+      keywords: ["ChatGPT", "AI integration", "digital transformation", "tech innovation"],
     },
     {
-      title: "Effective Web Branding Strategies",
-      description: "Discover how to create a compelling web presence that resonates with your target audience.",
+      title: "The Future of AI in Search Engines",
+      description: "How Google and ChatGPT are revolutionizing search with artificial intelligence.",
       image: "/placeholder.svg?height=400&width=600",
       date: "March 15, 2025",
-      slug: "effective-web-branding-strategies",
-      keywords: ["web branding", "digital marketing", "brand identity", "online presence", "web design"],
+      slug: "ai-search-engines",
+      keywords: ["AI search", "Google search", "ChatGPT", "search algorithms"],
     },
   ]
 
@@ -116,8 +118,21 @@ export default function Home() {
         <div className="vanguard-container">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold text-vanguard-blue mb-6 leading-tight">
-                {t("hero.title")}
+              <h1 className="text-4xl md:text-5xl font-bold text-vanguard-blue mb-6">
+                <AnimatedTextHeader
+                  phrases={[
+                    language === "en"
+                      ? "Innovation and creativity to transform your business"
+                      : "Innovación y creatividad para transformar tu negocio",
+                    language === "en"
+                      ? "Advanced AI Solutions"
+                      : "Soluciones avanzadas de IA",
+                    language === "en"
+                      ? "Cutting-Edge Technology"
+                      : "Tecnología de vanguardia"
+                  ]}
+                  className="text-vanguard-blue"
+                />
               </h1>
               <div className="vanguard-divider"></div>
               <p className="text-xl text-gray-600 mb-8">{t("hero.subtitle")}</p>
@@ -143,15 +158,16 @@ export default function Home() {
       </section>
 
       {/* AI Feature Showcase */}
-      <section className="vanguard-section bg-gray-50">
+      <section className="vanguard-section bg-vanguard-blue">
         <div className="vanguard-container">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-vanguard-blue mb-4">
-              {language === "en" ? "Groq-Powered Technology" : "Tecnología Potenciada por Groq"}
-            </h2>
-            <div className="vanguard-divider mx-auto mt-4"></div>
+            <p className="text-blue-100 max-w-2xl mx-auto">
+              {language === "en"
+                ? "Ask our AI assistant about our services, security, branding, and more. Powered by Groq for instant answers."
+                : "Pregunte a nuestro asistente de IA sobre servicios, seguridad, branding y más."}
+            </p>
           </div>
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-xl mx-auto">
             <AIFeatureShowcase />
           </div>
         </div>
@@ -188,31 +204,7 @@ export default function Home() {
                 company={review.company}
                 review={review.review}
                 rating={review.rating}
-                businessType={review.businessType}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Blog Section */}
-      <section className="vanguard-section">
-        <div className="vanguard-container">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-vanguard-blue mb-4">{t("blog.title")}</h2>
-            <p className="text-gray-600">{t("blog.subtitle")}</p>
-            <div className="vanguard-divider mx-auto mt-4"></div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {blogPosts.map((post, index) => (
-              <BlogCard
-                key={index}
-                title={post.title}
-                description={post.description}
-                image={post.image}
-                date={post.date}
-                slug={post.slug}
-                keywords={post.keywords}
+                businessType={review.businessType as BusinessType}
               />
             ))}
           </div>

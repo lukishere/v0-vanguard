@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Mail, Phone, MapPin } from "lucide-react"
+import AnimatedTextHeader from "@/components/animated-text-header"
 
 export default function ContactPage() {
   const { t } = useLanguage()
@@ -74,7 +75,7 @@ export default function ContactPage() {
     {
       icon: MapPin,
       title: t("contact.address"),
-      content: "Barcelona, Spain",
+      content: `Barcelona, ${t("contact.country")}`,
       href: "#",
     },
   ]
@@ -82,11 +83,19 @@ export default function ContactPage() {
   return (
     <>
       {/* Hero Section */}
-      <section className="vanguard-section bg-gray-50">
+      <section className="vanguard-section bg-white">
         <div className="vanguard-container">
-          <h1 className="text-3xl md:text-4xl font-bold text-vanguard-blue mb-4">{t("contact.title")}</h1>
+          <h1 className="text-4xl md:text-5xl font-bold text-vanguard-blue mb-6">
+            <AnimatedTextHeader
+              phrases={[
+                t("contact.title"),
+                t("contact.subtitle"),
+                "sales@vanguard-ia.tech"
+              ]}
+              className="text-vanguard-blue"
+            />
+          </h1>
           <div className="vanguard-divider"></div>
-          <p className="text-xl text-gray-600">{t("contact.subtitle")}</p>
         </div>
       </section>
 
@@ -186,16 +195,16 @@ export default function ContactPage() {
                 <div className="vanguard-divider"></div>
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="font-medium">Monday - Friday:</span>
+                    <span className="font-medium">{t("contact.hours.weekdays")}</span>
                     <span>9:00 AM - 6:00 PM</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="font-medium">Saturday:</span>
+                    <span className="font-medium">{t("contact.hours.saturday")}</span>
                     <span>10:00 AM - 2:00 PM</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="font-medium">Sunday:</span>
-                    <span>Closed</span>
+                    <span className="font-medium">{t("contact.hours.sunday")}</span>
+                    <span>{t("contact.hours.closed")}</span>
                   </div>
                 </div>
               </div>

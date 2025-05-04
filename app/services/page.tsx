@@ -3,9 +3,12 @@
 import { useLanguage } from "@/contexts/language-context"
 import { CTAButton } from "@/components/cta-button"
 import { Brain, Server, Globe, Database, Shield, CheckCircle } from "lucide-react"
+import { useState } from "react"
+import AnimatedTextHeader from "@/components/animated-text-header"
 
 export default function ServicesPage() {
   const { language } = useLanguage()
+  const [selectedIndex, setSelectedIndex] = useState(0)
 
   const content = {
     en: {
@@ -184,69 +187,86 @@ export default function ServicesPage() {
   }
 
   const currentContent = language === "en" ? content.en : content.es
+  const services = currentContent.services
+  const selectedService = services[selectedIndex]
 
   return (
     <>
       {/* Hero Section */}
-      <section className="bg-gray-50 py-16 relative overflow-hidden">
+      <section className="vanguard-section bg-white">
         <div className="vanguard-container">
-          <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl font-bold text-vanguard-blue mb-6">{currentContent.title}</h1>
-            <p className="text-xl text-gray-600 mb-8">{currentContent.subtitle}</p>
+          <h1 className="text-4xl md:text-5xl font-bold text-vanguard-blue mb-6">
+            <AnimatedTextHeader
+              phrases={[
+                currentContent.title,
+                currentContent.subtitle,
+                language === "en"
+                  ? "AI, IT, Web, Infrastructure, Security"
+                  : "IA, TI, Web, Infraestructura, Seguridad"
+              ]}
+              className="text-vanguard-blue"
+            />
+          </h1>
+          <div className="vanguard-divider"></div>
+        </div>
+      </section>
+
+      {/* New Services Layout */}
+      <section className="flex justify-center items-center py-1 bg-white">
+        <div className="flex flex-col gap-8 items-center mr-8">
+          {services.slice(0, 3).map((service, idx) => {
+            const Icon = service.icon
+            return (
+              <button
+                key={service.title}
+                className={`service-circle ${selectedIndex === idx ? "active" : ""}`}
+                onClick={() => setSelectedIndex(idx)}
+                aria-label={service.title}
+              >
+                <Icon className="h-10 w-10" />
+                <span className="sr-only">{service.title}</span>
+              </button>
+            )
+          })}
+        </div>
+        <div className="service-info-area mx-4 p-10 rounded-2xl shadow-xl bg-gray-50 border-2 border-gray-200 min-w-[350px] max-w-[420px] min-h-[350px] flex flex-col justify-center items-center">
+          <div className="flex flex-col items-center">
+            <div className="mb-4">
+              <selectedService.icon className="h-16 w-16 text-vanguard-blue" />
+            </div>
+            <h2 className="text-2xl font-bold text-vanguard-blue mb-2">{selectedService.title}</h2>
+            <div className="w-12 h-1 bg-vanguard-red mb-4"></div>
+            <p className="text-gray-600 mb-6 text-center">{selectedService.description}</p>
+            <ul className="text-left space-y-2 mb-6">
+              {selectedService.features.map((feature, i) => (
+                <li key={i} className="flex items-center text-gray-700">
+                  <CheckCircle className="h-5 w-5 text-vanguard-blue mr-2" />
+                  {feature}
+                </li>
+              ))}
+            </ul>
             <CTAButton type="quote" />
           </div>
         </div>
-      </section>
-
-      {/* Services */}
-      {currentContent.services.map((service, index) => {
-        const Icon = service.icon
-        const isEven = index % 2 === 0
-
-        return (
-          <section key={index} className={`py-16 ${isEven ? "bg-white" : "bg-gray-50"} relative overflow-hidden`}>
-            <div className="vanguard-container">
-              <div
-                className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center ${isEven ? "" : "lg:flex-row-reverse"}`}
+        <div className="flex flex-col gap-4 items-center ml-8">
+          {services.slice(3, 6).map((service, idx) => {
+            const Icon = service.icon
+            const realIdx = idx + 3
+            return (
+              <button
+                key={service.title}
+                className={`service-circle ${selectedIndex === realIdx ? "active" : ""}`}
+                onClick={() => setSelectedIndex(realIdx)}
+                aria-label={service.title}
               >
-                <div className={`order-2 ${isEven ? "lg:order-2" : "lg:order-1"}`}>
-                  <div className="bg-gray-100 rounded-lg p-8 h-full flex items-center justify-center">
-                    <Icon className="h-32 w-32 text-vanguard-blue" />
-                  </div>
-                </div>
-                <div className={`order-1 ${isEven ? "lg:order-1" : "lg:order-2"}`}>
-                  <h2 className="text-3xl font-bold text-vanguard-blue mb-4">{service.title}</h2>
-                  <div className="w-16 h-1 bg-vanguard-red mb-6"></div>
-                  <p className="text-gray-600 mb-8">{service.description}</p>
-
-                  <div className="space-y-3 mb-8">
-                    {service.features.map((feature, featureIndex) => (
-                      <div key={featureIndex} className="flex items-start">
-                        <CheckCircle className="h-5 w-5 text-vanguard-blue mr-2 mt-0.5 flex-shrink-0" />
-                        <span>{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <CTAButton type="quote" />
-                </div>
-              </div>
-            </div>
-          </section>
-        )
-      })}
-
-      {/* CTA Section */}
-      <section className="py-16 bg-vanguard-blue relative overflow-hidden">
-        <div className="vanguard-container text-center">
-          <h2 className="text-3xl font-bold text-white mb-6">{currentContent.cta.getStarted}</h2>
-          <p className="text-blue-100 max-w-2xl mx-auto mb-8">{currentContent.cta.discuss}</p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <CTAButton type="quote" className="bg-white text-vanguard-blue hover:bg-gray-100" />
-            <CTAButton type="contact" className="bg-transparent border-white text-white hover:bg-white/10" />
-          </div>
+                <Icon className="h-10 w-10" />
+                <span className="sr-only">{service.title}</span>
+              </button>
+            )
+          })}
         </div>
       </section>
+      <div className="mb-16"></div>
     </>
   )
 }
