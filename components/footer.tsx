@@ -38,8 +38,8 @@ export function Footer() {
   ]
 
   const contactInfo = [
-    { icon: Mail, text: "sales@vanguard-ia.tech", href: "mailto:sales@vanguard-ia.tech" },
-    { icon: Phone, text: "+34 627 961 956", href: "tel:+34627961956" },
+    { icon: Mail, text: "contacto@vanguard-ia.tech", href: "mailto:contacto@vanguard-ia.tech" },
+    { icon: Phone, text: "+34 644 059 040", href: "tel:+34644059040" },
     { icon: MapPin, text: "Barcelona, España", href: "#" },
   ]
 
@@ -47,7 +47,7 @@ export function Footer() {
     { label: t("nav.home"), href: "/" },
     { label: t("nav.about"), href: "/about" },
     { label: t("nav.services"), href: "/services" },
-    { label: t("nav.news"), href: "/news" },
+    { label: t("nav.events"), href: "/events" },
     { label: t("nav.contact"), href: "/contact" },
     { label: language === "en" ? "Privacy Policy" : "Política de Privacidad", href: "/privacy" },
     { label: language === "en" ? "Terms of Service" : "Términos de Servicio", href: "/terms" },
@@ -55,8 +55,8 @@ export function Footer() {
   ]
 
   return (
-    <footer className="bg-gray-50 border-t border-gray-100">
-      <div className="vanguard-container py-12">
+    <footer className="bg-gray-50 border-t border-gray-100" style={{ zIndex: 30, position: 'relative' }}>
+      <div className="vanguard-container py-12" style={{ position: 'relative', zIndex: 31 }}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Logo and Social */}
           <div className="space-y-6">

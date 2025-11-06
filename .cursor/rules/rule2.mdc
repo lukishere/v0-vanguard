@@ -1,0 +1,25 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+---
+description: Enforce coding standards and best practices
+alwaysApply: true
+---
+
+# Coding Standards
+
+- Use functional and declarative programming patterns; avoid classes unless required.
+- Prefer modular, reusable code with minimal duplication.
+- Use consistent naming conventions (camelCase for variables, PascalCase for components).
+- Enforce robust error handling and validation.
+- Validate inputs and preconditions early (guard clauses).
+- Place happy-path logic last.
+- Provide clear, user-friendly error messages.
+- Log or report unexpected errors.
+- Always include unit tests for utility functions.
+- Use semantic HTML and appropriate ARIA attributes where relevant.
+- Reference existing patterns and files for context.
+- Avoid deprecated patterns; use only approved, up-to-date practices.
+

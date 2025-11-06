@@ -8,7 +8,6 @@ import { useEffect, useState } from "react"
 export function LanguageSwitcher() {
   const { language, setLanguage } = useLanguage()
   const [mounted, setMounted] = useState(false)
-  const [isAnimating, setIsAnimating] = useState(false)
 
   // Ensure hydration
   useEffect(() => {
@@ -16,16 +15,13 @@ export function LanguageSwitcher() {
   }, [])
 
   const toggleLanguage = () => {
-    setIsAnimating(true)
-    setTimeout(() => {
-      setLanguage(language === "en" ? "es" : "en")
-      setIsAnimating(false)
-    }, 300)
+    setLanguage(language === "en" ? "es" : "en")
   }
 
+  // Show loading state during hydration
   if (!mounted) {
     return (
-      <Button variant="ghost" size="sm" className="flex items-center gap-1 opacity-0">
+      <Button variant="outline" size="sm" className="flex items-center gap-1 text-vanguard-blue border-vanguard-blue font-medium opacity-50">
         <Globe className="h-4 w-4" />
         <span>EN</span>
       </Button>
@@ -34,14 +30,13 @@ export function LanguageSwitcher() {
 
   return (
     <Button
-      variant="ghost"
+      variant="outline"
       size="sm"
       onClick={toggleLanguage}
-      className="flex items-center gap-1 text-gray-700 hover:text-vanguard-blue transition-all duration-300 relative overflow-hidden"
-      disabled={isAnimating}
+      className="flex items-center gap-1 text-vanguard-blue border-vanguard-blue hover:bg-vanguard-blue hover:text-white transition-all duration-300 font-medium"
     >
-      <Globe className="h-4 w-4 animate-pulse-subtle" />
-      <span className={isAnimating ? "animate-fade-out" : "animate-fade-in"}>{language === "en" ? "ES" : "EN"}</span>
+      <Globe className="h-4 w-4" />
+      <span>{language.toUpperCase()}</span>
     </Button>
   )
 }

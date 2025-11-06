@@ -10,53 +10,64 @@ export default function BlogPage() {
 
   const newsPosts = [
     {
-      title: "Google's Latest AI Breakthroughs",
+      title: "Google Unveils Gemini Ultra 2: Next-Gen Multimodal AI",
       description:
-        "Discover how Google is pushing the boundaries of artificial intelligence with their latest research and developments.",
-      image: "https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg",
-      date: "April 2, 2025",
-      slug: "google-ai-breakthroughs",
-      keywords: ["Google AI", "artificial intelligence", "machine learning", "AI research"],
+        "Gemini Ultra 2 doubles context length, adds live video understanding, and ships with a privacy-first on-device variant for Pixel 10.",
+      image:
+        "https://images.unsplash.com/photo-1527443154391-507e9dc6c5cc?auto=format&fit=crop&w=800&q=80",
+      date: "June 12, 2025",
+      slug: "google-gemini-ultra-2",
+      keywords: ["Google", "Gemini", "multimodal AI", "Pixel 10"],
     },
     {
-      title: "ChatGPT's Evolution and Impact",
-      description: "Explore how ChatGPT is transforming industries and revolutionizing human-AI interaction.",
-      image: "https://upload.wikimedia.org/wikipedia/commons/4/4b/OpenAI_Logo.svg",
-      date: "March 28, 2025",
-      slug: "chatgpt-evolution",
-      keywords: ["ChatGPT", "AI integration", "digital transformation", "tech innovation"],
+      title: "ChatGPT 6 Turbo Released with 256K Context Window",
+      description:
+        "OpenAI's newest model brings faster responses, native code execution sandboxes, and citation-aware outputs for enterprises.",
+      image:
+        "https://images.unsplash.com/photo-1650893074747-686f8c1eaf9a?auto=format&fit=crop&w=800&q=80",
+      date: "June 10, 2025",
+      slug: "chatgpt-6-turbo",
+      keywords: ["OpenAI", "ChatGPT 6", "large context", "enterprise AI"],
     },
     {
-      title: "The Future of AI in Search Engines",
-      description: "How Google and ChatGPT are revolutionizing search with artificial intelligence.",
-      image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=600&q=80",
-      date: "March 15, 2025",
-      slug: "ai-search-engines",
-      keywords: ["AI search", "Google search", "ChatGPT", "search algorithms"],
+      title: "Vanguard-IA Secures €5 M EU Grant for AI Ethics Platform",
+      description:
+        "The grant accelerates development of Vanguard-IA's real-time audit tool that scores model transparency & bias across industries.",
+      image:
+        "https://images.unsplash.com/photo-1535223289827-42f1e9919769?auto=format&fit=crop&w=800&q=80",
+      date: "June 8, 2025",
+      slug: "vanguard-ia-eu-grant",
+      keywords: ["Vanguard-IA", "AI ethics", "EU innovation"],
     },
     {
-      title: "AI Ethics in Tech Giants",
-      description: "Examining how Google and ChatGPT are addressing ethical concerns in AI development.",
-      image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
-      date: "March 10, 2025",
-      slug: "ai-ethics-tech-giants",
-      keywords: ["AI ethics", "responsible AI", "tech governance", "AI policy"],
+      title: "WWDC 2025: Apple Debuts 'Apple Intelligence OS' & Private Cloud Compute",
+      description:
+        "Apple's on-device LLM 'Ferret' powers new system-wide writing tools, while PCC handles heavy AI workloads under end-to-end encryption.",
+      image:
+        "https://images.unsplash.com/photo-1557872945-32ff50b37b14?auto=format&fit=crop&w=800&q=80",
+      date: "June 7, 2025",
+      slug: "wwdc-2025-apple-intelligence",
+      keywords: ["Apple", "WWDC 2025", "on-device AI", "privacy"],
     },
     {
-      title: "AI-Powered Business Solutions",
-      description: "How Google and ChatGPT are helping businesses leverage AI for growth and innovation.",
-      image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=600&q=80",
-      date: "February 28, 2025",
-      slug: "ai-business-solutions",
-      keywords: ["AI business", "enterprise AI", "AI tools", "business automation"],
+      title: "OpenAI & Google Sign Historic AI Safety Accord",
+      description:
+        "The two rivals commit to shared eval benchmarks, red-team data pools, and an emergency 'Kill-Switch' protocol for frontier models.",
+      image:
+        "https://images.unsplash.com/photo-1556742449-2b2a7c59b513?auto=format&fit=crop&w=800&q=80",
+      date: "June 3, 2025",
+      slug: "ai-safety-accord",
+      keywords: ["AI safety", "OpenAI", "Google", "governance"],
     },
     {
-      title: "The AI Arms Race: Google vs ChatGPT",
-      description: "A comparative analysis of AI strategies between Google and ChatGPT.",
-      image: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80",
-      date: "February 15, 2025",
-      slug: "ai-arms-race",
-      keywords: ["AI competition", "tech giants", "AI development", "innovation race"],
+      title: "AI-Generated Pop Hit 'Neon Dreams' Breaks into Billboard Top 10",
+      description:
+        "Co-created by musician Ava Rae and Sony's MuseNet-X, the track sparks debate on royalties for synthetic artists.",
+      image:
+        "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=800&q=80",
+      date: "June 1, 2025",
+      slug: "neon-dreams-ai-music",
+      keywords: ["AI music", "Billboard", "MuseNet-X", "copyright"],
     },
   ]
 
@@ -68,9 +79,9 @@ export default function BlogPage() {
           <h1 className="text-4xl md:text-5xl font-bold text-vanguard-blue mb-6">
             <AnimatedTextHeader
               phrases={[
-                t("news.title"),
-                t("news.subtitle"),
-                "AI, Technology, Business"
+                t("events.title"),
+                t("events.subtitle"),
+                "Events, Updates, Company"
               ]}
               className="text-vanguard-blue"
             />

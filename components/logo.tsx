@@ -25,12 +25,15 @@ export function Logo({ className = "", variant = "default" }: LogoProps) {
           alt="VANGUARD-IA Logo"
           width={40}
           height={40}
+          style={{ height: 'auto' }}
           className={`object-contain transition-transform duration-300 ${isHovered ? "scale-110" : ""}`}
         />
       </div>
       <span
-        className={`ml-2 text-2xl font-bold transition-all duration-300 ${
-          variant === "white" ? "text-white" : "text-vanguard-blue"
+        className={`ml-2 text-2xl font-bold transition-all duration-300 font-heading ${
+          variant === "white"
+            ? "text-white"
+            : "bg-gradient-to-r from-vanguard-500 to-vanguard-300 bg-clip-text text-transparent"
         } ${isHovered ? "tracking-wider" : ""}`}
       >
         VANGUARD-IA

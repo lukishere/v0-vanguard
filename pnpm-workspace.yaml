@@ -1,2 +1,8 @@
 overrides:
   default-connector: link:../../../../AppData/Local/pnpm/global/5/node_modules/dataconnect-generated/js/default-connector
+
+onlyBuiltDependencies:
+  - '@firebase/util'
+  - protobufjs
+  - sharp
+  - unrs-resolver

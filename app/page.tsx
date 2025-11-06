@@ -5,11 +5,14 @@ import { CTAButton } from "@/components/cta-button"
 import { ServiceCard } from "@/components/service-card"
 import { BlogCard } from "@/components/blog-card"
 import { ClientReview } from "@/components/client-review"
-import { AIFeatureShowcase } from "@/components/ai-feature-showcase"
+import { CircuitPattern } from "@/components/circuit-pattern"
 import { Brain, Server, Globe, Database, Shield } from "lucide-react"
 import Image from "next/image"
 import type { BusinessType } from "@/components/client-review"
 import AnimatedTextHeader from "@/components/animated-text-header"
+import LiveChat from '@/components/chatbot'
+import LogoLoop from "@/components/LogoLoop"
+import "@/components/LogoLoop.css"
 
 export default function Home() {
   const { t, language } = useLanguage()
@@ -113,32 +116,88 @@ export default function Home() {
 
   return (
     <>
-      {/* Hero Section with New Image */}
+      {/* Hero Section with Original Image */}
       <section className="vanguard-section bg-white">
         <div className="vanguard-container">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h1 className="text-4xl md:text-5xl font-bold text-vanguard-blue mb-6">
-                <AnimatedTextHeader
-                  phrases={[
-                    language === "en"
-                      ? "Innovation and creativity to transform your business"
-                      : "Innovación y creatividad para transformar tu negocio",
-                    language === "en"
-                      ? "Advanced AI Solutions"
-                      : "Soluciones avanzadas de IA",
-                    language === "en"
-                      ? "Cutting-Edge Technology"
-                      : "Tecnología de vanguardia"
-                  ]}
-                  className="text-vanguard-blue"
-                />
-              </h1>
-              <div className="vanguard-divider"></div>
-              <p className="text-xl text-gray-600 mb-8">{t("hero.subtitle")}</p>
+            <div className="space-y-6">
+              <div className="space-y-4">
+                <div className="w-full min-h-[8rem] sm:min-h-[9rem] lg:min-h-[10rem] flex items-center justify-start">
+                  <AnimatedTextHeader
+                    phrases={[
+                      language === "en"
+                        ? "Innovation and creativity to transform your business"
+                        : "Innovación y creatividad para transformar tu negocio",
+                      language === "en"
+                        ? "Advanced AI Solutions"
+                        : "Soluciones avanzadas de IA",
+                      language === "en"
+                        ? "Cutting-Edge Technology"
+                        : "Tecnología de vanguardia"
+                    ]}
+                    className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-vanguard-blue leading-tight"
+                  />
+                </div>
+                <div className="vanguard-divider"></div>
+              </div>
+              <p className="text-lg sm:text-xl text-gray-600 leading-relaxed max-w-2xl">{t("hero.subtitle")}</p>
               <div className="flex flex-wrap gap-4">
-                <CTAButton type="quote" />
                 <CTAButton type="learn" />
+              </div>
+              <div className="mt-8">
+                <LogoLoop 
+                  logos={[
+                    { 
+                      src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg", 
+                      alt: "GitHub",
+                      href: "https://github.com"
+                    },
+                    { 
+                      src: "https://cdn.simpleicons.org/perplexity/000000", 
+                      alt: "Perplexity AI",
+                      href: "https://www.perplexity.ai"
+                    },
+                    { 
+                      src: "https://cdn.simpleicons.org/anthropic/000000", 
+                      alt: "Claude Code",
+                      href: "https://www.anthropic.com"
+                    },
+                    { 
+                      src: "https://cursor.com/favicon.svg", 
+                      alt: "Cursor AI",
+                      href: "https://cursor.sh"
+                    },
+                    { 
+                      src: "https://cdn.simpleicons.org/n8n/000000", 
+                      alt: "N8N",
+                      href: "https://n8n.io"
+                    },
+                    { 
+                      src: "https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg", 
+                      alt: "AWS",
+                      href: "https://aws.amazon.com"
+                    },
+                    { 
+                      src: "https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg", 
+                      alt: "Microsoft",
+                      href: "https://www.microsoft.com"
+                    },
+                    { 
+                      src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg", 
+                      alt: "Google",
+                      href: "https://www.google.com"
+                    },
+                    { 
+                      src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg", 
+                      alt: "Figma",
+                      href: "https://www.figma.com"
+                    },
+                  ]}
+                  speed={60}
+                  logoHeight={40}
+                  gap={48}
+                  pauseOnHover={true}
+                />
               </div>
             </div>
             <div className="relative">
@@ -157,24 +216,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* AI Feature Showcase */}
-      <section className="vanguard-section bg-vanguard-blue">
-        <div className="vanguard-container">
-          <div className="text-center mb-12">
-            <p className="text-blue-100 max-w-2xl mx-auto">
-              {language === "en"
-                ? "Ask our AI assistant about our services, security, branding, and more. Powered by Groq for instant answers."
-                : "Pregunte a nuestro asistente de IA sobre servicios, seguridad, branding y más."}
-            </p>
-          </div>
-          <div className="max-w-xl mx-auto">
-            <AIFeatureShowcase />
-          </div>
-        </div>
-      </section>
-
       {/* Services Section */}
-      <section className="vanguard-section bg-white">
+      <section className="vanguard-section bg-gray-50 relative overflow-hidden">
+        <CircuitPattern opacity={0.03} />
         <div className="vanguard-container">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-vanguard-blue mb-4">{t("services.title")}</h2>
@@ -189,8 +233,8 @@ export default function Home() {
       </section>
 
       {/* Client Reviews Section */}
-      <section className="vanguard-section bg-vanguard-blue">
-        <div className="vanguard-container">
+      <section className="vanguard-section bg-vanguard-blue relative overflow-hidden" style={{ zIndex: 30, position: 'relative' }}>
+        <div className="vanguard-container" style={{ position: 'relative', zIndex: 31 }}>
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-white mb-4">{t("reviews.title")}</h2>
             <p className="text-blue-100 max-w-2xl mx-auto">{t("reviews.subtitle")}</p>
@@ -210,6 +254,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+      <LiveChat />
     </>
   )
 }

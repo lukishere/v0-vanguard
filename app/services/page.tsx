@@ -195,7 +195,7 @@ export default function ServicesPage() {
       {/* Hero Section */}
       <section className="vanguard-section bg-white">
         <div className="vanguard-container">
-          <h1 className="text-4xl md:text-5xl font-bold text-vanguard-blue mb-6">
+          <div className="text-4xl md:text-5xl font-bold text-vanguard-blue mb-6">
             <AnimatedTextHeader
               phrases={[
                 currentContent.title,
@@ -206,14 +206,36 @@ export default function ServicesPage() {
               ]}
               className="text-vanguard-blue"
             />
-          </h1>
+          </div>
           <div className="vanguard-divider"></div>
         </div>
       </section>
 
+      {/* Services Video Section */}
+      <section className="vanguard-section bg-gray-50">
+        <div className="vanguard-container">
+          <div className="max-w-4xl mx-auto">
+            <div className="aspect-video rounded-lg overflow-hidden shadow-xl bg-black">
+              <video
+                className="w-full h-full object-contain"
+                controls
+                preload="metadata"
+                aria-label={language === "en" ? "Services explanation video" : "Video explicativo de servicios"}
+              >
+                <source src="/videos/services-video.mp4" type="video/mp4" />
+                {language === "en" 
+                  ? "Your browser does not support the video tag."
+                  : "Su navegador no admite la etiqueta de video."}
+              </video>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* New Services Layout */}
-      <section className="flex justify-center items-center py-1 bg-white">
-        <div className="flex flex-col gap-8 items-center mr-8">
+      <section className="flex flex-col md:flex-row justify-center items-center py-8 md:py-1 bg-white gap-4 md:gap-0">
+        {/* Left side icons - hidden on mobile, shown on desktop */}
+        <div className="hidden md:flex flex-col gap-8 items-center mr-8">
           {services.slice(0, 3).map((service, idx) => {
             const Icon = service.icon
             return (
@@ -229,26 +251,30 @@ export default function ServicesPage() {
             )
           })}
         </div>
-        <div className="service-info-area mx-4 p-10 rounded-2xl shadow-xl bg-gray-50 border-2 border-gray-200 min-w-[350px] max-w-[420px] min-h-[350px] flex flex-col justify-center items-center">
+        
+        {/* Service info area - responsive */}
+        <div className="service-info-area mx-4 p-6 md:p-10 rounded-2xl shadow-xl bg-gray-50 border-2 border-gray-200 w-full md:min-w-[350px] md:max-w-[420px] min-h-[350px] flex flex-col justify-center items-center">
           <div className="flex flex-col items-center">
             <div className="mb-4">
-              <selectedService.icon className="h-16 w-16 text-vanguard-blue" />
+              <selectedService.icon className="h-12 w-12 md:h-16 md:w-16 text-vanguard-blue" />
             </div>
-            <h2 className="text-2xl font-bold text-vanguard-blue mb-2">{selectedService.title}</h2>
+            <h2 className="text-xl md:text-2xl font-bold text-vanguard-blue mb-2 text-center">{selectedService.title}</h2>
             <div className="w-12 h-1 bg-vanguard-red mb-4"></div>
-            <p className="text-gray-600 mb-6 text-center">{selectedService.description}</p>
-            <ul className="text-left space-y-2 mb-6">
+            <p className="text-gray-600 mb-6 text-center text-sm md:text-base px-2">{selectedService.description}</p>
+            <ul className="text-left space-y-2 mb-6 w-full max-w-sm px-4">
               {selectedService.features.map((feature, i) => (
-                <li key={i} className="flex items-center text-gray-700">
-                  <CheckCircle className="h-5 w-5 text-vanguard-blue mr-2" />
-                  {feature}
+                <li key={i} className="flex items-start text-gray-700 text-sm md:text-base">
+                  <CheckCircle className="h-4 w-4 md:h-5 md:w-5 text-vanguard-blue mr-2 mt-0.5 flex-shrink-0" />
+                  <span>{feature}</span>
                 </li>
               ))}
             </ul>
             <CTAButton type="quote" />
           </div>
         </div>
-        <div className="flex flex-col gap-4 items-center ml-8">
+        
+        {/* Right side icons - hidden on mobile, shown on desktop */}
+        <div className="hidden md:flex flex-col gap-4 items-center ml-8">
           {services.slice(3, 6).map((service, idx) => {
             const Icon = service.icon
             const realIdx = idx + 3
@@ -260,6 +286,24 @@ export default function ServicesPage() {
                 aria-label={service.title}
               >
                 <Icon className="h-10 w-10" />
+                <span className="sr-only">{service.title}</span>
+              </button>
+            )
+          })}
+        </div>
+        
+        {/* Mobile: Service selector buttons below the card */}
+        <div className="md:hidden flex flex-wrap justify-center gap-4 mt-4 px-4">
+          {services.map((service, idx) => {
+            const Icon = service.icon
+            return (
+              <button
+                key={service.title}
+                className={`service-circle ${selectedIndex === idx ? "active" : ""}`}
+                onClick={() => setSelectedIndex(idx)}
+                aria-label={service.title}
+              >
+                <Icon className="h-8 w-8" />
                 <span className="sr-only">{service.title}</span>
               </button>
             )

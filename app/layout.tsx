@@ -5,9 +5,10 @@ import "./globals.css"
 import { LanguageProvider } from "@/contexts/language-context"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
-import { Chatbot } from "@/components/chatbot"
 import { CursorTrail } from "@/components/cursor-trail"
-import { ParticleBackground } from "@/components/particle-background"
+import ReactParticlesBackground from "@/components/react-particles-background"
+import LiveChat from '@/components/chatbot'
+import { KnowledgeBaseProvider } from '@/contexts/knowledge-base-context'
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -26,14 +27,16 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <LanguageProvider>
-          <div className="flex flex-col min-h-screen">
-            <ParticleBackground />
-            <Header />
-            <main className="flex-grow">{children}</main>
-            <Footer />
-            <Chatbot />
-            <CursorTrail />
-          </div>
+          <KnowledgeBaseProvider>
+            <ReactParticlesBackground />
+            <div className="flex flex-col min-h-screen relative">
+              <Header />
+              <main className="flex-grow">{children}</main>
+              <Footer />
+              <CursorTrail />
+              {/* <LiveChat /> */}
+            </div>
+          </KnowledgeBaseProvider>
         </LanguageProvider>
       </body>
     </html>

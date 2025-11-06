@@ -6,7 +6,7 @@ import Link from "next/link"
 interface BlogCardProps {
   title: string
   description: string
-  image: string
+  image: string | null
   date: string
   slug: string
   keywords?: string[]
@@ -25,21 +25,28 @@ export function BlogCard({ title, description, image, date, slug, keywords = [] 
 
   return (
     <Card className="vanguard-card border-0 overflow-hidden group">
-      <div className="relative h-48 w-full overflow-hidden">
-        <a href={generateGoogleNewsUrl()} target="_blank" rel="noopener noreferrer">
-          <Image
-            src={image || "/placeholder.svg"}
-            alt={title}
-            fill
-            className="object-cover transition-transform duration-700 group-hover:scale-110"
-          />
-        </a>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-        <div className="absolute top-2 right-2 bg-white/90 text-vanguard-blue text-xs font-medium py-1 px-2 rounded">
-          {date}
+      {image && (
+        <div className="relative h-48 w-full overflow-hidden">
+          <a href={generateGoogleNewsUrl()} target="_blank" rel="noopener noreferrer">
+            <Image
+              src={image}
+              alt={title}
+              fill
+              className="object-cover transition-transform duration-700 group-hover:scale-110"
+            />
+          </a>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="absolute top-2 right-2 bg-white/90 text-vanguard-blue text-xs font-medium py-1 px-2 rounded">
+            {date}
+          </div>
         </div>
-      </div>
+      )}
       <CardHeader className="pb-2">
+        {!image && (
+          <div className="text-vanguard-blue text-xs font-medium mb-2">
+            {date}
+          </div>
+        )}
         <CardTitle className="text-vanguard-blue">
           {title}
         </CardTitle>

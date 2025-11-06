@@ -4,10 +4,18 @@ import { createContext, useContext, useState, useEffect, type ReactNode } from "
 
 type Language = "en" | "es"
 
+type TranslationKey = keyof typeof translations.en
+
+type Translations = {
+  [K in Language]: {
+    [key in TranslationKey]: string
+  }
+}
+
 type LanguageContextType = {
   language: Language
   setLanguage: (language: Language) => void
-  t: (key: string) => string
+  t: (key: TranslationKey) => string
 }
 
 const translations = {
@@ -15,7 +23,7 @@ const translations = {
     "nav.home": "Home",
     "nav.about": "About",
     "nav.services": "Services",
-    "nav.news": "News",
+    "nav.events": "Events",
     "nav.contact": "Contact",
     "cta.learnMore": "Learn More",
     "cta.readNews": "Read News Articles",
@@ -44,13 +52,14 @@ const translations = {
     "contact.subtitle": "Get in touch with our team of experts",
     "contact.form.name": "Name",
     "contact.form.email": "Email",
+    "contact.form.message": "Message",
     "contact.form.submit": "Submit",
     "contact.address": "Location",
     "contact.phone": "Phone",
     "contact.email": "Email",
     "footer.rights": "All rights reserved",
-    "news.title": "Latest AI News",
-    "news.subtitle": "Stay updated with the latest developments in AI from Google and ChatGPT",
+    "events.title": "Latest Events",
+    "events.subtitle": "Stay updated with our latest events and company updates",
     "about.team": "Our Team",
     "about.mission": "Our Mission",
     "about.vision": "Our Vision",
@@ -70,22 +79,8 @@ const translations = {
     "contact.form.sent": "Your message has been sent successfully. We'll get back to you shortly.",
     "contact.form.sending": "Sending...",
     "faq.didntFind": "Didn't find what you're looking for?",
-    "chat.title": "Chat with us",
-    "chat.placeholder": "Type your question here...",
-    "chat.send": "Send",
-    "chat.greeting": "Hello! I'm VANGUARD-IA's AI assistant. How can I help you today?",
-    "chat.close": "Close",
-    "chat.open": "Chat with us",
     "reviews.title": "What Our Clients Say",
     "reviews.subtitle": "Trusted by businesses across industries",
-    "ai.showcase.title": "Groq-Powered Technology",
-    "ai.showcase.placeholder": "Ask about our services...",
-    "ai.showcase.button": "Get Response",
-    "ai.showcase.processing": "Processing...",
-    "ai.showcase.response": "Response:",
-    "ai.showcase.generating": "Generating response...",
-    "ai.showcase.hint": "Ask about our services using the examples above.",
-    "contact.form.message": "Request a Quote",
     "contact.country": "Spain",
     "contact.hours.weekdays": "Monday - Friday:",
     "contact.hours.saturday": "Saturday:",
@@ -96,14 +91,14 @@ const translations = {
     "nav.home": "Inicio",
     "nav.about": "Nosotros",
     "nav.services": "Servicios",
-    "nav.news": "Noticias",
+    "nav.events": "Eventos",
     "nav.contact": "Contacto",
     "cta.learnMore": "Saber Más",
     "cta.readNews": "Leer Artículos de Noticias",
     "cta.contactUs": "Contáctanos",
     "cta.getQuote": "Solicitar Presupuesto",
     "hero.title": "Innovación y creatividad para transformar tu negocio",
-    "hero.subtitle": "Consultoría especializada en IA, Aplicaciones - Branding Web, Servicios Informáticos, Infraestructura y Seguridad",
+    "hero.subtitle": "Consultoría especializada en Agentes de IA, Automatizacion, Bots, Servicios Informáticos, Infraestructura y Seguridad",
     "services.title": "Nuestros Servicios",
     "services.ai.title": "Desarrollo de IA",
     "services.ai.description":
@@ -126,13 +121,14 @@ const translations = {
     "contact.subtitle": "Ponte en contacto con nuestro equipo de expertos",
     "contact.form.name": "Nombre",
     "contact.form.email": "Correo electrónico",
+    "contact.form.message": "Mensaje",
     "contact.form.submit": "Enviar",
     "contact.address": "Ubicación",
     "contact.phone": "Teléfono",
     "contact.email": "Correo electrónico",
     "footer.rights": "Todos los derechos reservados",
-    "news.title": "Últimas Noticias de IA",
-    "news.subtitle": "Mantente actualizado con los últimos desarrollos en IA de Google y ChatGPT",
+    "events.title": "Últimos Eventos",
+    "events.subtitle": "Mantente actualizado con nuestros últimos eventos y actualizaciones de la empresa",
     "about.team": "Nuestro Equipo",
     "about.mission": "Nuestra Misión",
     "about.vision": "Nuestra Visión",
@@ -152,52 +148,41 @@ const translations = {
     "contact.form.sent": "Tu mensaje ha sido enviado con éxito. Nos pondremos en contacto contigo en breve.",
     "contact.form.sending": "Enviando...",
     "faq.didntFind": "¿No encontraste lo que buscabas?",
-    "chat.title": "Chatea con nosotros",
-    "chat.placeholder": "Escribe tu pregunta aquí...",
-    "chat.send": "Enviar",
-    "chat.greeting": "¡Hola! Soy el asistente de IA de VANGUARD-IA. ¿Cómo puedo ayudarte hoy?",
-    "chat.close": "Cerrar",
-    "chat.open": "Chatea con nosotros",
     "reviews.title": "Lo Que Dicen Nuestros Clientes",
     "reviews.subtitle": "Confiado por empresas de diversas industrias",
-    "ai.showcase.title": "Tecnología Potenciada por Groq",
-    "ai.showcase.placeholder": "Pregunte sobre nuestros servicios...",
-    "ai.showcase.button": "Obtener Respuesta",
-    "ai.showcase.processing": "Procesando...",
-    "ai.showcase.response": "Respuesta:",
-    "ai.showcase.generating": "Generando respuesta...",
-    "ai.showcase.hint": "Pregunte sobre nuestros servicios usando los ejemplos anteriores.",
-    "contact.form.message": "Solicitar un Presupuesto",
     "contact.country": "España",
     "contact.hours.weekdays": "Lunes - Viernes:",
     "contact.hours.saturday": "Sábado:",
     "contact.hours.sunday": "Domingo:",
     "contact.hours.closed": "Cerrado",
-  },
-}
+  }
+} as const
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguage] = useState<Language>("en")
 
-  // Function to get translation
-  const t = (key: string): string => {
-    const currentTranslations = translations[language]
-    return currentTranslations[key as keyof typeof currentTranslations] || key
+  // Function to get translation with improved type safety
+  const t = (key: TranslationKey): string => {
+    return translations[language][key] || key
   }
 
   // Store language preference in localStorage
   useEffect(() => {
-    const savedLanguage = localStorage.getItem("vanguard-language") as Language | null
-    if (savedLanguage && (savedLanguage === "en" || savedLanguage === "es")) {
-      setLanguage(savedLanguage)
+    if (typeof window !== 'undefined') {
+      const savedLanguage = localStorage.getItem("vanguard-language") as Language | null
+      if (savedLanguage && (savedLanguage === "en" || savedLanguage === "es")) {
+        setLanguage(savedLanguage)
+      }
     }
   }, [])
 
   // Update localStorage when language changes
   useEffect(() => {
-    localStorage.setItem("vanguard-language", language)
+    if (typeof window !== 'undefined') {
+      localStorage.setItem("vanguard-language", language)
+    }
   }, [language])
 
   return <LanguageContext.Provider value={{ language, setLanguage, t }}>{children}</LanguageContext.Provider>

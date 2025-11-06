@@ -27,6 +27,11 @@ const config = {
         vanguard: {
           blue: "#0047AB", // Metallic blue color from the business card
           red: "#D32F2F", // Red accent color
+          700: "#0047AB",
+          600: "#005FCC",
+          500: "#0A72E9",
+          400: "#3C8FF0",
+          300: "#74ACF6",
         },
         primary: {
           DEFAULT: "hsl(var(--primary))",
@@ -121,6 +126,10 @@ const config = {
         "fade-out": "fade-out 0.3s ease-out",
         "subtle-attention": "subtle-attention 2s ease-in-out",
         vibrate: "vibrate 0.8s ease-in-out",
+      },
+      fontFamily: {
+        sans: ["Inter", "Helvetica", "Arial", "sans-serif"],
+        heading: ["Poppins", "Helvetica", "Arial", "sans-serif"],
       },
     },
   },

@@ -63,14 +63,14 @@ export default function ContactPage() {
     {
       icon: Mail,
       title: t("contact.email"),
-      content: "sales@vanguard-ia.tech",
-      href: "mailto:sales@vanguard-ia.tech",
+      content: "contacto@vanguard-ia.tech",
+      href: "mailto:contacto@vanguard-ia.tech",
     },
     {
       icon: Phone,
       title: t("contact.phone"),
-      content: "+34 627 961 956",
-      href: "tel:+34627961956",
+      content: "+34 644 059 040",
+      href: "tel:+34644059040",
     },
     {
       icon: MapPin,
@@ -85,23 +85,23 @@ export default function ContactPage() {
       {/* Hero Section */}
       <section className="vanguard-section bg-white">
         <div className="vanguard-container">
-          <h1 className="text-4xl md:text-5xl font-bold text-vanguard-blue mb-6">
+          <div className="text-4xl md:text-5xl font-bold text-vanguard-blue mb-6">
             <AnimatedTextHeader
               phrases={[
                 t("contact.title"),
                 t("contact.subtitle"),
-                "sales@vanguard-ia.tech"
+                "contacto@vanguard-ia.tech"
               ]}
               className="text-vanguard-blue"
             />
-          </h1>
+          </div>
           <div className="vanguard-divider"></div>
         </div>
       </section>
 
       {/* Contact Form Section */}
-      <section className="vanguard-section">
-        <div className="vanguard-container">
+      <section className="vanguard-section" style={{ zIndex: 30, position: 'relative' }}>
+        <div className="vanguard-container" style={{ position: 'relative', zIndex: 31 }}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Contact Form */}
             <Card className="vanguard-card border-0">
