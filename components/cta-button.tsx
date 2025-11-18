@@ -26,12 +26,12 @@ export function CTAButton({ type, className = "", href, text, isExternal = false
     },
     contact: {
       text: text || t("cta.contactUs"),
-      href: href || "/contact",
+      href: href || "/contact/",
       variant: "secondary" as const,
     },
     quote: {
       text: text || t("cta.getQuote"),
-      href: href || "/contact?quote=true",
+      href: href || "/contact/?quote=true",
       variant: "default" as const,
     },
     external: {

@@ -1,15 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
 import nodemailer from 'nodemailer';
-import { 
-  AppError, 
-  ValidationError, 
-  RateLimitError, 
+import {
+  AppError,
+  ValidationError,
+  RateLimitError,
   ExternalServiceError,
   ErrorHandler,
   ErrorCodes,
   ErrorTypes,
-  createRequestContext 
+  createRequestContext
 } from '@/lib/errors';
 import { logger, createLogContext, measurePerformance, LogCategory } from '@/lib/logger';
 import { InputValidator } from '@/lib/validation';
@@ -60,6 +59,7 @@ const rateLimitMap = new Map<string, RateLimitEntry>();
 const RATE_LIMIT_WINDOW = 15 * 60 * 1000; // 15 minutes
 const RATE_LIMIT_MAX_REQUESTS = 5;
 const RATE_LIMIT_BLOCK_DURATION = 60 * 60 * 1000; // 1 hour block after exceeding
+const RECAPTCHA_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify';
 
 // Enhanced HTML sanitization
 function sanitizeInput(input: string): string {
@@ -121,14 +121,15 @@ function checkRateLimit(ip: string): { allowed: boolean; resetTime?: number } {
 function validateEnvironment(): void {
   const requiredVars = [
     'SMTP_HOST',
-    'SMTP_PORT', 
+    'SMTP_PORT',
     'SMTP_USER',
     'SMTP_PASS',
-    'CONTACT_EMAIL'
+    'CONTACT_EMAIL',
+    'RECAPTCHA_SECRET_KEY'
   ];
 
   const missing = requiredVars.filter(varName => !process.env[varName]);
-  
+
   if (missing.length > 0) {
     throw new AppError(
       'ConfigurationError',
@@ -189,6 +190,56 @@ Message: ${sanitizeInput(message)}
   }
 }
 
+type RecaptchaVerificationResponse = {
+  success: boolean;
+  challenge_ts?: string;
+  hostname?: string;
+  'error-codes'?: string[];
+  score?: number;
+  action?: string;
+};
+
+async function verifyRecaptchaToken(token: string, remoteIp?: string): Promise<RecaptchaVerificationResponse> {
+  const secretKey = process.env.RECAPTCHA_SECRET_KEY;
+
+  const formData = new URLSearchParams();
+  if (!secretKey) {
+    throw new AppError(
+      'ConfigurationError',
+      ErrorCodes.INTERNAL_SERVER_ERROR,
+      ErrorTypes.CONFIGURATION_ERROR,
+      'Missing RECAPTCHA_SECRET_KEY environment variable',
+      false
+    );
+  }
+
+  formData.append('secret', secretKey);
+  formData.append('response', token);
+  if (remoteIp) {
+    formData.append('remoteip', remoteIp);
+  }
+
+  let response: Response;
+  try {
+    response = await fetch(RECAPTCHA_VERIFY_URL, {
+      method: 'POST',
+      body: formData
+    });
+  } catch (networkError) {
+    throw new ExternalServiceError(`Failed to contact captcha verification service: ${networkError instanceof Error ? networkError.message : 'Unknown error'}`);
+  }
+
+  if (!response.ok) {
+    throw new ExternalServiceError(`Captcha verification service responded with status ${response.status}`);
+  }
+
+  try {
+    return await response.json() as RecaptchaVerificationResponse;
+  } catch {
+    throw new ExternalServiceError('Captcha verification service returned an invalid response');
+  }
+}
+
 export async function POST(request: NextRequest) {
   const startTime = Date.now();
   const requestContext = createRequestContext(request);
@@ -209,34 +260,72 @@ export async function POST(request: NextRequest) {
       throw new ValidationError('Invalid JSON in request body', requestContext);
     }
 
+    // Basic honeypot check for spam bots
+    if (typeof body?.honeypot === 'string' && body.honeypot.trim().length > 0) {
+      logger.warn('Honeypot field detected, likely bot submission', LogCategory.API, logContext);
+      throw new ValidationError('Invalid submission detected', requestContext);
+    }
+
     // Enhanced validation using our custom validator
     const validationResult = InputValidator.validateContactForm(body);
     if (!validationResult.isValid) {
       const errorMessages = Object.entries(validationResult.errors)
         .map(([field, errors]) => `${field}: ${errors.join(', ')}`)
         .join('; ');
-      
+
       logger.warn(`Enhanced validation failed: ${errorMessages}`, LogCategory.API, logContext, {
         validationErrors: validationResult.errors
       });
-      
+
       throw new ValidationError(`Validation failed: ${errorMessages}`, requestContext);
     }
 
-    const { name, email, message } = validationResult.sanitizedData!;
+    const sanitizedData = validationResult.sanitizedData;
+    if (!sanitizedData) {
+      throw new ValidationError('Unable to process contact data', requestContext);
+    }
+
+    const { name, email, message, captchaToken } = sanitizedData;
 
     // Enhanced rate limiting
     const clientIP = requestContext.ip || 'unknown';
     const rateLimitResult = checkRateLimit(clientIP);
-    
+
     if (!rateLimitResult.allowed) {
-      logger.rateLimitExceeded(logContext, { 
+      logger.rateLimitExceeded(logContext, {
         ip: clientIP,
-        resetTime: rateLimitResult.resetTime 
+        resetTime: rateLimitResult.resetTime
       });
-      
+
       const resetTime = rateLimitResult.resetTime ? new Date(rateLimitResult.resetTime).toISOString() : 'unknown';
       throw new RateLimitError(`Rate limit exceeded. ${resetTime ? `Try again after ${resetTime}` : 'Please try again later.'}`);
+    }
+
+    // Verify reCAPTCHA v3 token
+    const remoteIp = clientIP === 'unknown' ? undefined : clientIP;
+    const captchaVerification = await verifyRecaptchaToken(captchaToken, remoteIp);
+    if (!captchaVerification.success) {
+      logger.warn('Captcha verification failed', LogCategory.API, logContext, {
+        captchaErrors: captchaVerification['error-codes'] ?? []
+      });
+      throw new ValidationError(
+        `Captcha verification failed${captchaVerification['error-codes']?.length ? `: ${captchaVerification['error-codes']?.join(', ')}` : ''}`,
+        requestContext
+      );
+    }
+
+    // Verify score (reCAPTCHA v3 returns a score from 0.0 to 1.0)
+    // Lower scores indicate higher risk. Typically, scores below 0.5 are considered suspicious
+    const score = captchaVerification.score ?? 0;
+    if (score < 0.5) {
+      logger.warn('Captcha score too low', LogCategory.API, logContext, {
+        score,
+        action: captchaVerification.action
+      });
+      throw new ValidationError(
+        'Captcha verification failed: Low security score',
+        requestContext
+      );
     }
 
     // Send email with performance measurement
@@ -263,24 +352,24 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     const duration = Date.now() - startTime;
     const appError = ErrorHandler.handleError(error as Error, requestContext);
-    
+
     // Log the error
     ErrorHandler.logError(appError);
-    
+
     // Log API response
     logger.apiRequest(
-      request.method, 
-      new URL(request.url).pathname, 
-      appError.httpCode, 
-      duration, 
+      request.method,
+      new URL(request.url).pathname,
+      appError.httpCode,
+      duration,
       logContext
     );
 
     // Return appropriate error response
     const errorResponse = ErrorHandler.createErrorResponse(appError, process.env.NODE_ENV === 'development');
-    
-    return NextResponse.json(errorResponse, { 
-      status: appError.httpCode 
+
+    return NextResponse.json(errorResponse, {
+      status: appError.httpCode
     });
   }
 }
@@ -294,7 +383,7 @@ export async function GET() {
     'GET method not allowed for this endpoint',
     true
   );
-  
+
   const errorResponse = ErrorHandler.createErrorResponse(error);
   return NextResponse.json(errorResponse, { status: 405 });
 }
@@ -307,7 +396,7 @@ export async function PUT() {
     'PUT method not allowed for this endpoint',
     true
   );
-  
+
   const errorResponse = ErrorHandler.createErrorResponse(error);
   return NextResponse.json(errorResponse, { status: 405 });
 }
@@ -320,7 +409,7 @@ export async function DELETE() {
     'DELETE method not allowed for this endpoint',
     true
   );
-  
+
   const errorResponse = ErrorHandler.createErrorResponse(error);
   return NextResponse.json(errorResponse, { status: 405 });
-} 
+}

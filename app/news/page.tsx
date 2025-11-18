@@ -3,7 +3,7 @@
 import { useLanguage } from "@/contexts/language-context"
 import { BlogCard } from "@/components/blog-card"
 import { TechBackground } from "@/components/tech-background"
-import AnimatedTextHeader from "@/components/animated-text-header"
+import { SectionTitle } from "@/components/section-title"
 
 export default function BlogPage() {
   const { t } = useLanguage()
@@ -76,16 +76,16 @@ export default function BlogPage() {
       {/* Hero Section */}
       <section className="vanguard-section bg-white">
         <div className="vanguard-container">
-          <h1 className="text-4xl md:text-5xl font-bold text-vanguard-blue mb-6">
-            <AnimatedTextHeader
-              phrases={[
-                t("events.title"),
-                t("events.subtitle"),
-                "Events, Updates, Company"
-              ]}
-              className="text-vanguard-blue"
-            />
-          </h1>
+          <SectionTitle
+            text={[
+              t("events.title"),
+              t("events.subtitle"),
+              "Events, Updates, Company"
+            ]}
+            as="h1"
+            className="text-3xl md:text-4xl text-vanguard-blue mb-6"
+            initialDelay={120}
+          />
           <div className="vanguard-divider"></div>
         </div>
       </section>

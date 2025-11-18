@@ -2,25 +2,36 @@
 // Based on OWASP security best practices
 
 import validator from 'validator';
-import DOMPurify from 'dompurify';
-import { JSDOM } from 'jsdom';
+type AdvancedSanitizeOptions = {
+  normalizeWhitespace?: boolean;
+};
 
-// Initialize DOMPurify for server-side usage
-const window = new JSDOM('').window;
-const purify = DOMPurify(window as any);
+const stripScripts = (value: string) =>
+  value
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
 
-// Configure DOMPurify with strict settings
-purify.setConfig({
-  ALLOWED_TAGS: [], // No HTML tags allowed
-  ALLOWED_ATTR: [], // No attributes allowed
-  KEEP_CONTENT: true, // Keep text content
-  RETURN_DOM: false,
-  RETURN_DOM_FRAGMENT: false,
-  SANITIZE_DOM: true,
-  FORBID_ATTR: ['style', 'class', 'id'],
-  FORBID_CONTENTS: ['script', 'style'],
-  FORBID_TAGS: ['script', 'style', 'iframe', 'object', 'embed', 'form', 'input', 'button']
-});
+const stripTags = (value: string) => value.replace(/<[^>]+>/g, '');
+
+const collapseWhitespace = (value: string) => value.replace(/\s+/g, ' ').trim();
+
+const sanitizeAdvancedInternal = (input: string, options: AdvancedSanitizeOptions = {}) => {
+  const normalizeWhitespace = options.normalizeWhitespace ?? true;
+
+  let cleaned = input;
+
+  cleaned = stripScripts(cleaned);
+  cleaned = stripTags(cleaned);
+  cleaned = validator.stripLow(cleaned, true);
+  cleaned = cleaned.replace(/[<>"'`]/g, '');
+  cleaned = validator.escape(cleaned);
+
+  if (normalizeWhitespace) {
+    cleaned = collapseWhitespace(cleaned);
+  }
+
+  return cleaned;
+};
 
 export interface ValidationOptions {
   minLength?: number;
@@ -38,11 +49,11 @@ export interface ValidationResult {
 }
 
 export class InputValidator {
-  
+
   // Basic sanitization - removes dangerous characters and patterns
   static sanitizeBasic(input: string): string {
     if (!input || typeof input !== 'string') return '';
-    
+
     return input
       .trim()
       // Remove null bytes
@@ -64,17 +75,9 @@ export class InputValidator {
   // Advanced sanitization using DOMPurify
   static sanitizeAdvanced(input: string): string {
     if (!input || typeof input !== 'string') return '';
-    
-    // First pass: basic sanitization
-    let sanitized = this.sanitizeBasic(input);
-    
-    // Second pass: DOMPurify
-    sanitized = purify.sanitize(sanitized, { 
-      ALLOWED_TAGS: [],
-      ALLOWED_ATTR: [],
-      KEEP_CONTENT: true 
-    });
-    
+
+    const sanitized = sanitizeAdvancedInternal(this.sanitizeBasic(input));
+
     return sanitized;
   }
 
@@ -244,29 +247,29 @@ export class InputValidator {
       /javascript:/i,
       /vbscript:/i,
       /on\w+\s*=/i,
-      
+
       // SQL injection attempts
       /union\s+select/i,
       /drop\s+table/i,
       /insert\s+into/i,
       /delete\s+from/i,
-      
+
       // Command injection attempts
       /\|\s*\w+/,
       /;\s*\w+/,
       /&&\s*\w+/,
       /\$\(/,
       /`[^`]*`/,
-      
+
       // Path traversal attempts
       /\.\.\//,
       /\.\.\\/,
-      
+
       // Protocol handlers
       /file:/i,
       /ftp:/i,
       /ldap:/i,
-      
+
       // Suspicious encodings
       /%[0-9a-f]{2}/i,
       /\\u[0-9a-f]{4}/i,
@@ -321,7 +324,7 @@ export class InputValidator {
   // Comprehensive validation for contact form
   static validateContactForm(data: Record<string, unknown>): {
     isValid: boolean;
-    sanitizedData?: { name: string; email: string; message: string };
+    sanitizedData?: { name: string; email: string; message: string; captchaToken: string };
     errors: Record<string, string[]>;
   } {
     const errors: Record<string, string[]> = {};
@@ -344,6 +347,15 @@ export class InputValidator {
       errors.message = messageResult.errors;
     }
 
+    // Validate captcha token
+    const captchaRaw = String(data.captchaToken ?? '');
+    const captchaToken = this.sanitizeBasic(captchaRaw);
+    if (!captchaToken) {
+      errors.captchaToken = ['Captcha verification is required'];
+    } else if (captchaToken.length < 10) {
+      errors.captchaToken = ['Captcha token appears invalid'];
+    }
+
     const isValid = Object.keys(errors).length === 0;
 
     return {
@@ -351,7 +363,8 @@ export class InputValidator {
       sanitizedData: isValid ? {
         name: nameResult.sanitizedValue ?? '',
         email: emailResult.sanitizedValue ?? '',
-        message: messageResult.sanitizedValue ?? ''
+        message: messageResult.sanitizedValue ?? '',
+        captchaToken
       } : undefined,
       errors
     };
@@ -401,4 +414,4 @@ export const ValidationUtils = {
     const cleaned = phone.replace(/\D/g, '');
     return validator.isMobilePhone(cleaned) ? cleaned : null;
   }
-}; 
+};

@@ -1,109 +1,182 @@
-import { pipeline } from '@xenova/transformers';
-import { Document } from 'langchain/document';
-import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
+import { Document } from "langchain/document"
+import { RecursiveCharacterTextSplitter } from "langchain/text_splitter"
+import { getKnowledgeEntries, KnowledgeEntry } from "./data-loader"
 
-export interface ContentMetadata {
-  source: string;
-  type: 'services' | 'faq' | 'about' | 'terms' | 'privacy';
-  language: 'en' | 'es';
-  title?: string;
+// Feature flag to completely disable transformers import
+const ENABLE_TRANSFORMERS = false // Set to true only when transformers is working
+
+export type ContentMetadata = {
+  source: string
+  type: KnowledgeEntry["type"]
+  language: KnowledgeEntry["language"]
+  title?: string
+}
+
+type KnowledgeDocument = {
+  doc: Document
+  embedding: number[]
 }
 
 export class KnowledgeBase {
-  private model: any;
-  private documents: Document[] = [];
-  private splitter: RecursiveCharacterTextSplitter;
-  private initialized = false;
+  private model: any
+  private documents: KnowledgeDocument[] = []
+  private splitter: RecursiveCharacterTextSplitter
+  private initialized = false
+  private loadedDefaultContent = false
 
   constructor() {
     this.splitter = new RecursiveCharacterTextSplitter({
       chunkSize: 1000,
       chunkOverlap: 200,
-    });
+    })
   }
 
   async initialize() {
-    if (this.initialized) return;
-    
+    if (this.initialized) {
+      return
+    }
+
+    // Completely disable transformers when flag is false
+    if (!ENABLE_TRANSFORMERS) {
+      console.warn("Transformers disabled via feature flag - KnowledgeBase will operate in degraded mode")
+      this.initialized = false
+      return
+    }
+
+    // Prevent initialization in browser environment
+    if (typeof window !== 'undefined') {
+      console.warn("KnowledgeBase initialization skipped in browser environment")
+      this.initialized = false
+      return
+    }
+
     try {
-      this.model = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
-      this.initialized = true;
+      console.log("Initializing transformers model...")
+
+      // Add timeout and better error handling for the import
+      const importPromise = import("@xenova/transformers")
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Transformers import timeout")), 30000)
+      )
+
+      const { pipeline } = await Promise.race([importPromise, timeoutPromise]) as any
+
+      console.log("Pipeline imported successfully, creating model...")
+      this.model = await pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2")
+      this.initialized = true
+      console.log("Transformers model initialized successfully")
     } catch (error) {
-      console.error('Failed to initialize knowledge base:', error);
-      throw error;
+      console.error("Error initializing transformers pipeline:", error)
+      console.error("Stack trace:", error instanceof Error ? error.stack : "No stack trace")
+      // Don't throw - allow graceful degradation
+      this.initialized = false
+      console.warn("KnowledgeBase will operate in degraded mode without embeddings")
     }
   }
 
-  async addContent(content: any, type: ContentMetadata['type'], language: ContentMetadata['language']) {
+  async ensureDefaultContentLoaded() {
     if (!this.initialized) {
-      throw new Error('Knowledge base not initialized');
+      await this.initialize()
     }
 
-    const text = this.formatContent(content, type);
-    const chunks = await this.splitter.createDocuments([text], [{
-      source: `/${type}`,
-      type,
-      language,
-      title: content.title || type
-    }]);
-    
-    this.documents.push(...chunks);
+    if (this.loadedDefaultContent) {
+      return
+    }
+
+    const entries = getKnowledgeEntries()
+    await this.addEntries(entries)
+    this.loadedDefaultContent = true
   }
 
-  private formatContent(content: any, type: ContentMetadata['type']): string {
-    switch(type) {
-      case 'services':
-        return content.services.map((s: any) => 
-          `${s.title}. ${s.description}. Features: ${s.features.join(', ')}`
-        ).join('\n\n');
-      case 'faq':
-        return content.faqs.map((f: any) => 
-          `Q: ${f.question} A: ${f.answer}`
-        ).join('\n\n');
-      case 'about':
-        return `${content.mission.title}: ${content.mission.content}\n\n${content.vision.title}: ${content.vision.content}`;
+  async addEntries(entries: KnowledgeEntry[]) {
+    for (const entry of entries) {
+      await this.addEntry(entry)
+    }
+  }
+
+  async addEntry(entry: KnowledgeEntry) {
+    if (!this.initialized) {
+      console.warn("Knowledge base not initialized, skipping entry:", entry.title)
+      return // Graceful degradation - don't throw
+    }
+
+    const text = this.formatEntry(entry)
+    const chunks = await this.splitter.createDocuments([text], [
+      {
+        source: `/${entry.type}`,
+        type: entry.type,
+        language: entry.language,
+        title: entry.title ?? ("title" in entry.content ? entry.content.title : entry.type),
+      },
+    ])
+
+    for (const chunk of chunks) {
+      const embedding = await this.getEmbedding(chunk.pageContent)
+      this.documents.push({ doc: chunk, embedding })
+    }
+  }
+
+  private formatEntry(entry: KnowledgeEntry): string {
+    switch (entry.type) {
+      case "services":
+        return entry.content.services
+          .map(
+            (s) =>
+              `${s.title}. ${s.description}. Features: ${Array.isArray(s.features) ? s.features.join(", ") : ""}`
+          )
+          .join("\n\n")
+      case "faq":
+        return entry.content.faqs.map((f) => `Q: ${f.question} A: ${f.answer}`).join("\n\n")
+      case "about":
+        return [
+          `${entry.content.mission.title}: ${entry.content.mission.content}`,
+          `${entry.content.vision.title}: ${entry.content.vision.content}`,
+          entry.content.values?.items
+            ? `Values: ${entry.content.values.items.map((item) => `${item.title} - ${item.description}`).join("; ")}`
+            : "",
+          entry.content.approach?.steps
+            ? `Approach: ${entry.content.approach.steps
+                .map((step) => `${step.number} ${step.title}: ${step.description}`)
+                .join("; ")}`
+            : "",
+        ]
+          .filter(Boolean)
+          .join("\n\n")
+      case "contact":
+        return `Email: ${entry.content.email}. Phone: ${entry.content.phone}. Location: ${entry.content.address}, ${entry.content.city}, ${entry.content.country}.`
       default:
-        return JSON.stringify(content);
+        return JSON.stringify(entry.content)
     }
   }
 
-  async search(query: string, language: ContentMetadata['language'] = 'en'): Promise<Document[]> {
+  async search(query: string, language: ContentMetadata["language"] = "en", k: number = 3): Promise<Document[]> {
     if (!this.initialized) {
-      throw new Error('Knowledge base not initialized');
+      console.warn("Knowledge base not initialized, returning empty results")
+      return [] // Return empty results instead of throwing
     }
 
-    try {
-      const queryEmbedding = await this.getEmbedding(query);
-      const results = await this.similaritySearch(queryEmbedding);
-      return results.filter(doc => doc.metadata.language === language);
-    } catch (error) {
-      console.error('Search failed:', error);
-      return [];
-    }
+    const queryEmbedding = await this.getEmbedding(query)
+    const scores = this.documents.map(({ doc, embedding }) => ({
+      doc,
+      score: this.cosineSimilarity(queryEmbedding, embedding),
+    }))
+
+    return scores
+      .filter(({ doc }) => doc.metadata.language === language)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, k)
+      .map((item) => item.doc)
   }
 
   private async getEmbedding(text: string): Promise<number[]> {
-    const output = await this.model(text, { pooling: 'mean', normalize: true });
-    return Array.from(output.data);
+    const output = await this.model(text, { pooling: "mean", normalize: true })
+    return Array.from(output.data)
   }
 
-  private async similaritySearch(queryEmbedding: number[], k: number = 3): Promise<Document[]> {
-    const scores = await Promise.all(this.documents.map(async doc => ({
-      doc,
-      score: await this.cosineSimilarity(queryEmbedding, doc.pageContent)
-    })));
-    
-    return scores
-      .sort((a, b) => b.score - a.score)
-      .slice(0, k)
-      .map(item => item.doc);
+  private cosineSimilarity(a: number[], b: number[]): number {
+    const dotProduct = a.reduce((sum, val, i) => sum + val * b[i], 0)
+    const magnitudeA = Math.sqrt(a.reduce((sum, val) => sum + val * val, 0))
+    const magnitudeB = Math.sqrt(b.reduce((sum, val) => sum + val * val, 0))
+    return dotProduct / (magnitudeA * magnitudeB)
   }
-
-  private async cosineSimilarity(a: number[], b: string): Promise<number> {
-    const bEmbedding = await this.getEmbedding(b);
-    const dotProduct = a.reduce((sum, val, i) => sum + val * bEmbedding[i], 0);
-    const magnitudeA = Math.sqrt(a.reduce((sum, val) => sum + val * val, 0));
-    const magnitudeB = Math.sqrt(bEmbedding.reduce((sum, val) => sum + val * val, 0));
-    return dotProduct / (magnitudeA * magnitudeB);
-  }
-} 
+}

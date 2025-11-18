@@ -247,6 +247,42 @@ export class ErrorHandler {
     //   sentryService.captureException(error);
     // }
   }
+
+  // Main handler for API routes (returns NextResponse)
+  public static handle(
+    error: unknown,
+    requestContext?: ErrorContext,
+    logContext?: any,
+    duration?: number
+  ): Response {
+    // Convert to AppError if needed
+    const appError = error instanceof AppError
+      ? error
+      : ErrorHandler.handleError(error as Error, requestContext);
+
+    // Log the error
+    ErrorHandler.logError(appError);
+
+    // Log additional context if provided
+    if (logContext && duration !== undefined) {
+      console.error('Request failed:', {
+        ...logContext,
+        duration,
+        error: appError.toJSON()
+      });
+    }
+
+    // Create error response
+    const errorResponse = ErrorHandler.createErrorResponse(appError, true);
+
+    // Return NextResponse with appropriate status code
+    return new Response(JSON.stringify(errorResponse), {
+      status: appError.httpCode,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  }
 }
 
 // Common Error Definitions
@@ -278,7 +314,7 @@ export const CommonErrors = {
 // Request Context Helper
 export function createRequestContext(request: Request): ErrorContext {
   const url = new URL(request.url);
-  
+
   return {
     requestId: crypto.randomUUID(),
     ip: request.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown',
@@ -287,4 +323,4 @@ export function createRequestContext(request: Request): ErrorContext {
     method: request.method,
     timestamp: new Date().toISOString()
   };
-} 
+}

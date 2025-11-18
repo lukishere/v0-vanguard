@@ -1,6 +1,4 @@
 ---
-description: 
-globs: 
 alwaysApply: true
 ---
 ---
@@ -23,3 +21,7 @@ alwaysApply: true
 - Reference existing patterns and files for context.
 - Avoid deprecated patterns; use only approved, up-to-date practices.
 
+# Golden Rules
+
+- Ask if you are applying a critical change for the environment.
+- Ask me if I want to create big documentation, fast documents dont need approval.

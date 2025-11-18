@@ -1,111 +1,192 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { useLanguage } from "@/contexts/language-context"
-import { BlogCard } from "@/components/blog-card"
-import { TechBackground } from "@/components/tech-background"
-import AnimatedTextHeader from "@/components/animated-text-header"
+import { SectionTitle } from "@/components/section-title"
+import FlowingMenu from "@/components/flowing-menu"
 
-export default function BlogPage() {
-  const { t } = useLanguage()
+interface EventItem {
+  id: string
+  type: "evento"
+  title: string
+  content: string
+  author: string
+  isActive: boolean
+  eventDate?: string
+  eventLocation?: string
+  eventLink?: string
+  eventImage?: string
+  eventSummary?: string
+  eventDetails?: string
+  showInShowcase?: boolean
+}
 
-  const newsPosts = [
-    {
-      title: "Google Unveils Gemini Ultra 2: Next-Gen Multimodal AI",
-      description:
-        "Gemini Ultra 2 doubles context length, adds live video understanding, and ships with a privacy-first on-device variant for Pixel 10.",
-      image:
-        "https://images.unsplash.com/photo-1527443154391-507e9dc6c5cc?auto=format&fit=crop&w=800&q=80",
-      date: "June 12, 2025",
-      slug: "google-gemini-ultra-2",
-      keywords: ["Google", "Gemini", "multimodal AI", "Pixel 10"],
-    },
-    {
-      title: "ChatGPT 6 Turbo Released with 256K Context Window",
-      description:
-        "OpenAI's newest model brings faster responses, native code execution sandboxes, and citation-aware outputs for enterprises.",
-      image:
-        "https://images.unsplash.com/photo-1650893074747-686f8c1eaf9a?auto=format&fit=crop&w=800&q=80",
-      date: "June 10, 2025",
-      slug: "chatgpt-6-turbo",
-      keywords: ["OpenAI", "ChatGPT 6", "large context", "enterprise AI"],
-    },
-    {
-      title: "Vanguard-IA Secures €5 M EU Grant for AI Ethics Platform",
-      description:
-        "The grant accelerates development of Vanguard-IA's real-time audit tool that scores model transparency & bias across industries.",
-      image:
-        "https://images.unsplash.com/photo-1535223289827-42f1e9919769?auto=format&fit=crop&w=800&q=80",
-      date: "June 8, 2025",
-      slug: "vanguard-ia-eu-grant",
-      keywords: ["Vanguard-IA", "AI ethics", "EU innovation"],
-    },
-    {
-      title: "WWDC 2025: Apple Debuts 'Apple Intelligence OS' & Private Cloud Compute",
-      description:
-        "Apple's on-device LLM 'Ferret' powers new system-wide writing tools, while PCC handles heavy AI workloads under end-to-end encryption.",
-      image:
-        "https://images.unsplash.com/photo-1557872945-32ff50b37b14?auto=format&fit=crop&w=800&q=80",
-      date: "June 7, 2025",
-      slug: "wwdc-2025-apple-intelligence",
-      keywords: ["Apple", "WWDC 2025", "on-device AI", "privacy"],
-    },
-    {
-      title: "OpenAI & Google Sign Historic AI Safety Accord",
-      description:
-        "The two rivals commit to shared eval benchmarks, red-team data pools, and an emergency 'Kill-Switch' protocol for frontier models.",
-      image:
-        "https://images.unsplash.com/photo-1556742449-2b2a7c59b513?auto=format&fit=crop&w=800&q=80",
-      date: "June 3, 2025",
-      slug: "ai-safety-accord",
-      keywords: ["AI safety", "OpenAI", "Google", "governance"],
-    },
-    {
-      title: "AI-Generated Pop Hit 'Neon Dreams' Breaks into Billboard Top 10",
-      description:
-        "Co-created by musician Ava Rae and Sony's MuseNet-X, the track sparks debate on royalties for synthetic artists.",
-      image:
-        "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=800&q=80",
-      date: "June 1, 2025",
-      slug: "neon-dreams-ai-music",
-      keywords: ["AI music", "Billboard", "MuseNet-X", "copyright"],
-    },
-  ]
+export default function EventsPage() {
+  const { t, language } = useLanguage()
+  const [events, setEvents] = useState<EventItem[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchEvents()
+  }, [])
+
+  const fetchEvents = async () => {
+    try {
+      const response = await fetch('/api/news')
+      if (response.ok) {
+        const data = await response.json()
+        // Filtrar solo eventos activos
+        const activeEvents = data.filter((item: EventItem) =>
+          item.type === "evento" && item.isActive
+        )
+        setEvents(activeEvents)
+      }
+    } catch (error) {
+      console.error('Error fetching events:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Eventos para el showcase (FlowingMenu)
+  const showcaseEvents = events
+    .filter(e => e.showInShowcase && e.eventLink && e.eventImage)
+    .map(e => ({
+      link: e.eventLink!,
+      text: e.title,
+      image: e.eventImage!
+    }))
+
+  if (loading) {
+    return (
+      <>
+        <section className="relative overflow-hidden bg-slate-950">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.18),_rgba(2,6,23,0.92))]" />
+          <div className="vanguard-container relative z-10 py-24">
+            <h1 className="text-3xl text-white md:text-4xl mb-6">Eventos</h1>
+            <div className="vanguard-divider"></div>
+          </div>
+        </section>
+        <section className="relative overflow-hidden bg-slate-950">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.18),_rgba(2,6,23,0.92))]" />
+          <div className="relative z-10 vanguard-container py-24">
+            <div className="animate-pulse space-y-8">
+              <div className="h-48 bg-white/10 rounded-3xl"></div>
+              <div className="grid md:grid-cols-2 gap-8">
+                <div className="h-64 bg-white/10 rounded-3xl"></div>
+                <div className="h-64 bg-white/10 rounded-3xl"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </>
+    )
+  }
 
   return (
     <>
       {/* Hero Section */}
-      <section className="vanguard-section bg-white">
-        <div className="vanguard-container">
-          <div className="text-4xl md:text-5xl font-bold text-vanguard-blue mb-6">
-            <AnimatedTextHeader
-              phrases={[
-                t("events.title"),
-                t("events.subtitle"),
-                "Events, Updates, Company"
-              ]}
-              className="text-vanguard-blue"
-            />
-          </div>
+      <section className="relative overflow-hidden bg-slate-950">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.18),_rgba(2,6,23,0.92))]" />
+        <div className="vanguard-container relative z-10 py-24">
+          <SectionTitle
+            text={[
+              t("events.title"),
+              t("events.subtitle"),
+              "Events, Updates, Company"
+            ]}
+            as="h1"
+            className="mb-6 text-3xl text-white md:text-4xl"
+            initialDelay={120}
+          />
           <div className="vanguard-divider"></div>
         </div>
       </section>
 
-      {/* News Posts */}
-      <section className="py-16">
-        <div className="vanguard-container">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {newsPosts.map((post, index) => (
-              <BlogCard
-                key={index}
-                title={post.title}
-                description={post.description}
-                image={null}
-                date={post.date}
-                slug={post.slug}
-                keywords={post.keywords}
-              />
-            ))}
-          </div>
+      {/* Events Section */}
+      <section className="relative overflow-hidden bg-slate-950">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.18),_rgba(2,6,23,0.92))]" />
+        <div className="relative z-10 vanguard-container py-24">
+          {events.length === 0 ? (
+            <div className="text-center text-slate-100 py-12">
+              <h2 className="text-2xl md:text-3xl mb-4">No hay eventos próximos</h2>
+              <p className="text-slate-300">Vuelve pronto para ver nuestros próximos eventos</p>
+            </div>
+          ) : (
+            <>
+              <div className="mb-12 text-center text-slate-100">
+                <SectionTitle
+                  text={
+                    language === "en"
+                      ? "Where to meet us next"
+                      : "Dónde encontrarnos"
+                  }
+                  as="h2"
+                  className="text-2xl md:text-3xl text-slate-100"
+                  initialDelay={200}
+                />
+                <p className="mx-auto mt-4 max-w-2xl text-sm text-slate-300 md:text-base">
+                  {language === "en"
+                    ? "Hover the flowing menu to explore where Vanguard-IA will be sharing vision, demos and partnerships."
+                    : "Interactua con el menú interactivo para descubrir dónde Vanguard-IA compartirá servicios, visión y nuevas alianzas."}
+                </p>
+              </div>
+
+              <div className="relative mx-auto flex max-w-6xl flex-col gap-12">
+                {/* FlowingMenu - Solo si hay eventos con showcase */}
+                {showcaseEvents.length > 0 && (
+                  <FlowingMenu
+                    className="w-full rounded-[32px] border border-white/10 bg-white/5 backdrop-blur"
+                    items={showcaseEvents}
+                  />
+                )}
+
+                {/* Tarjetas de eventos */}
+                <div className="grid w-full gap-8 text-slate-200 md:grid-cols-2">
+                  {events.map((event) => (
+                    <div
+                      key={event.id}
+                      className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-[0_25px_50px_rgba(8,8,14,0.45)] backdrop-blur"
+                    >
+                      {event.eventDate && (
+                        <span className="text-xs font-semibold uppercase tracking-[0.35em] text-slate-300">
+                          {event.eventDate}
+                        </span>
+                      )}
+                      <h3 className="mt-3 text-xl font-semibold text-white md:text-2xl">
+                        {event.title}
+                      </h3>
+                      {event.eventLocation && (
+                        <p className="mt-2 text-sm text-slate-400">
+                          📍 {event.eventLocation}
+                        </p>
+                      )}
+                      {event.eventSummary && (
+                        <p className="mt-4 text-sm leading-relaxed md:text-base">
+                          {event.eventSummary}
+                        </p>
+                      )}
+                      {event.eventDetails && (
+                        <p className="mt-3 text-sm leading-relaxed text-slate-300 md:text-base">
+                          {event.eventDetails}
+                        </p>
+                      )}
+                      {event.eventLink && (
+                        <a
+                          href={event.eventLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-4 inline-flex items-center text-sm font-semibold uppercase tracking-wide text-vanguard-blue hover:underline"
+                        >
+                          {language === "en" ? "Event website" : "Sitio oficial"}
+                        </a>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </section>
     </>

@@ -1,0 +1,39 @@
+---
+description: Rules for AI agents to collaborate and support each other when working on this project
+alwaysApply: false
+---
+# Agent Collaboration Rules
+
+## Context Sharing
+
+- **Always check existing documentation first**: Before starting work, review `docs/README.md` and relevant sections (architecture, operations, planning, security).
+- **Reference existing patterns**: When implementing features, search for similar implementations in the codebase and follow established patterns.
+- **Document your changes**: Update relevant documentation files when making significant changes, especially in `docs/operations/` for operational changes.
+
+## Error Analysis & Best Practices
+
+- **Use Context7 for error analysis**: When analyzing errors or debugging issues, use Context7 to get up-to-date best practices and solutions from library documentation.
+- **Check library documentation**: Before implementing workarounds, consult official documentation via Context7 to ensure you're following current best practices.
+- **Document error resolutions**: Add troubleshooting steps to `docs/operations/troubleshooting.md` or create specific guides for recurring issues.
+
+## Communication Standards
+
+- **Clear commit messages**: Write descriptive commit messages that explain what was changed and why, making it easier for other agents to understand the context.
+- **Code comments for complex logic**: Add comments explaining non-obvious decisions, especially when deviating from standard patterns.
+- **Update ESTADO_PROYECTO.md**: When making significant architectural changes, update the project state document.
+
+## Workflow Collaboration
+
+- **Check for existing work**: Before starting a new feature, search the codebase to avoid duplicating existing functionality.
+- **Respect existing conventions**: Follow the coding standards defined in `rule1.mdc` and `rule2.mdc`.
+- **Test before marking complete**: Ensure your changes don't break existing functionality by running tests and linting.
+
+## Knowledge Base
+
+- **Consult knowledge base**: When working on chatbot or AI features, check `docs/operations/guardbot.md` and `docs/operations/guardbot2.md` for established patterns.
+- **Update knowledge base**: If you discover new patterns or solutions, document them in the appropriate `docs/` section for future reference.
+
+## Multi-language Support
+
+- **Maintain bilingual consistency**: When adding new features, ensure both English and Spanish translations are updated in `contexts/language-context.tsx`.
+- **Test in both languages**: Verify functionality works correctly in both supported languages.

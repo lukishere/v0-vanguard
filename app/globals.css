@@ -1,9 +1,9 @@
+/* Import better fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Import better fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
 
 @layer base {
   :root {
@@ -41,7 +41,7 @@
   * {
     @apply border-border;
   }
-  
+
   body {
     @apply bg-background text-foreground;
     font-family: 'Inter', 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
@@ -78,10 +78,45 @@
   @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
 }
 
+/* Espaciado móvil mejorado */
+@media (max-width: 640px) {
+  .vanguard-container {
+    @apply px-6;
+  }
+  .vanguard-section {
+    @apply py-16;
+  }
+}
+
 /* Minimalist design elements */
 .vanguard-divider {
   @apply w-16 h-0.5 bg-vanguard-red my-6;
 }
+
+/* Sistema de espaciado consistente basado en múltiplos de 8px */
+.spacing-xs { gap: 0.5rem; }    /* 8px */
+.spacing-sm { gap: 1rem; }      /* 16px */
+.spacing-md { gap: 1.5rem; }    /* 24px */
+.spacing-lg { gap: 2rem; }      /* 32px */
+.spacing-xl { gap: 3rem; }      /* 48px */
+.spacing-2xl { gap: 4rem; }     /* 64px */
+
+/* Espaciado vertical consistente */
+.space-y-xs > * + * { margin-top: 0.5rem; }    /* 8px */
+.space-y-sm > * + * { margin-top: 1rem; }      /* 16px */
+.space-y-md > * + * { margin-top: 1.5rem; }    /* 24px */
+.space-y-lg > * + * { margin-top: 2rem; }      /* 32px */
+.space-y-xl > * + * { margin-top: 3rem; }      /* 48px */
+.space-y-2xl > * + * { margin-top: 4rem; }     /* 64px */
+
+/* Jerarquía tipográfica mejorada */
+.text-display { font-size: 3.5rem; line-height: 1.1; letter-spacing: -0.025em; }
+.text-heading-1 { font-size: 2.5rem; line-height: 1.2; letter-spacing: -0.025em; }
+.text-heading-2 { font-size: 2rem; line-height: 1.3; letter-spacing: -0.025em; }
+.text-heading-3 { font-size: 1.5rem; line-height: 1.4; letter-spacing: -0.025em; }
+.text-body-lg { font-size: 1.125rem; line-height: 1.6; }
+.text-body { font-size: 1rem; line-height: 1.6; }
+.text-body-sm { font-size: 0.875rem; line-height: 1.5; }
 
 .vanguard-card {
   @apply bg-white border border-gray-100 rounded-lg shadow-sm hover:shadow-md transition-all duration-300;
@@ -320,11 +355,11 @@
 }
 
 @keyframes slideInRight {
-  from { 
+  from {
     opacity: 0;
     transform: translateX(30px);
   }
-  to { 
+  to {
     opacity: 1;
     transform: translateX(0);
   }
@@ -409,7 +444,7 @@
   animation: gradient-xy 15s ease infinite;
 }
 
-.bg-300% {
+.bg-300percent {
   background-size: 300% 300%;
 }
 
@@ -420,4 +455,122 @@
   50% {
     background-position: 100% 50%;
   }
+}
+
+/* Admin Dashboard Vibrant Design System */
+.admin-bg-primary {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+}
+
+.admin-bg-secondary {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #1e293b 100%);
+}
+
+.admin-bg-accent {
+  background: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
+}
+
+.admin-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.admin-card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.admin-card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+
+.admin-status-excellent {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: #16a34a;
+}
+
+.admin-status-warning {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #d97706;
+}
+
+.admin-status-critical {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #dc2626;
+}
+
+.admin-status-normal {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #2563eb;
+}
+
+.admin-activity-feedback {
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.1) 0%, rgba(20, 184, 166, 0.05) 100%);
+  border: 1px solid rgba(20, 184, 166, 0.3);
+  color: #0d9488;
+}
+
+.admin-activity-meeting {
+  background: linear-gradient(135deg, rgba(202, 138, 4, 0.1) 0%, rgba(202, 138, 4, 0.05) 100%);
+  border: 1px solid rgba(202, 138, 4, 0.3);
+  color: #a16207;
+}
+
+.admin-activity-access {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(168, 85, 247, 0.05) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  color: #7c3aed;
+}
+
+.admin-activity-demo {
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.1) 0%, rgba(249, 115, 22, 0.05) 100%);
+  border: 1px solid rgba(249, 115, 22, 0.3);
+  color: #c2410c;
+}
+
+.admin-sidebar-active {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(99, 102, 241, 0.2) 50%, rgba(139, 92, 246, 0.2) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  box-shadow:
+    0 0 20px rgba(59, 130, 246, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.admin-sidebar-hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.admin-metric-glow {
+  box-shadow:
+    0 0 20px rgba(59, 130, 246, 0.3),
+    0 0 40px rgba(59, 130, 246, 0.1);
+}
+
+.admin-success-glow {
+  box-shadow:
+    0 0 20px rgba(34, 197, 94, 0.3),
+    0 0 40px rgba(34, 197, 94, 0.1);
+}
+
+.admin-warning-glow {
+  box-shadow:
+    0 0 20px rgba(245, 158, 11, 0.3),
+    0 0 40px rgba(245, 158, 11, 0.1);
+}
+
+.admin-error-glow {
+  box-shadow:
+    0 0 20px rgba(239, 68, 68, 0.3),
+    0 0 40px rgba(239, 68, 68, 0.1);
 }

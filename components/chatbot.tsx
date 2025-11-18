@@ -1,24 +1,23 @@
-'use client'
-import React, { useState, useRef, useEffect } from 'react';
+"use client"
+
+import React, { useState, useRef, useEffect } from "react"
+import { useLanguage } from "@/contexts/language-context"
+import { useKnowledgeBase } from "@/contexts/knowledge-base-context"
+import { ResponseGenerator } from "@/lib/knowledge-base/response-generator"
 
 interface Message {
-  id: string;
-  user: 'Bot' | 'You';
-  text: string;
-  timestamp: string;
-  status?: 'sent' | 'delivered' | 'read';
+  id: string
+  user: "Bot" | "You"
+  text: string
+  timestamp: string
+  status?: "sent" | "delivered" | "read"
 }
 
-const mockMessages: Message[] = [
-  { id: '1', user: 'Bot', text: 'Welcome to Live Chat!', timestamp: '7:20', status: 'read' },
-  { id: '2', user: 'You', text: 'Hi there!', timestamp: '7:21', status: 'sent' },
-];
-
-const EMOJIS = ['😀', '👍', '🎉', '🚀', '🤖', '💡', '🔥', '🙌', '😎', '❤️'];
+const EMOJIS = ["😀", "👍", "🎉", "🚀", "🤖", "💡", "🔥", "🙌", "😎", "❤️"]
 // VANGUARD logo colors
-const VANGUARD_BLUE = '#1976a5'; // main deep blue
-const VANGUARD_ACCENT = '#21a1c4'; // accent blue
-const VANGUARD_GRADIENT = `from-[${VANGUARD_BLUE}] to-[${VANGUARD_ACCENT}]`;
+const VANGUARD_BLUE = "#1976a5" // main deep blue
+const VANGUARD_ACCENT = "#21a1c4" // accent blue
+const responseGenerator = new ResponseGenerator()
 
 function ChatHeader({ onClose }: { onClose: () => void }) {
   return (
@@ -35,8 +34,8 @@ function ChatHeader({ onClose }: { onClose: () => void }) {
           <div className="text-white font-extrabold text-lg tracking-wide flex items-center gap-2">
             GUARDBOT <span className="text-xs font-semibold bg-white/20 px-2 py-0.5 rounded text-[#21a1c4] border border-[#21a1c4]/30 ml-1">LIVE CHAT</span>
           </div>
-          <div className="flex items-center gap-1 text-xs" style={{ color: '#21a1c4' }}>
-            <span className="inline-block w-2 h-2 rounded-full animate-pulse" style={{ background: '#21a1c4' }} aria-label="Online" />
+          <div className="flex items-center gap-1 text-xs" style={{ color: "#21a1c4" }}>
+            <span className="inline-block w-2 h-2 rounded-full animate-pulse" style={{ background: "#21a1c4" }} aria-label="Online" />
             Online
           </div>
         </div>
@@ -53,42 +52,42 @@ function ChatHeader({ onClose }: { onClose: () => void }) {
 }
 
 function MessageBubble({ msg }: { msg: Message }) {
-  const isUser = msg.user === 'You';
+  const isUser = msg.user === "You"
   return (
-    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}> 
+    <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
       <div
         className={`max-w-[80vw] md:max-w-md rounded-2xl px-4 py-2 text-sm shadow-md mb-1
           ${isUser
             ? `bg-gradient-to-br from-[${VANGUARD_BLUE}] to-[${VANGUARD_ACCENT}] text-black border border-[${VANGUARD_ACCENT}]/30`
-            : 'bg-white/80 backdrop-blur border border-[${VANGUARD_BLUE}]/10 text-black'}
+            : "bg-white/80 backdrop-blur border border-[${VANGUARD_BLUE}]/10 text-black"}
         `}
         tabIndex={0}
         aria-label={`${msg.user} message: ${msg.text}`}
       >
         <div className="text-black">{msg.text}</div>
-        <div className="text-xs flex items-center gap-1 mt-1" style={{ color: '#333' }}>
+        <div className="text-xs flex items-center gap-1 mt-1" style={{ color: "#333" }}>
           {msg.timestamp}
-          {msg.status === 'read' && <span title="Read">✓✓</span>}
-          {msg.status === 'sent' && <span title="Sent">✓</span>}
+          {msg.status === "read" && <span title="Read">✓✓</span>}
+          {msg.status === "sent" && <span title="Sent">✓</span>}
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 function ChatMessages({ messages, typing, onScroll, showScrollBtn, onScrollToBottom }: {
-  messages: Message[];
-  typing: boolean;
-  onScroll: () => void;
-  showScrollBtn: boolean;
-  onScrollToBottom: () => void;
+  messages: Message[]
+  typing: boolean
+  onScroll: () => void
+  showScrollBtn: boolean
+  onScrollToBottom: () => void
 }) {
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement>(null)
   useEffect(() => {
     if (ref.current && !showScrollBtn) {
-      ref.current.scrollTo({ top: ref.current.scrollHeight, behavior: 'smooth' });
+      ref.current.scrollTo({ top: ref.current.scrollHeight, behavior: "smooth" })
     }
-  }, [messages, showScrollBtn]);
+  }, [messages, showScrollBtn])
   return (
     <div
       ref={ref}
@@ -138,18 +137,22 @@ function EmojiPicker({ onSelect }: { onSelect: (emoji: string) => void }) {
   );
 }
 
-function ChatInput({ value, onChange, onSend, onEmoji, showEmoji, setShowEmoji }: {
-  value: string;
-  onChange: (v: string) => void;
-  onSend: () => void;
-  onEmoji: (emoji: string) => void;
-  showEmoji: boolean;
-  setShowEmoji: (v: boolean) => void;
+function ChatInput({ value, onChange, onSend, onEmoji, showEmoji, setShowEmoji, disabled }: {
+  value: string
+  onChange: (v: string) => void
+  onSend: () => void
+  onEmoji: (emoji: string) => void
+  showEmoji: boolean
+  setShowEmoji: (v: boolean) => void
+  disabled?: boolean
 }) {
   return (
     <form
       className="relative flex items-center gap-2 px-2 sm:px-4 py-3 border-t bg-white/80 backdrop-blur rounded-b-2xl"
-      onSubmit={e => { e.preventDefault(); onSend(); }}
+      onSubmit={(e) => {
+        e.preventDefault()
+        if (!disabled) onSend()
+      }}
       aria-label="Type your message"
     >
       <button
@@ -158,6 +161,7 @@ function ChatInput({ value, onChange, onSend, onEmoji, showEmoji, setShowEmoji }
         style={{ color: VANGUARD_ACCENT }}
         aria-label="Open emoji picker"
         onClick={() => setShowEmoji(!showEmoji)}
+        disabled={disabled}
       >
         😊
       </button>
@@ -170,10 +174,11 @@ function ChatInput({ value, onChange, onSend, onEmoji, showEmoji, setShowEmoji }
         }}
         placeholder="Type your message..."
         value={value}
-        onChange={e => onChange(e.target.value)}
-        onKeyDown={e => e.key === 'Enter' && onSend()}
+        onChange={(e) => onChange(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && !disabled && onSend()}
         aria-label="Message input"
         autoComplete="off"
+        disabled={disabled}
       />
       <button
         type="submit"
@@ -182,6 +187,7 @@ function ChatInput({ value, onChange, onSend, onEmoji, showEmoji, setShowEmoji }
           background: `linear-gradient(90deg, ${VANGUARD_BLUE} 0%, ${VANGUARD_ACCENT} 100%)`,
         }}
         aria-label="Send message"
+        disabled={disabled}
       >
         Send
       </button>
@@ -213,80 +219,143 @@ function FloatingChatButton({ onClick, unread }: { onClick: () => void; unread: 
   );
 }
 
+function formatTime() {
+  return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+}
+
+function getInitialMessage(language: "en" | "es"): Message {
+  return {
+    id: "welcome",
+    user: "Bot",
+    text:
+      language === "en"
+        ? "Hi! I'm GuardBot. Ask me anything about our services, approach, or how to get in touch."
+        : "¡Hola! Soy GuardBot. Pregúntame sobre nuestros servicios, enfoque o cómo contactarnos.",
+    timestamp: formatTime(),
+    status: "read",
+  }
+}
+
 export default function LiveChat() {
-  const [messages, setMessages] = useState<Message[]>(mockMessages);
-  const [input, setInput] = useState('');
-  const [open, setOpen] = useState(false);
-  const [showEmoji, setShowEmoji] = useState(false);
-  const [typing, setTyping] = useState(false);
-  const [showScrollBtn, setShowScrollBtn] = useState(false);
-  const [unread, setUnread] = useState(false);
-  const chatRef = useRef<HTMLDivElement>(null);
+  const { language } = useLanguage()
+  const { search, isLoading, error, isEnabled } = useKnowledgeBase()
+  const [messages, setMessages] = useState<Message[]>([getInitialMessage(language)])
+  const [input, setInput] = useState("")
+  const [open, setOpen] = useState(false)
+  const [showEmoji, setShowEmoji] = useState(false)
+  const [typing, setTyping] = useState(false)
+  const [showScrollBtn, setShowScrollBtn] = useState(false)
+  const [unread, setUnread] = useState(false)
+  const chatRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (!open && messages[messages.length - 1]?.user === 'Bot') {
-      setUnread(true);
+    setMessages([getInitialMessage(language)])
+  }, [language])
+
+  useEffect(() => {
+    if (!open && messages[messages.length - 1]?.user === "Bot") {
+      setUnread(true)
     }
-  }, [messages, open]);
+  }, [messages, open])
 
   useEffect(() => {
-    if (messages.length > 0 && messages[messages.length - 1].user === 'You') {
-      setTyping(true);
-      const timeout = setTimeout(() => {
-        setMessages(msgs => [
-          ...msgs,
-          {
-            id: Date.now().toString(),
-            user: 'Bot',
-            text: 'This is a smart bot reply! 🚀',
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            status: 'read',
-          },
-        ]);
-        setTyping(false);
-      }, 1200);
-      return () => clearTimeout(timeout);
-    }
-  }, [messages]);
-
-  useEffect(() => {
-    if (open) setUnread(false);
-  }, [open]);
+    if (open) setUnread(false)
+  }, [open])
 
   const handleScroll = () => {
-    if (!chatRef.current) return;
-    const { scrollTop, scrollHeight, clientHeight } = chatRef.current;
-    setShowScrollBtn(scrollHeight - scrollTop - clientHeight > 60);
-  };
+    if (!chatRef.current) return
+    const { scrollTop, scrollHeight, clientHeight } = chatRef.current
+    setShowScrollBtn(scrollHeight - scrollTop - clientHeight > 60)
+  }
   const handleScrollToBottom = () => {
-    chatRef.current?.scrollTo({ top: chatRef.current.scrollHeight, behavior: 'smooth' });
-    setShowScrollBtn(false);
-  };
+    chatRef.current?.scrollTo({ top: chatRef.current.scrollHeight, behavior: "smooth" })
+    setShowScrollBtn(false)
+  }
 
-  const handleSend = () => {
-    if (!input.trim()) return;
-    setMessages((msgs) => [
-      ...msgs,
-      {
-        id: Date.now().toString(),
-        user: 'You',
-        text: input,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        status: 'sent',
-      },
-    ]);
-    setInput('');
-    setShowEmoji(false);
-  };
+  const handleSend = async () => {
+    const trimmed = input.trim()
+    if (!trimmed) return
+
+    const timestamp = formatTime()
+    const userMessage: Message = {
+      id: `user-${Date.now()}`,
+      user: "You",
+      text: trimmed,
+      timestamp,
+      status: "sent",
+    }
+
+    setMessages((msgs) => [...msgs, userMessage])
+    setInput("")
+    setShowEmoji(false)
+
+    try {
+      setTyping(true)
+      const results = await search(trimmed, language)
+
+      let answer: string | null = null
+
+      if (results.length > 0) {
+        answer = responseGenerator.generate(trimmed, results, language)
+      } else {
+        try {
+          const response = await fetch("/api/perplexity/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              message: trimmed,
+              context: messages.map((msg) => ({ role: msg.user === "Bot" ? "assistant" : "user", content: msg.text })),
+              language,
+            }),
+          })
+
+          if (response.ok) {
+            const data = await response.json()
+            answer = data.reply ?? null
+          }
+        } catch (error) {
+          console.error("Perplexity fallback failed", error)
+        }
+      }
+
+      const botMessage: Message = {
+        id: `bot-${Date.now()}`,
+        user: "Bot",
+        text:
+          answer ??
+          (language === "en"
+            ? "I couldn't find that information right now. Could you rephrase or ask about one of our services?"
+            : "No pude encontrar la información por ahora. ¿Puedes reformular o preguntar por uno de nuestros servicios?"),
+        timestamp: formatTime(),
+        status: "read",
+      }
+
+      setMessages((msgs) => [...msgs, botMessage])
+    } catch {
+      const fallback: Message = {
+        id: `bot-${Date.now()}`,
+        user: "Bot",
+        text:
+          language === "en"
+            ? "I'm sorry, I couldn't process that query right now."
+            : "Lo siento, no pude procesar tu consulta en este momento.",
+        timestamp: formatTime(),
+        status: "read",
+      }
+      setMessages((msgs) => [...msgs, fallback])
+    } finally {
+      setTyping(false)
+    }
+  }
 
   const handleEmoji = (emoji: string) => {
-    setInput((v) => v + emoji);
-    setShowEmoji(false);
-  };
+    setInput((v) => v + emoji)
+    setShowEmoji(false)
+  }
 
   // Responsive chat window size
   const chatWindowClass =
-    'fixed bottom-6 right-6 z-50 w-[98vw] max-w-lg sm:w-[420px] rounded-2xl shadow-2xl border border-[#21a1c4]/30 bg-white/70 backdrop-blur-lg flex flex-col overflow-hidden animate-fade-in ring-2 ring-[#1976a5]/30';
+    "chat-window fixed bottom-6 right-6 z-50 w-[98vw] max-w-lg sm:w-[420px] rounded-2xl shadow-2xl border border-[#21a1c4]/30 bg-white/70 backdrop-blur-lg flex flex-col overflow-hidden animate-fade-in ring-2 ring-[#1976a5]/30"
 
   return (
     <>
@@ -319,12 +388,20 @@ export default function LiveChat() {
             onEmoji={handleEmoji}
             showEmoji={showEmoji}
             setShowEmoji={setShowEmoji}
+            disabled={typing || isLoading}
           />
+          {error && (
+            <div className="px-4 pb-4 text-xs text-red-500">
+              {language === "en"
+                ? "Knowledge base could not be initialized. Responses might be limited."
+                : "No se pudo inicializar la base de conocimiento. Las respuestas pueden ser limitadas."}
+            </div>
+          )}
         </section>
       )}
       <style>{`
         @media (max-width: 640px) {
-          .fixed.bottom-6.right-6.z-50.w-\[98vw\].max-w-lg.sm\:w-\[420px\] {
+          .chat-window {
             width: 99vw !important;
             right: 0.5vw !important;
             left: 0.5vw !important;
@@ -332,6 +409,9 @@ export default function LiveChat() {
             max-height: 90vh !important;
             font-size: 1rem;
           }
+        }
+        .chat-window {
+          width: 98vw;
         }
         .animate-fade-in {
           animation: fadeInChat 0.3s cubic-bezier(.4,2,.6,1);

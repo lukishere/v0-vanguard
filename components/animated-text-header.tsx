@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface AnimatedTextHeaderProps {
@@ -46,11 +46,40 @@ export default function AnimatedTextHeader({ phrases, className = "" }: Animated
   }, [phrases.length, mounted, phrases]);
 
   // Show static fallback during SSR to avoid hydration mismatches
+  const containerHeightClass = useMemo(() => {
+    if (phrases.some((phrase) => phrase.length > 90)) {
+      return "min-h-[6.5rem]";
+    }
+    if (phrases.some((phrase) => phrase.length > 60)) {
+      return "min-h-[6rem]";
+    }
+    return "min-h-[5rem]";
+  }, [phrases]);
+
+  const sizeAdjustmentClass = useMemo(() => {
+    if (phrases.some((phrase) => phrase.length > 90)) {
+      return "text-3xl sm:text-4xl md:text-[2.75rem] lg:text-[3rem]";
+    }
+    if (phrases.some((phrase) => phrase.length > 60)) {
+      return "text-[2.5rem] sm:text-4xl md:text-[2.9rem] lg:text-[3.25rem]";
+    }
+    return "";
+  }, [phrases]);
+
   if (!mounted) {
     return (
-      <h1 className={`${className} w-full block`}>
-        {phrases[0] || "Loading..."}
-      </h1>
+      <div
+        className={`w-full flex items-center overflow-hidden ${containerHeightClass}`}
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        <span
+          className={`${className} ${sizeAdjustmentClass} w-full block leading-tight`}
+          style={{ lineHeight: 1.2, textWrap: "balance" as any }}
+        >
+          {phrases[0] || "Loading..."}
+        </span>
+      </div>
     );
   }
 
@@ -58,16 +87,20 @@ export default function AnimatedTextHeader({ phrases, className = "" }: Animated
   console.log('AnimatedTextHeader: Rendering with phrase:', currentPhrase);
 
   return (
-    <div className="w-full flex items-center overflow-hidden min-h-[4rem] sm:min-h-[5rem] md:min-h-[6rem] lg:min-h-[7rem]">
+    <div
+      className={`w-full flex items-center overflow-hidden ${containerHeightClass}`}
+      aria-live="polite"
+      aria-atomic="true"
+    >
       <AnimatePresence mode="wait">
         {isVisible && (
-          <motion.h1
+          <motion.span
             key={currentIndex}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className={`${className} w-full block`}
+            className={`${className} ${sizeAdjustmentClass} w-full block leading-tight`}
             style={{
               background: 'linear-gradient(45deg, #0047AB, #1E90FF, #4169E1)',
               backgroundSize: '300% 300%',
@@ -76,14 +109,14 @@ export default function AnimatedTextHeader({ phrases, className = "" }: Animated
               backgroundClip: 'text',
               animation: 'gradient-shift 3s ease infinite',
               textAlign: 'left',
-              lineHeight: '1.2',
+              lineHeight: 1.2,
               maxWidth: '100%',
               wordWrap: 'break-word',
               hyphens: 'auto'
             }}
           >
             {currentPhrase}
-          </motion.h1>
+          </motion.span>
         )}
       </AnimatePresence>
     </div>
