@@ -1,11 +1,8 @@
 import type { Metadata } from "next"
 import { formatDistanceToNow } from "date-fns"
 import { es } from "date-fns/locale"
-import { clerkClient } from "@clerk/nextjs/server"
-import { getClientMetadataFromUser } from "@/lib/admin/clerk-metadata"
-import { getAllActivities } from "@/app/actions/client-activities"
-import { getAllDemos } from "@/lib/demos/catalog"
-import { EnhancedRiskAlerts } from "@/components/admin/enhanced-risk-alerts"
+import { RiskAlertsWrapper } from "@/components/admin/risk-alerts-wrapper"
+
 
 export const metadata: Metadata = {
   title: "Gestión de Riesgos | Panel Admin - Vanguard-IA",
@@ -150,23 +147,6 @@ async function getRiskAlerts() {
   }
 }
 
-export default async function AdminRiesgosPage() {
-  const riskAlerts = await getRiskAlerts()
-
-  return (
-    <div className="space-y-10">
-      <div className="space-y-4">
-        <div>
-          <h1 className="text-2xl font-bold text-white">Gestión de Riesgos</h1>
-          <p className="text-white/70">
-            Monitorea alertas críticas, clientes inactivos y riesgos de engagement para mantener el crecimiento saludable del negocio.
-          </p>
-        </div>
-      </div>
-
-      <div className="grid gap-6">
-        <EnhancedRiskAlerts alerts={riskAlerts} />
-      </div>
-    </div>
-  )
+export default function AdminRiesgosPage() {
+  return <RiskAlertsWrapper />
 }

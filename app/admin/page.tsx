@@ -10,6 +10,7 @@ import { EnhancedAdoptionPipeline } from "@/components/admin/enhanced-adoption-p
 import { EnhancedMilestonesWrapper } from "@/components/admin/enhanced-milestones-wrapper"
 import { DashboardHeader } from "@/components/admin/real-time-status"
 import { RealtimeSimulator } from "@/components/admin/realtime-simulator"
+import { DashboardWrapper } from "@/components/admin/dashboard-wrapper"
 import { cn } from "@/lib/utils"
 import { getClientMetadataFromUser } from "@/lib/admin/clerk-metadata"
 import { getAllDemos } from "@/lib/demos/catalog"
@@ -17,6 +18,7 @@ import { clerkClient } from "@clerk/nextjs/server"
 import { getAllActivities } from "@/app/actions/client-activities"
 import { getAllDemoLikes } from "@/app/actions/demo-likes"
 import { getAllMeetingMilestones, type MeetingMilestone } from "@/app/actions/meeting-milestones"
+
 
 // Importar el tipo Milestone del componente EnhancedMilestones
 import type { Milestone } from "@/components/admin/enhanced-milestones"
@@ -704,47 +706,6 @@ async function getDashboardData() {
   }
 }
 
-export default async function AdminDashboardPage() {
-  const { dynamicMetrics, recentActivities, adoptionPipeline, activeClients, convertedMilestones } = await getDashboardData()
-
-  return (
-    <div className="space-y-10">
-      <DashboardHeader
-        title="Resumen ejecutivo"
-        description="Visión general de clientes activos, adopción de demos y prioridades para el equipo de cuentas."
-        enabled={true}
-        interval={60000} // 1 minute refresh
-      />
-
-      <section className="space-y-6">
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {dynamicMetrics.map((metric) => (
-            <MetricsCard key={metric.title} {...metric} />
-          ))}
-        </div>
-      </section>
-
-      <section className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-3">
-          <EnhancedActivityTimeline activities={recentActivities} />
-        </div>
-      </section>
-
-      <section className="grid gap-6 lg:grid-cols-[2fr_1fr]">
-        <EnhancedAdoptionPipeline
-          stages={adoptionPipeline}
-          totalActiveClients={activeClients}
-        />
-
-        <EnhancedMilestonesWrapper
-          milestones={convertedMilestones}
-        />
-      </section>
-
-      {/* Realtime Controls */}
-      <section className="flex justify-end">
-        <RealtimeSimulator />
-      </section>
-    </div>
-  )
+export default function AdminDashboardPage() {
+  return <DashboardWrapper />
 }

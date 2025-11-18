@@ -1,68 +1,11 @@
 import { Users } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { getClientMetadataFromUser } from "@/lib/admin/clerk-metadata"
-import { getAllDemos } from "@/lib/demos/catalog"
-import { clerkClient } from "@clerk/nextjs/server"
-import { ClientTable } from "@/components/admin/client-table"
-import { getClientActivityStats } from "@/app/actions/client-activities"
+import { ClientTableWrapper } from "@/components/admin/client-table-wrapper"
 
-async function getClients() {
-  const demos = await getAllDemos()
+// Force dynamic rendering since this page uses server-side authentication
+export const dynamic = 'force-dynamic'
 
-  try {
-    // Obtener usuarios reales de Clerk
-    const clerk = await clerkClient()
-    const users = await clerk.users.getUserList({
-      limit: 200,
-      orderBy: "-created_at"
-    })
-
-    // Filtrar usuarios: mostrar todos EXCEPTO admins
-    const clients = await Promise.all(
-      users.data
-        .filter((user) => {
-          const metadata = getClientMetadataFromUser(user)
-          return metadata.role !== "admin"
-        })
-        .map(async (user) => {
-          const metadata = getClientMetadataFromUser(user)
-
-          // Obtener última actividad del sistema de actividades del dashboard
-          let lastActive: string | null = null
-          try {
-            const activityStats = await getClientActivityStats(user.id)
-            if (activityStats.lastActivity) {
-              lastActive = activityStats.lastActivity.timestamp
-            }
-          } catch (activityError) {
-            console.warn(`No se pudieron obtener actividades para usuario ${user.id}:`, activityError)
-          }
-
-          // Si no hay actividad en el dashboard, usar lastActiveAt de Clerk como fallback
-          if (!lastActive && user.lastActiveAt) {
-            lastActive = new Date(user.lastActiveAt).toISOString()
-          }
-
-          return {
-            id: user.id,
-            name: user.fullName ?? user.username ?? user.emailAddresses.at(0)?.emailAddress ?? "Usuario",
-            email: user.emailAddresses.at(0)?.emailAddress ?? null,
-            metadata,
-            lastActive,
-          }
-        })
-    )
-
-    return { clients, demos }
-  } catch (error) {
-    console.error('Error al obtener clientes de Clerk:', error)
-    return { clients: [], demos }
-  }
-}
-
-export default async function AdminClientsPage() {
-  const { clients, demos } = await getClients()
-
+export default function AdminClientsPage() {
   return (
     <div className="space-y-8">
       <header className="space-y-2">
@@ -80,7 +23,7 @@ export default async function AdminClientsPage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <ClientTable clients={clients} demos={demos} />
+          <ClientTableWrapper />
         </CardContent>
       </Card>
     </div>

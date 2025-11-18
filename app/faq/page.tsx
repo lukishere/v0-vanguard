@@ -17,8 +17,7 @@ export default function FAQPage() {
           <SectionTitle
             text={[
               currentContent.title,
-              currentContent.subtitle,
-              t("faq.support")
+              currentContent.subtitle
             ]}
             as="h1"
             className="text-2xl sm:text-3xl text-vanguard-blue mb-4"
