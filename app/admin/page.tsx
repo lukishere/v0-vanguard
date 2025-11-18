@@ -18,8 +18,6 @@ import { getAllActivities } from "@/app/actions/client-activities"
 import { getAllDemoLikes } from "@/app/actions/demo-likes"
 import { getAllMeetingMilestones, type MeetingMilestone } from "@/app/actions/meeting-milestones"
 
-// Force dynamic rendering since this page uses server-side authentication and real-time data
-export const dynamic = 'force-dynamic'
 
 // Importar el tipo Milestone del componente EnhancedMilestones
 import type { Milestone } from "@/components/admin/enhanced-milestones"
