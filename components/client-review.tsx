@@ -52,7 +52,7 @@ export function ClientReview({ name, position, company, review, rating, business
   }
 
   return (
-    <Card className="border-0 shadow-sm hover:shadow-md transition-all duration-300 h-full overflow-hidden">
+    <Card className="border-0 shadow-sm hover:shadow-md transition-all duration-300 h-full min-h-[280px] overflow-hidden">
       <div className={`${getBackgroundColor()} p-4 flex justify-between items-center border-b`}>
         <div className="flex items-center">
           <div className="mr-3">{getBusinessIcon()}</div>

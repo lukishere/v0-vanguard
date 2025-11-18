@@ -1,0 +1,57 @@
+{
+  "version": "1.0.0",
+  "projectType": "Next.js TypeScript",
+  "rules": {
+    "fileNavigation": {
+      "preferredDirectories": [
+        "app/",
+        "components/",
+        "lib/",
+        "hooks/",
+        "contexts/"
+      ],
+      "excludePatterns": [
+        "node_modules/",
+        ".next/",
+        ".git/",
+        "dataconnect-generated/"
+      ]
+    },
+    "codeStyle": {
+      "indentation": 2,
+      "lineLength": 80,
+      "trailingCommas": true
+    },
+    "linting": {
+      "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
+        "next/core-web-vitals"
+      ],
+      "rules": {
+        "no-unused-vars": "warn",
+        "react/no-unescaped-entities": "off",
+        "@typescript-eslint/explicit-function-return-type": "error"
+      }
+    },
+    "formatting": {
+      "autoFormat": true,
+      "formatOnSave": true,
+      "prettierConfig": {
+        "semi": true,
+        "singleQuote": true,
+        "tabWidth": 2,
+        "trailingComma": "es5"
+      }
+    },
+    "intellisense": {
+      "suggestImports": true,
+      "autoImports": true,
+      "smartCompletion": true
+    },
+    "performance": {
+      "maxOpenFiles": 10,
+      "memoryOptimization": true
+    }
+  }
+} 

@@ -1,0 +1,13 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Coding Standards
+
+- Use functional and declarative patterns over object-oriented ones.
+- Prefer modular, reusable code with minimal duplication.
+- Use consistent naming conventions (e.g., camelCase for variables, PascalCase for components).
+- Include robust error handling and validation.
+- Break complex logic into helper functions.
+

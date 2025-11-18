@@ -37,10 +37,10 @@ export function Header() {
 
   const navItems = [
     { href: "/", label: t("nav.home") },
-    { href: "/about", label: t("nav.about") },
-    { href: "/services", label: t("nav.services") },
-    { href: "/news", label: t("nav.news") },
-    { href: "/contact", label: t("nav.contact") },
+    { href: "/about/", label: t("nav.about") },
+    { href: "/services/", label: t("nav.services") },
+    { href: "/events/", label: t("nav.events") },
+    { href: "/contact/", label: t("nav.contact") },
   ]
 
   return (
@@ -74,7 +74,7 @@ export function Header() {
               asChild
               className="bg-vanguard-blue hover:bg-vanguard-blue/90 text-white transition-all duration-300 transform hover:-translate-y-0.5"
             >
-              <Link href="/contact?quote=true">{t("cta.getQuote")}</Link>
+              <Link href="/clientes/">{t("cta.getQuote")}</Link>
             </Button>
           </nav>
 
@@ -113,7 +113,7 @@ export function Header() {
                 asChild
                 className="bg-vanguard-blue hover:bg-vanguard-blue/90 text-white w-full transition-all duration-300 hover:-translate-y-0.5"
               >
-                <Link href="/contact?quote=true" onClick={() => setIsMenuOpen(false)}>
+                <Link href="/clientes/" onClick={() => setIsMenuOpen(false)}>
                   {t("cta.getQuote")}
                 </Link>
               </Button>

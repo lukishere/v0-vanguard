@@ -1,89 +1,57 @@
 "use client"
 
 import { useLanguage } from "@/contexts/language-context"
+import { useCookies } from "@/contexts/cookie-context"
 import { Logo } from "@/components/logo"
-import { Facebook, Linkedin, Instagram, Mail, Phone, MapPin } from "lucide-react"
+import { Linkedin, Mail, Phone, MapPin, Settings } from "lucide-react"
 import Link from "next/link"
+import { Button } from "@/components/ui/button"
 
-// Custom X (formerly Twitter) icon
-function XIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <path d="M4 4l11.5 11.5M4 20l16-16" />
-      <path d="M19 4v16M5 4v16" />
-    </svg>
-  )
-}
 
 export function Footer() {
   const { t, language } = useLanguage()
+  const { setShowSettings } = useCookies()
   const currentYear = new Date().getFullYear()
 
-  const socialLinks = [
-    { icon: Facebook, href: "#", label: "Facebook" },
-    { icon: XIcon, href: "#", label: "X" },
-    { icon: Linkedin, href: "#", label: "LinkedIn" },
-    { icon: Instagram, href: "#", label: "Instagram" },
-  ]
-
   const contactInfo = [
-    { icon: Mail, text: "sales@vanguard-ia.tech", href: "mailto:sales@vanguard-ia.tech" },
-    { icon: Phone, text: "+34 627 961 956", href: "tel:+34627961956" },
+    { icon: Mail, text: "contacto@vanguard-ia.tech", href: "mailto:contacto@vanguard-ia.tech" },
+    { icon: Phone, text: "+34 644 059 040", href: "tel:+34644059040" },
     { icon: MapPin, text: "Barcelona, España", href: "#" },
+    {
+      icon: Linkedin,
+      text: t("contact.linkedin.title") + "!",
+      href: "https://www.linkedin.com/company/vanguard-ia"
+    },
   ]
 
   const footerLinks = [
     { label: t("nav.home"), href: "/" },
-    { label: t("nav.about"), href: "/about" },
-    { label: t("nav.services"), href: "/services" },
-    { label: t("nav.news"), href: "/news" },
-    { label: t("nav.contact"), href: "/contact" },
-    { label: language === "en" ? "Privacy Policy" : "Política de Privacidad", href: "/privacy" },
-    { label: language === "en" ? "Terms of Service" : "Términos de Servicio", href: "/terms" },
-    { label: language === "en" ? "FAQ" : "Preguntas Frecuentes", href: "/faq" },
+    { label: t("nav.about"), href: "/about/" },
+    { label: t("nav.services"), href: "/services/" },
+    { label: t("nav.events"), href: "/events/" },
+    { label: t("nav.contact"), href: "/contact/" },
+    { label: t("footer.privacyPolicy"), href: "/privacy/" },
+    { label: t("footer.cookiePolicy"), href: "/cookies/" },
+    { label: t("footer.termsOfService"), href: "/terms/" },
+    { label: t("footer.faq"), href: "/faq/" },
   ]
 
   return (
-    <footer className="bg-gray-50 border-t border-gray-100">
-      <div className="vanguard-container py-12">
+    <footer className="bg-gray-50 border-t border-gray-100" style={{ zIndex: 30, position: 'relative' }}>
+      <div className="vanguard-container py-12" style={{ position: 'relative', zIndex: 31 }}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Logo and Social */}
           <div className="space-y-6">
             <Logo />
             <p className="text-gray-600 max-w-xs">
-              {language === "en"
-                ? "Specialized consultancy in AI, Apps, Computer Services, Web branding, Infrastructure, and Security."
-                : "Consultoría especializada en IA, Apps, Servicios Informáticos, Branding web, Infraestructura y Seguridad."}
+              {t("footer.description")}
             </p>
-            <div className="flex space-x-4">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  className="text-vanguard-blue hover:text-vanguard-blue/80 transition-all duration-300 transform hover:scale-110 hover:-translate-y-1"
-                  aria-label={social.label}
-                >
-                  <social.icon className="h-5 w-5" />
-                </a>
-              ))}
-            </div>
           </div>
 
           {/* Contact Info */}
           <div>
             <h3 className="text-lg font-semibold text-vanguard-blue mb-4">
-              {language === "en" ? "Contact" : "Contacto"}
+              {t("footer.contact")}
             </h3>
             <div className="vanguard-divider"></div>
             <ul className="space-y-3">
@@ -106,7 +74,7 @@ export function Footer() {
           {/* Quick Links */}
           <div>
             <h3 className="text-lg font-semibold text-vanguard-blue mb-4">
-              {language === "en" ? "Quick Links" : "Enlaces Rápidos"}
+              {t("footer.quickLinks")}
             </h3>
             <div className="vanguard-divider"></div>
             <ul className="grid grid-cols-2 gap-2">
@@ -124,18 +92,29 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-gray-200 mt-12 pt-6 flex flex-col md:flex-row justify-between items-center">
+        <div className="border-t border-gray-200 mt-12 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-gray-500 text-sm">
-            © {currentYear} VANGUARD-IA. {language === "en" ? "All rights reserved." : "Todos los derechos reservados."}
+            © {currentYear} VANGUARD-IA. {t("footer.rights")}
           </p>
-          <p className="text-gray-500 text-sm mt-2 md:mt-0">
-            <a
-              href="https://www.vanguard-ia.tech"
-              className="hover:text-vanguard-blue transition-all duration-300 vanguard-button-hover"
+          <div className="flex flex-col sm:flex-row items-center gap-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowSettings(true)}
+              className="text-gray-500 hover:text-vanguard-blue text-sm"
             >
-              www.vanguard-ia.tech
-            </a>
-          </p>
+              <Settings className="h-4 w-4 mr-2" />
+              {t("footer.cookieSettings")}
+            </Button>
+            <p className="text-gray-500 text-sm">
+              <a
+                href="https://www.vanguard-ia.tech"
+                className="hover:text-vanguard-blue transition-all duration-300 vanguard-button-hover"
+              >
+                www.vanguard-ia.tech
+              </a>
+            </p>
+          </div>
         </div>
       </div>
     </footer>
