@@ -33,8 +33,23 @@ export default function RootLayout({
   return (
     <LanguageProvider>
       <HtmlWrapper>
-        {/* Temporarily disable Clerk for testing */}
-        <div>
+        <ClerkProviderWrapper
+          appearance={{
+            variables: {
+              colorPrimary: "#1F3B6D",
+              colorBackground: "#ffffff",
+              fontFamily: inter.style.fontFamily,
+              colorText: "#1F2933",
+              colorInputBackground: "#F8FAFC",
+              colorInputText: "#1F2933",
+            },
+            elements: {
+              formButtonPrimary: "bg-vanguard-blue hover:bg-vanguard-blue/90 text-white transition-all",
+              footerActionLink: "text-vanguard-blue hover:text-vanguard-blue/80",
+              card: "shadow-lg border border-slate-100 rounded-3xl",
+            },
+          }}
+        >
           <body className={inter.className}>
             <CookieProvider>
               <KnowledgeBaseProvider>
