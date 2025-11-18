@@ -7,6 +7,9 @@ import { getAllActivities } from "@/app/actions/client-activities"
 import { getAllDemos } from "@/lib/demos/catalog"
 import { EnhancedRiskAlerts } from "@/components/admin/enhanced-risk-alerts"
 
+// Force dynamic rendering since this page uses server-side authentication
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: "Gestión de Riesgos | Panel Admin - Vanguard-IA",
   description: "Monitorea y gestiona alertas de riesgo del portal de clientes.",

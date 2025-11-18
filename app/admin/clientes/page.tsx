@@ -6,6 +6,9 @@ import { clerkClient } from "@clerk/nextjs/server"
 import { ClientTable } from "@/components/admin/client-table"
 import { getClientActivityStats } from "@/app/actions/client-activities"
 
+// Force dynamic rendering since this page uses server-side authentication
+export const dynamic = 'force-dynamic'
+
 async function getClients() {
   const demos = await getAllDemos()
 
