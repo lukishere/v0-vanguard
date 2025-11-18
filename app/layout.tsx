@@ -33,23 +33,8 @@ export default function RootLayout({
   return (
     <LanguageProvider>
       <HtmlWrapper>
-        <ClerkProviderWrapper
-          appearance={{
-            variables: {
-              colorPrimary: "#1F3B6D",
-              colorBackground: "#ffffff",
-              fontFamily: inter.style.fontFamily,
-              colorText: "#1F2933",
-              colorInputBackground: "#F8FAFC",
-              colorInputText: "#1F2933",
-            },
-            elements: {
-              formButtonPrimary: "bg-vanguard-blue hover:bg-vanguard-blue/90 text-white transition-all",
-              footerActionLink: "text-vanguard-blue hover:text-vanguard-blue/80",
-              card: "shadow-lg border border-slate-100 rounded-3xl",
-            },
-          }}
-        >
+        {/* Temporarily disable Clerk for testing */}
+        <div>
           <body className={inter.className}>
             <CookieProvider>
               <KnowledgeBaseProvider>
@@ -71,7 +56,7 @@ export default function RootLayout({
               </KnowledgeBaseProvider>
             </CookieProvider>
           </body>
-        </ClerkProviderWrapper>
+        </div>
       </HtmlWrapper>
     </LanguageProvider>
   )
