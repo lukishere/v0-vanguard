@@ -1,7 +1,6 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { headers } from "next/headers"
-import { ClerkProvider } from "@clerk/nextjs"
+import { ClerkProviderWrapper } from "@/components/clerk-provider-wrapper"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { LanguageProvider } from "@/contexts/language-context"
@@ -31,13 +30,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const clerkHeaders = headers()
-
   return (
     <LanguageProvider>
       <HtmlWrapper>
-        <ClerkProvider
-          headers={clerkHeaders}
+        <ClerkProviderWrapper
           appearance={{
             variables: {
               colorPrimary: "#1F3B6D",
@@ -75,7 +71,7 @@ export default function RootLayout({
               </KnowledgeBaseProvider>
             </CookieProvider>
           </body>
-        </ClerkProvider>
+        </ClerkProviderWrapper>
       </HtmlWrapper>
     </LanguageProvider>
   )
