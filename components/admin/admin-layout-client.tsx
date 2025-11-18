@@ -19,12 +19,9 @@ export function AdminLayoutClient({ children }: AdminLayoutClientProps) {
   useEffect(() => {
     if (!isLoaded) return
 
-    // TEMPORAL: Allow access in development mode when no user is authenticated
-    // This allows testing the admin dashboard without full Clerk setup
     if (!user) {
-      console.log('[Admin Layout Client] DEVELOPMENT MODE: No user found, allowing access for testing')
-      console.log('  ⚠️  WARNING: This is temporary development access')
-      setIsAuthorized(true)
+      console.log('[Admin Layout Client] No user authenticated, redirecting to sign-in')
+      router.replace("/sign-in")
       return
     }
 
