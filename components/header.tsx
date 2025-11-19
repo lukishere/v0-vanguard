@@ -8,12 +8,14 @@ import { LanguageSwitcher } from "@/components/language-switcher"
 import { Button } from "@/components/ui/button"
 import { Menu, X } from "lucide-react"
 import { usePathname } from "next/navigation"
+import { useUser } from "@clerk/nextjs"
 
 export function Header() {
   const { t } = useLanguage()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
+  const { isSignedIn } = useUser()
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen)
@@ -70,12 +72,15 @@ export function Header() {
               </Link>
             ))}
             <LanguageSwitcher />
-            <Button
-              asChild
-              className="bg-vanguard-blue hover:bg-vanguard-blue/90 text-white transition-all duration-300 transform hover:-translate-y-0.5"
-            >
-              <Link href="/clientes/">{t("cta.getQuote")}</Link>
-            </Button>
+            {/* Only show "Acceso Clientes" button if user is NOT signed in */}
+            {!isSignedIn && (
+              <Button
+                asChild
+                className="bg-vanguard-blue hover:bg-vanguard-blue/90 text-white transition-all duration-300 transform hover:-translate-y-0.5"
+              >
+                <Link href="/clientes/">{t("cta.getQuote")}</Link>
+              </Button>
+            )}
           </nav>
 
           {/* Mobile Menu Button */}
@@ -109,14 +114,17 @@ export function Header() {
                   {item.label}
                 </Link>
               ))}
-              <Button
-                asChild
-                className="bg-vanguard-blue hover:bg-vanguard-blue/90 text-white w-full transition-all duration-300 hover:-translate-y-0.5"
-              >
-                <Link href="/clientes/" onClick={() => setIsMenuOpen(false)}>
-                  {t("cta.getQuote")}
-                </Link>
-              </Button>
+              {/* Only show "Acceso Clientes" button if user is NOT signed in */}
+              {!isSignedIn && (
+                <Button
+                  asChild
+                  className="bg-vanguard-blue hover:bg-vanguard-blue/90 text-white w-full transition-all duration-300 hover:-translate-y-0.5"
+                >
+                  <Link href="/clientes/" onClick={() => setIsMenuOpen(false)}>
+                    {t("cta.getQuote")}
+                  </Link>
+                </Button>
+              )}
             </div>
           </nav>
         )}
