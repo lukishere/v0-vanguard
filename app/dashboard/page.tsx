@@ -42,7 +42,7 @@ export default async function ClientDashboardPage() {
 
   // Fetch all data on server side
   const clientMetadata = await getClientPublicMetadata(userId, user)
-  const clientAccess = clientMetadata.demoAccess
+  const clientAccess = Array.isArray(clientMetadata.demoAccess) ? clientMetadata.demoAccess : []
 
   // Obtener todas las demos del catálogo y filtrar las eliminadas
   const deletedDemoIds = await getDeletedDemos()

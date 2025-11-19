@@ -59,13 +59,13 @@ export function getClientMetadataFromUser(user: User | null): ClientPublicMetada
   const metadata = user.publicMetadata ?? {}
 
   const role = getUserRole(user) ?? DEFAULT_METADATA.role
-  const demoAccess = normalizeDemoAccess(metadata.demoAccess)
+  const demoAccess = normalizeDemoAccess(metadata.demoAccess) ?? []
   const lastActivity = typeof metadata.lastActivity === 'string' ? metadata.lastActivity : undefined
   const customContent = normalizeCustomContent(metadata.customContent)
 
   return {
     role,
-    demoAccess,
+    demoAccess: Array.isArray(demoAccess) ? demoAccess : [],
     ...(lastActivity ? { lastActivity } : {}),
     ...(customContent ? { customContent } : {}),
   }
