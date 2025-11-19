@@ -32,6 +32,32 @@ export default clerkMiddleware(async (auth, req) => {
   // Get auth data using await auth() (recommended approach)
   const { userId, sessionClaims } = await auth()
 
+  // Initialize metadata for new users
+  if (userId && sessionClaims) {
+    const publicMetadata = sessionClaims.publicMetadata as Record<string, unknown> | undefined;
+    
+    // If user has no role, initialize with default metadata
+    if (!publicMetadata?.role) {
+      try {
+        const { clerkClient } = await import("@clerk/nextjs/server");
+        const client = await clerkClient();
+        
+        // Set default user role and empty demoAccess
+        await client.users.updateUser(userId, {
+          publicMetadata: {
+            role: "user",
+            demoAccess: [],
+            lastActivity: new Date().toISOString(),
+          },
+        });
+        
+        console.log(`✅ [Proxy] Initialized metadata for new user: ${userId}`);
+      } catch (error) {
+        console.error("❌ [Proxy] Failed to initialize user metadata:", error);
+      }
+    }
+  }
+
   // Get user role from session claims
   const userRole = getRoleFromSessionClaims(sessionClaims)
   const isUserAdmin = userRole === 'admin'
