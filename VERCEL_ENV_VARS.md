@@ -3,14 +3,24 @@
 ## 📋 Variables Requeridas
 
 ### Clerk Authentication (OBLIGATORIAS)
+
 ```
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = pk_test_c2VsZWN0ZWQtcGFuZGEtMC5jbGVyay5hY2NvdW50cy5kZXYk
 CLERK_SECRET_KEY = sk_test_5Ej1XoMPNqjfBT4WEXiH0VTR0CjuNARhGHPSC4kO9O
+CLERK_WEBHOOK_SECRET = whsec_XXXXXXXXXXXXXXXXXXXXXXXXXX
 NEXT_PUBLIC_CLERK_SIGN_IN_URL = /sign-in
 NEXT_PUBLIC_CLERK_SIGN_UP_URL = /sign-up
 ```
 
+**IMPORTANTE - Configurar Webhook:**
+1. Ve a https://dashboard.clerk.com → Tu app → "Webhooks"
+2. Click "Add Endpoint"
+3. URL: `https://tu-dominio.vercel.app/api/webhooks/clerk`
+4. Eventos: Selecciona "user.created"
+5. Copia el "Signing Secret" y úsalo como `CLERK_WEBHOOK_SECRET`
+
 ### Firebase Configuration (YA CONFIGURADAS)
+
 ```
 NEXT_PUBLIC_FIREBASE_API_KEY = AIzaSyApFVqxGU8bcPrGmnaQK3GvdBjLzSZGFow
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN = v0-vanguard.firebaseapp.com
@@ -22,6 +32,7 @@ NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID = G-4BDJL1V5MN
 ```
 
 ### Otras Variables (OPCIONALES)
+
 ```
 SMTP_HOST = smtp.gmail.com
 SMTP_PORT = 587
@@ -46,6 +57,7 @@ PERPLEXITY_API_KEY = your_perplexity_api_key_here
 ## ✅ Verificación
 
 Después del redeploy, el sitio debería:
+
 - ✅ Cargar sin errores 401/500
 - ✅ Permitir registro/login
 - ✅ Mostrar dashboard correcto según rol
@@ -56,4 +68,4 @@ Después del redeploy, el sitio debería:
 - Las variables `NEXT_PUBLIC_*` son visibles en el navegador
 - Las variables sin `NEXT_PUBLIC_` son secretas (solo backend)
 - **Clerk keys** son críticas para el funcionamiento</contents>
-</xai:function_call">Vercel
+  </xai:function_call">Vercel
