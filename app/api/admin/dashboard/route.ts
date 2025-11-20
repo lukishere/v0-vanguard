@@ -1,23 +1,24 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getDashboardMetrics } from "@/app/admin/page"
-import { getRecentActivities } from "@/app/admin/page"
+import { getAllDemos } from "@/lib/demos/catalog"
+import { clerkClient } from "@clerk/nextjs/server"
+import { getClientMetadataFromUser } from "@/lib/admin/clerk-metadata"
+import { getAllActivities } from "@/app/actions/client-activities"
+import { getAllDemoLikes } from "@/app/actions/demo-likes"
+import { getAllMeetingMilestones } from "@/app/actions/meeting-milestones"
+import { formatDistanceToNow } from "date-fns"
+import { es } from "date-fns/locale"
 
-// This is a workaround since we can't import server functions directly
-// We'll recreate the logic here
-async function getDashboardMetricsData() {
+export async function GET(request: NextRequest) {
   try {
-    // Obtener datos reales
-    const { getAllDemos } = await import("@/lib/demos/catalog")
-    const { clerkClient } = await import("@clerk/nextjs/server")
-    const { getClientMetadataFromUser } = await import("@/lib/admin/clerk-metadata")
-    const { getAllActivities } = await import("@/app/actions/client-activities")
-    const { getAllDemoLikes } = await import("@/app/actions/demo-likes")
-
+    // Get all necessary data
     const demos = await getAllDemos()
     const clerk = await clerkClient()
     const users = await clerk.users.getUserList({ limit: 200, orderBy: "-created_at" })
+    const activities = await getAllActivities()
+    const demoLikesStats = await getAllDemoLikes()
+    const meetingMilestones = await getAllMeetingMilestones()
 
-    // Filtrar clientes (usuarios no admin)
+    // Filter clients (non-admin users)
     const clients = users.data
       .map((user) => {
         const metadata = getClientMetadataFromUser(user)
@@ -25,12 +26,12 @@ async function getDashboardMetricsData() {
           id: user.id,
           metadata,
           lastActive: user.lastActiveAt,
+          createdAt: user.createdAt,
         }
       })
       .filter((entry) => entry.metadata.role !== "admin")
 
-    // Obtener actividades recientes
-    const activities = await getAllActivities()
+    // Recent activities (last week)
     const recentActivities = activities.filter(activity => {
       const activityDate = new Date(activity.timestamp)
       const oneWeekAgo = new Date()
@@ -38,47 +39,35 @@ async function getDashboardMetricsData() {
       return activityDate >= oneWeekAgo
     })
 
-    // Obtener likes de demos
-    const demoLikesStats = await getAllDemoLikes()
-
-    // Calcular métricas con lógica mejorada
+    // Calculate active clients
     const activeClients = clients.filter(client =>
       client.metadata.demoAccess.some(access =>
         new Date(access.expiresAt) > new Date()
       )
     ).length
 
-    // Demos con engagement (que tienen likes o han sido accedidas recientemente)
+    // Calculate metrics
     const engagedDemos = Object.keys(demoLikesStats).length
-
-    // Actividades de feedback (comentarios o ratings)
     const feedbackActivities = recentActivities.filter(activity =>
       activity.type === "demo-liked" || activity.type === "demo-unliked"
     ).length
-
-    // Próximas reuniones (actividades de meeting)
     const upcomingMeetings = recentActivities.filter(activity =>
       activity.type === "meeting-requested"
     ).length
 
-    // Calcular tendencias (simuladas por ahora - en producción usar datos históricos)
-    const getRandomTrend = () => Math.random() * 20 - 10 // -10% a +10%
-
-    // Determinar status basado en valores y objetivos
+    const getRandomTrend = () => Math.random() * 20 - 10
     const getClientStatus = (count: number) => {
       if (count >= 25) return "excellent"
       if (count >= 15) return "normal"
       if (count >= 8) return "warning"
       return "critical"
     }
-
     const getEngagementStatus = (count: number) => {
       if (count >= 8) return "excellent"
       if (count >= 5) return "normal"
       if (count >= 2) return "warning"
       return "critical"
     }
-
     const getFeedbackStatus = (count: number) => {
       if (count >= 15) return "excellent"
       if (count >= 8) return "normal"
@@ -86,7 +75,7 @@ async function getDashboardMetricsData() {
       return "critical"
     }
 
-    return [
+    const dynamicMetrics = [
       {
         title: "Clientes activos",
         value: activeClients.toString(),
@@ -136,59 +125,56 @@ async function getDashboardMetricsData() {
         actionLabel: "Gestionar",
       },
     ]
-  } catch (error) {
-    console.error('Error obteniendo métricas del dashboard:', error)
-    // Retornar métricas por defecto en caso de error
-    return [
-      {
-        title: "Clientes activos",
-        value: "0",
-        helperText: "Error al cargar datos",
-        icon: "Users",
-        status: "critical",
-      },
-      {
-        title: "Demos con engagement",
-        value: "0",
-        helperText: "Error al cargar datos",
-        icon: "Briefcase",
-        status: "critical",
-      },
-      {
-        title: "Feedback recibido",
-        value: "0",
-        helperText: "Error al cargar datos",
-        icon: "MessageSquare",
-        status: "critical",
-      },
-      {
-        title: "Solicitudes recientes",
-        value: "0",
-        helperText: "Error al cargar datos",
-        icon: "Calendar",
-        status: "critical",
-      },
-    ]
-  }
-}
 
-export async function GET(request: NextRequest) {
-  try {
-    const metrics = await getDashboardMetricsData()
+    // Calculate adoption pipeline
+    const adoptionPipeline = [] // Simplified for now
+
+    // Format activities for timeline
+    const formattedActivities = recentActivities.slice(0, 10).map(activity => ({
+      id: activity.id,
+      title: activity.description,
+      description: `Cliente: ${activity.clientId}`,
+      timestamp: formatDistanceToNow(new Date(activity.timestamp), { locale: es, addSuffix: true }),
+      type: "feedback",
+      clientId: activity.clientId,
+      clientEmail: activity.clientId,
+    }))
+
+    // Convert milestones
+    const convertedMilestones = meetingMilestones.map(m => ({
+      id: m.id,
+      title: m.title,
+      description: m.description,
+      type: "meeting",
+      status: "upcoming",
+      date: m.preferredDate,
+      time: m.preferredTime,
+      duration: 60,
+      attendees: [m.clientName],
+      location: "Videoconferencia",
+      meetingType: "virtual",
+      priority: "medium",
+      assignedTo: ["Equipo de cuentas"],
+      client: m.clientName,
+      clientId: m.clientId,
+      notificationStatus: "none",
+      reminderSent: false,
+      notes: m.notes,
+    }))
 
     return NextResponse.json({
-      success: true,
-      data: {
-        metrics,
-        timestamp: new Date().toISOString()
-      }
+      dynamicMetrics,
+      recentActivities: formattedActivities,
+      adoptionPipeline,
+      activeClients,
+      convertedMilestones
     })
   } catch (error) {
-    console.error('Error in dashboard refresh API:', error)
+    console.error('Error in dashboard API:', error)
     return NextResponse.json(
       {
-        success: false,
-        error: 'Failed to refresh dashboard data'
+        error: 'Failed to load dashboard data',
+        details: error instanceof Error ? error.message : 'Unknown error'
       },
       { status: 500 }
     )
@@ -196,25 +182,6 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  // This could be used for manual refresh triggers
-  try {
-    const metrics = await getDashboardMetricsData()
-
-    return NextResponse.json({
-      success: true,
-      data: {
-        metrics,
-        timestamp: new Date().toISOString()
-      }
-    })
-  } catch (error) {
-    console.error('Error in dashboard refresh API:', error)
-    return NextResponse.json(
-      {
-        success: false,
-        error: 'Failed to refresh dashboard data'
-      },
-      { status: 500 }
-    )
-  }
+  // Manual refresh trigger
+  return GET(request)
 }
