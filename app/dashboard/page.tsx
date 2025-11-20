@@ -16,6 +16,16 @@ export const metadata = {
     "Accede a demos, avances y recursos personalizados como cliente de Vanguard-IA.",
 };
 
+// Función helper para validar demos
+function isValidDemo(demo: any): demo is Demo {
+  return demo &&
+         typeof demo === 'object' &&
+         typeof demo.id === 'string' &&
+         typeof demo.name === 'string' &&
+         demo.id.length > 0 &&
+         demo.name.length > 0;
+}
+
 export default async function ClientDashboardPage() {
   const user = await currentUser();
   const userId = user?.id ?? "";
@@ -58,9 +68,9 @@ export default async function ClientDashboardPage() {
   // Obtener todas las demos del catálogo y filtrar las eliminadas
   const deletedDemoIds = await getDeletedDemos();
   const allDemosRaw = await getAllDemos();
-  const allDemos = allDemosRaw.filter(
-    (demo) => !deletedDemoIds.includes(demo.id)
-  );
+  const allDemos = allDemosRaw
+    .filter(isValidDemo) // Validar que sean objetos válidos primero
+    .filter((demo) => !deletedDemoIds.includes(demo.id));
 
   // Demos ACTIVAS: Todas las que el cliente tiene acceso asignado (y no eliminadas)
   let activeDemos: Demo[] = clientAccess
@@ -77,7 +87,7 @@ export default async function ClientDashboardPage() {
       }
       return enrichDemoWithAccess(demo, access);
     })
-    .filter((demo): demo is Demo => demo !== null)
+    .filter(isValidDemo) // Validar objetos válidos después de enrich
     .filter((demo) => demo.status === "active"); // Solo demos activas
 
   // Log básico para desarrollo
@@ -89,6 +99,7 @@ export default async function ClientDashboardPage() {
 
   // Demos DISPONIBLES: TODAS las del catálogo con status "available" (sin importar si están asignadas)
   const availableDemos = allDemos
+    .filter(isValidDemo) // Validar objetos válidos primero
     .filter((demo) => demo.status === "available")
     .map((demo) => {
       if (!demo.icon) {
@@ -100,6 +111,7 @@ export default async function ClientDashboardPage() {
 
   // Demos EN DESARROLLO: TODAS las con status "in-development" (sin importar si están asignadas)
   const inDevelopmentDemos = allDemos
+    .filter(isValidDemo) // Validar objetos válidos primero
     .filter((demo) => demo.status === "in-development")
     .map((demo) => {
       if (!demo.icon) {

@@ -7,6 +7,16 @@ import { DemoCard } from "./demo-card"
 import { ActivityTimeline } from "./activity-timeline"
 import { Target, Clock, BookOpen, Activity } from "lucide-react"
 
+// Función helper para validar demos en el cliente
+function isValidDemo(demo: any): demo is Demo {
+  return demo &&
+         typeof demo === 'object' &&
+         demo.id &&
+         demo.name &&
+         typeof demo.id === 'string' &&
+         typeof demo.name === 'string';
+}
+
 interface DemoTabsProps {
   activeDemos: Demo[]
   inDevelopmentDemos: Demo[]
@@ -76,7 +86,7 @@ export function DemoTabs({
       <TabsContent value="active" className="mt-6">
         {activeDemos.length > 0 ? (
           <div className="grid gap-6 lg:grid-cols-3">
-            {activeDemos.map((demo) => (
+            {activeDemos.filter(isValidDemo).map((demo) => (
               <DemoCard key={demo.id} demo={demo} />
             ))}
           </div>
@@ -90,7 +100,7 @@ export function DemoTabs({
       <TabsContent value="development" className="mt-6">
         {inDevelopmentDemos.length > 0 ? (
           <div className="grid gap-6 lg:grid-cols-3">
-            {inDevelopmentDemos.map((demo) => (
+            {inDevelopmentDemos.filter(isValidDemo).map((demo) => (
               <DemoCard key={demo.id} demo={demo} />
             ))}
           </div>
@@ -104,7 +114,7 @@ export function DemoTabs({
       <TabsContent value="catalog" className="mt-6">
         {availableDemos.length > 0 ? (
           <div className="grid gap-6 lg:grid-cols-3">
-            {availableDemos.map((demo) => (
+            {availableDemos.filter(isValidDemo).map((demo) => (
               <DemoCard key={demo.id} demo={demo} />
             ))}
           </div>
