@@ -312,3 +312,4 @@ pnpm tsx scripts/make-client.ts <user-id>
 **Estado**: ✅ Configuración completa y funcional
 **Última actualización**: November 16, 2025
 
+

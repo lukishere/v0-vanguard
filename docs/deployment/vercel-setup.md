@@ -5,6 +5,7 @@
 ### Required Variables
 
 #### Clerk Authentication
+
 ```bash
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_c2VsZWN0ZWQtcGFuZGEtMC5jbGVyay5hY2NvdW50cy5kZXYk
 CLERK_SECRET_KEY=sk_test_5Ej1XoMPNqjfBT4WEXiH0VTR0CjuNARhGHPSC4kO9O
@@ -14,6 +15,7 @@ NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
 ```
 
 #### Firebase Configuration
+
 ```bash
 NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyApFVqxGU8bcPrGmnaQK3GvdBjLzSZGFow
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=v0-vanguard.firebaseapp.com
@@ -25,6 +27,7 @@ NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=G-4BDJL1V5MN
 ```
 
 ### Optional Variables
+
 ```bash
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
@@ -39,11 +42,13 @@ PERPLEXITY_API_KEY=your_perplexity_key
 ## 🚀 Deployment Steps
 
 1. **Connect Repository**
+
    - Go to https://vercel.com/dashboard
    - Click "Add New Project"
    - Import from GitHub: `lukishere/v0-vanguard`
 
 2. **Configure Environment Variables**
+
    - Settings → Environment Variables
    - Add all required variables
    - Environment: Production, Preview, Development
@@ -64,12 +69,13 @@ PERPLEXITY_API_KEY=your_perplexity_key
 ## 🔍 Troubleshooting
 
 ### Build Errors
+
 - **"Function Runtimes must have a valid version"**: Delete `vercel.json`
 - **"Turbopack parsing error"**: Check code formatting consistency
 - **"Dynamic server usage"**: Add `export const dynamic = 'force-dynamic'`
 
 ### Runtime Errors
+
 - **401 Unauthorized**: Missing Clerk environment variables
 - **500 Internal Server Error**: Check Clerk webhook configuration
 - **Client-side exception**: Verify metadata initialization in webhook
-

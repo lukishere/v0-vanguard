@@ -339,3 +339,4 @@ pnpm tsx scripts/make-client.ts <userId-o-email>
 - [ ] Audit log de cambios en metadata
 
 
+

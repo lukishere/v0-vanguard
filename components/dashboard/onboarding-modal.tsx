@@ -1,43 +1,43 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { Building2, Loader2 } from "lucide-react"
-import { useState } from "react"
-import { toast } from "sonner"
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Building2, Loader2 } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 interface OnboardingModalProps {
-  isOpen: boolean
-  onComplete: () => void
+  isOpen: boolean;
+  onComplete: () => void;
 }
 
 interface CompanyProfile {
-  companyName: string
-  industry: string
-  companySize: string
-  position: string
-  phone: string
-  interests: string
+  companyName: string;
+  industry: string;
+  companySize: string;
+  position: string;
+  phone: string;
+  interests: string;
 }
 
 export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<CompanyProfile>({
     companyName: "",
     industry: "",
@@ -45,11 +45,11 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
     position: "",
     phone: "",
     interests: "",
-  })
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
+    e.preventDefault();
+    setIsSubmitting(true);
 
     try {
       const response = await fetch("/api/user/profile", {
@@ -58,31 +58,31 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
-      })
+      });
 
       if (!response.ok) {
-        throw new Error("Error al guardar el perfil")
+        throw new Error("Error al guardar el perfil");
       }
 
-      toast.success("¡Perfil completado exitosamente!")
-      onComplete()
+      toast.success("¡Perfil completado exitosamente!");
+      onComplete();
     } catch (error) {
-      console.error("Error saving profile:", error)
-      toast.error("Error al guardar el perfil. Por favor, intenta nuevamente.")
+      console.error("Error saving profile:", error);
+      toast.error("Error al guardar el perfil. Por favor, intenta nuevamente.");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const handleChange = (field: keyof CompanyProfile, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-  }
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
 
-  const isFormValid = 
+  const isFormValid =
     formData.companyName.trim() !== "" &&
     formData.industry !== "" &&
     formData.companySize !== "" &&
-    formData.position.trim() !== ""
+    formData.position.trim() !== "";
 
   return (
     <Dialog open={isOpen} onOpenChange={() => {}}>
@@ -90,11 +90,14 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
         <DialogHeader>
           <div className="flex items-center gap-2 mb-2">
             <Building2 className="h-6 w-6 text-vanguard-blue" />
-            <DialogTitle className="text-2xl">Completa tu Perfil Empresarial</DialogTitle>
+            <DialogTitle className="text-2xl">
+              Completa tu Perfil Empresarial
+            </DialogTitle>
           </div>
           <DialogDescription>
-            Para brindarte una mejor experiencia, necesitamos conocer un poco más sobre tu empresa.
-            Esta información nos ayudará a personalizar las demos y servicios según tus necesidades.
+            Para brindarte una mejor experiencia, necesitamos conocer un poco
+            más sobre tu empresa. Esta información nos ayudará a personalizar
+            las demos y servicios según tus necesidades.
           </DialogDescription>
         </DialogHeader>
 
@@ -233,6 +236,5 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
-

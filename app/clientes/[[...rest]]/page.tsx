@@ -1,3 +1,6 @@
+import { auth } from "@clerk/nextjs/server"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
 import type { Metadata } from "next"
 import { ClientSignIn } from "@/components/client-sign-in"
 
@@ -6,7 +9,9 @@ export const metadata: Metadata = {
   description: "Portal seguro para clientes de Vanguard-IA con autenticación Clerk.",
 }
 
-export default function ClientPortalPage() {
+export default async function ClientPortalPage() {
+  const { userId } = await auth()
+
   return (
     <section className="relative min-h-[70vh] bg-slate-900 text-white overflow-hidden">
       <div className="absolute inset-0">
@@ -44,21 +49,42 @@ export default function ClientPortalPage() {
         </div>
 
         <div className="w-full max-w-md rounded-3xl border border-white/10 bg-white/5 p-6 shadow-2xl backdrop-blur">
-          <ClientSignIn
-            appearance={{
-              elements: {
-                card: "shadow-none bg-transparent border-0",
-                headerTitle: "text-white",
-                headerSubtitle: "text-white/70",
-                socialButtonsBlockButton: "bg-white/10 hover:bg-white/20 text-white",
-                formFieldInput:
-                  "bg-white/10 border border-white/20 text-white placeholder:text-white/50 focus:border-vanguard-blue focus:ring-vanguard-blue/40",
-                formFieldLabel: "text-white/70",
-                footerActionLink: "text-vanguard-blue hover:text-vanguard-blue/80",
-                footer: "text-white/60",
-              },
-            }}
-          />
+          {userId ? (
+            <div className="flex flex-col items-center justify-center py-8 space-y-4 text-center">
+              <div className="p-3 rounded-full bg-vanguard-blue/20 text-vanguard-blue">
+                <span className="text-2xl">👋</span>
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold text-white">Ya has iniciado sesión</h3>
+                <p className="text-white/60 mt-2">
+                  Haz clic abajo para acceder a tu portal.
+                </p>
+              </div>
+              <Button
+                asChild
+                className="w-full bg-vanguard-blue hover:bg-vanguard-blue/90 text-white"
+                size="lg"
+              >
+                <Link href="/dashboard">Ir al Dashboard</Link>
+              </Button>
+            </div>
+          ) : (
+            <ClientSignIn
+              appearance={{
+                elements: {
+                  card: "shadow-none bg-transparent border-0",
+                  headerTitle: "text-white",
+                  headerSubtitle: "text-white/70",
+                  socialButtonsBlockButton: "bg-white/10 hover:bg-white/20 text-white",
+                  formFieldInput:
+                    "bg-white/10 border border-white/20 text-white placeholder:text-white/50 focus:border-vanguard-blue focus:ring-vanguard-blue/40",
+                  formFieldLabel: "text-white/70",
+                  footerActionLink: "text-vanguard-blue hover:text-vanguard-blue/80",
+                  footer: "text-white/60",
+                },
+              }}
+            />
+          )}
         </div>
       </div>
     </section>

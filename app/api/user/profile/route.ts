@@ -1,5 +1,4 @@
-import { clerkClient } from "@clerk/nextjs/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -20,15 +19,13 @@ export async function POST(request: Request) {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json(
-        { error: "No autenticado" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
 
     // 2. Parsear datos del formulario
     const body = await request.json();
-    const { companyName, industry, companySize, position, phone, interests } = body;
+    const { companyName, industry, companySize, position, phone, interests } =
+      body;
 
     // 3. Validar campos requeridos
     if (!companyName || !industry || !companySize || !position) {
@@ -91,10 +88,7 @@ export async function GET() {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json(
-        { error: "No autenticado" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
 
     const client = await clerkClient();
@@ -113,4 +107,3 @@ export async function GET() {
     );
   }
 }
-

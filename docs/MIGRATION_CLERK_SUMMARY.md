@@ -268,3 +268,4 @@ El middleware de Next.js:
 **¡Migración completada con éxito! 🚀**
 
 
+

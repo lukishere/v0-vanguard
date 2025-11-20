@@ -35,12 +35,13 @@ export default clerkMiddleware(async (auth, req) => {
   // Get user role from session claims
   const userRole = getRoleFromSessionClaims(sessionClaims);
   const isUserAdmin = userRole === "admin";
-  
+
   // Initialize metadata for new users (only on protected routes, not during auth flow)
-  const isAuthRoute = req.nextUrl.pathname.startsWith('/sign-in') || 
-                      req.nextUrl.pathname.startsWith('/sign-up') ||
-                      req.nextUrl.pathname.startsWith('/auth');
-  
+  const isAuthRoute =
+    req.nextUrl.pathname.startsWith("/sign-in") ||
+    req.nextUrl.pathname.startsWith("/sign-up") ||
+    req.nextUrl.pathname.startsWith("/auth");
+
   if (userId && sessionClaims && !isAuthRoute && !isPublicRoute(req)) {
     const publicMetadata = sessionClaims.publicMetadata as
       | Record<string, unknown>
@@ -62,7 +63,7 @@ export default clerkMiddleware(async (auth, req) => {
         });
 
         console.log(`✅ [Proxy] Initialized metadata for new user: ${userId}`);
-        
+
         // Redirect to refresh session with new metadata
         return NextResponse.redirect(req.url);
       } catch (error) {

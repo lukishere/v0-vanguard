@@ -124,3 +124,4 @@ pnpm tsx scripts/make-client.ts <user-id>
 **Fecha**: November 16, 2025
 **Versión**: 1.0.0
 
+
