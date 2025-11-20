@@ -97,7 +97,7 @@ export async function getAllActivities(): Promise<ClientActivity[]> {
     }
 
     // Sort by timestamp descending
-    return allActivities.sort((a, b) => 
+    return allActivities.sort((a, b) =>
       new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
     )
   } catch (error) {

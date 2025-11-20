@@ -40,7 +40,7 @@ export async function toggleDemoLike(demoId: string) {
       },
     })
 
-    console.log(isLiked ? "👎 [Likes] Unlike registrado:" : "👍 [Likes] Like registrado:", { 
+    console.log(isLiked ? "👎 [Likes] Unlike registrado:" : "👍 [Likes] Like registrado:", {
       demoId,
       clientId: userId,
     })
@@ -55,10 +55,10 @@ export async function toggleDemoLike(demoId: string) {
 // Obtener estadísticas de likes para una demo
 export async function getDemoLikeStats(demoId: string): Promise<DemoLikeStats> {
   const { userId } = await auth()
-  
+
   try {
     const clerk = await clerkClient()
-    
+
     // Get current user's like status
     let likedByCurrentUser = false
     if (userId) {
@@ -105,7 +105,7 @@ export async function getAllDemoLikes(): Promise<Record<string, number>> {
     for (const user of users.data) {
       const metadata = (user.publicMetadata || {}) as any
       const likedDemos = (metadata.likedDemos || []) as string[]
-      
+
       for (const demoId of likedDemos) {
         stats[demoId] = (stats[demoId] || 0) + 1
       }

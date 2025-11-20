@@ -152,7 +152,7 @@ export async function getAllServiceRequests(): Promise<ServiceRequest[]> {
       allRequests.push(...serviceRequests)
     }
 
-    return allRequests.sort((a, b) => 
+    return allRequests.sort((a, b) =>
       new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime()
     )
   } catch (error) {
@@ -169,7 +169,7 @@ export async function getClientServiceRequests(clientId: string): Promise<Servic
     const metadata = (user.publicMetadata || {}) as any
     const serviceRequests = (metadata.serviceRequests || []) as ServiceRequest[]
 
-    return serviceRequests.sort((a, b) => 
+    return serviceRequests.sort((a, b) =>
       new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime()
     )
   } catch (error) {

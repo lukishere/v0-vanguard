@@ -3,7 +3,7 @@
 import { auth, clerkClient } from "@clerk/nextjs/server"
 import { revalidatePath } from "next/cache"
 
-export type MeetingMilestoneType = 
+export type MeetingMilestoneType =
   | "demo-call"
   | "technical-session"
   | "contract-review"
@@ -154,7 +154,7 @@ export async function getAllMeetingMilestones(): Promise<MeetingMilestone[]> {
       allMilestones.push(...meetingMilestones)
     }
 
-    return allMilestones.sort((a, b) => 
+    return allMilestones.sort((a, b) =>
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     )
   } catch (error) {
@@ -178,7 +178,7 @@ export async function getClientMeetingMilestones(clientId?: string): Promise<Mee
     const metadata = (user.publicMetadata || {}) as any
     const meetingMilestones = (metadata.meetingMilestones || []) as MeetingMilestone[]
 
-    return meetingMilestones.sort((a, b) => 
+    return meetingMilestones.sort((a, b) =>
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     )
   } catch (error) {
@@ -241,6 +241,15 @@ export async function requestMeetingMilestone(
   }
 
   try {
+    const clerk = await clerkClient()
+    const user = await clerk.users.getUser(userId)
+    const metadata = (user.publicMetadata || {}) as any
+
+    const clientName = `${user.firstName || ''} ${user.lastName || ''}`.trim() ||
+                       user.username ||
+                       user.emailAddresses[0]?.emailAddress ||
+                       'Cliente'
+
     // Map meeting type to milestone type
     const typeMap: Record<string, MeetingMilestoneType> = {
       demo: "demo-call",
@@ -252,17 +261,49 @@ export async function requestMeetingMilestone(
     const title = `${meetingType === "demo" ? "Demo" : meetingType === "consultation" ? "Consulta" : "Implementación"} - ${productType}`
     const scheduledFor = `${preferredDate}T${preferredTime}:00`
 
-    return await createMeetingMilestone(
-      milestoneType,
+    const milestoneId = `mtg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+
+    const milestone: MeetingMilestone = {
+      id: milestoneId,
+      clientId: userId,
+      clientName,
+      type: milestoneType,
       title,
-      notes,
+      description: notes,
       scheduledFor,
-      undefined,
-      productType
-    )
+      demoName: productType,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }
+
+    const meetingMilestones = (metadata.meetingMilestones || []) as MeetingMilestone[]
+    meetingMilestones.push(milestone)
+
+    await clerk.users.updateUser(userId, {
+      publicMetadata: {
+        ...metadata,
+        meetingMilestones,
+      },
+    })
+
+    console.log("📅 [Meeting Request] Reunión solicitada:", {
+      id: milestoneId,
+      type: milestoneType,
+      title,
+      cliente: clientName,
+      scheduledFor,
+    })
+
+    revalidatePath("/admin")
+    revalidatePath("/dashboard")
+
+    return { success: true, milestoneId, milestone }
   } catch (error) {
-    console.error("Error al solicitar reunión:", error)
-    return { success: false, error: "Error al procesar la solicitud" }
+    console.error("❌ [Meeting Request] Error al solicitar reunión:", error)
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : "Error al procesar la solicitud" 
+    }
   }
 }
 

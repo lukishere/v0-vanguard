@@ -65,7 +65,7 @@ export function ClientDashboardWrapper({
       try {
         // Force reload to get fresh metadata from Clerk
         await user.reload();
-        
+
         // Check if onboarding is already completed in metadata
         const metadata = user.publicMetadata as any;
         const onboardingCompleted = metadata?.onboardingCompleted === true;
@@ -107,26 +107,26 @@ export function ClientDashboardWrapper({
         // Multiple retries to ensure Clerk metadata is synchronized
         let retries = 0;
         const maxRetries = 5;
-        
+
         while (retries < maxRetries) {
           await user.reload();
           const metadata = user.publicMetadata as any;
-          
+
           if (metadata?.onboardingCompleted === true) {
             console.log(`✅ [Onboarding] Metadata actualizada correctamente (intento ${retries + 1})`);
             break;
           }
-          
+
           if (retries < maxRetries - 1) {
             console.warn(
               `⚠️ [Onboarding] Metadata aún no sincronizada, reintentando... (${retries + 1}/${maxRetries})`
             );
             await new Promise(resolve => setTimeout(resolve, 1000 * (retries + 1)));
           }
-          
+
           retries++;
         }
-        
+
         if (retries === maxRetries) {
           console.error("❌ [Onboarding] Metadata no se sincronizó después de múltiples intentos");
         }
