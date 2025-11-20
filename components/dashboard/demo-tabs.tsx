@@ -7,14 +7,20 @@ import { DemoCard } from "./demo-card"
 import { ActivityTimeline } from "./activity-timeline"
 import { Target, Clock, BookOpen, Activity } from "lucide-react"
 
-// Función helper para validar demos en el cliente
+// Función helper para validar demos en el cliente (más defensiva)
 function isValidDemo(demo: any): demo is Demo {
-  return demo &&
-         typeof demo === 'object' &&
-         demo.id &&
-         demo.name &&
-         typeof demo.id === 'string' &&
-         typeof demo.name === 'string';
+  try {
+    return demo &&
+           typeof demo === 'object' &&
+           demo !== null &&
+           typeof demo.id === 'string' &&
+           typeof demo.name === 'string' &&
+           demo.id.trim().length > 0 &&
+           demo.name.trim().length > 0;
+  } catch (error) {
+    console.warn('⚠️ [DemoTabs] Error validating demo:', error);
+    return false;
+  }
 }
 
 interface DemoTabsProps {
@@ -35,6 +41,12 @@ export function DemoTabs({
   availableDemos,
   activities = [],
 }: DemoTabsProps) {
+  // Defensive programming: ensure arrays are valid
+  const safeActiveDemos = Array.isArray(activeDemos) ? activeDemos.filter(isValidDemo) : [];
+  const safeInDevelopmentDemos = Array.isArray(inDevelopmentDemos) ? inDevelopmentDemos.filter(isValidDemo) : [];
+  const safeAvailableDemos = Array.isArray(availableDemos) ? availableDemos.filter(isValidDemo) : [];
+  const safeActivities = Array.isArray(activities) ? activities : [];
+
   return (
     <Tabs defaultValue="active" className="w-full">
       <TabsList className="grid w-full grid-cols-4 bg-slate-800/60 border border-white/20 p-2 rounded-xl h-auto">
@@ -44,9 +56,9 @@ export function DemoTabs({
         >
           <Target className="h-5 w-5" />
           <span className="hidden sm:inline">Activas</span>
-          {activeDemos.length > 0 && (
+          {safeActiveDemos.length > 0 && (
             <span className="ml-1 px-2.5 py-1 text-xs rounded-full bg-vanguard-blue/30 text-vanguard-blue font-semibold">
-              {activeDemos.length}
+              {safeActiveDemos.length}
             </span>
           )}
         </TabsTrigger>
@@ -56,9 +68,9 @@ export function DemoTabs({
         >
           <Clock className="h-5 w-5" />
           <span className="hidden sm:inline">En Desarrollo</span>
-          {inDevelopmentDemos.length > 0 && (
+          {safeInDevelopmentDemos.length > 0 && (
             <span className="ml-1 px-2.5 py-1 text-xs rounded-full bg-amber-500/30 text-amber-400 font-semibold">
-              {inDevelopmentDemos.length}
+              {safeInDevelopmentDemos.length}
             </span>
           )}
         </TabsTrigger>
@@ -68,9 +80,9 @@ export function DemoTabs({
         >
           <BookOpen className="h-5 w-5" />
           <span className="hidden sm:inline">Disponibles</span>
-          {availableDemos.length > 0 && (
+          {safeAvailableDemos.length > 0 && (
             <span className="ml-1 px-2.5 py-1 text-xs rounded-full bg-blue-500/30 text-blue-400 font-semibold">
-              {availableDemos.length}
+              {safeAvailableDemos.length}
             </span>
           )}
         </TabsTrigger>
@@ -84,9 +96,9 @@ export function DemoTabs({
       </TabsList>
 
       <TabsContent value="active" className="mt-6">
-        {activeDemos.length > 0 ? (
+        {safeActiveDemos.length > 0 ? (
           <div className="grid gap-6 lg:grid-cols-3">
-            {activeDemos.filter(isValidDemo).map((demo) => (
+            {safeActiveDemos.map((demo) => (
               <DemoCard key={demo.id} demo={demo} />
             ))}
           </div>
@@ -98,9 +110,9 @@ export function DemoTabs({
       </TabsContent>
 
       <TabsContent value="development" className="mt-6">
-        {inDevelopmentDemos.length > 0 ? (
+        {safeInDevelopmentDemos.length > 0 ? (
           <div className="grid gap-6 lg:grid-cols-3">
-            {inDevelopmentDemos.filter(isValidDemo).map((demo) => (
+            {safeInDevelopmentDemos.map((demo) => (
               <DemoCard key={demo.id} demo={demo} />
             ))}
           </div>
@@ -112,9 +124,9 @@ export function DemoTabs({
       </TabsContent>
 
       <TabsContent value="catalog" className="mt-6">
-        {availableDemos.length > 0 ? (
+        {safeAvailableDemos.length > 0 ? (
           <div className="grid gap-6 lg:grid-cols-3">
-            {availableDemos.filter(isValidDemo).map((demo) => (
+            {safeAvailableDemos.map((demo) => (
               <DemoCard key={demo.id} demo={demo} />
             ))}
           </div>
@@ -126,7 +138,7 @@ export function DemoTabs({
       </TabsContent>
 
       <TabsContent value="activity" className="mt-6">
-        <ActivityTimeline activities={activities} />
+        <ActivityTimeline activities={safeActivities} />
       </TabsContent>
     </Tabs>
   )

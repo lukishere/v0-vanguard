@@ -16,14 +16,20 @@ export const metadata = {
     "Accede a demos, avances y recursos personalizados como cliente de Vanguard-IA.",
 };
 
-// Función helper para validar demos
+// Función helper para validar demos (más defensiva)
 function isValidDemo(demo: any): demo is Demo {
-  return demo &&
-         typeof demo === 'object' &&
-         typeof demo.id === 'string' &&
-         typeof demo.name === 'string' &&
-         demo.id.length > 0 &&
-         demo.name.length > 0;
+  try {
+    return demo &&
+           typeof demo === 'object' &&
+           demo !== null &&
+           typeof demo.id === 'string' &&
+           typeof demo.name === 'string' &&
+           demo.id.trim().length > 0 &&
+           demo.name.trim().length > 0;
+  } catch (error) {
+    console.warn('⚠️ [Dashboard] Error validating demo:', error);
+    return false;
+  }
 }
 
 export default async function ClientDashboardPage() {

@@ -89,14 +89,21 @@ export function ClientDashboardWrapper({
         }
       } catch (error) {
         console.error("❌ [Onboarding] Error verificando estado:", error);
-        // En caso de error, no mostrar el modal para evitar bloquear al usuario
+        // En caso de error, asumir que el usuario ya completó onboarding para evitar bloquearlo
         setShowOnboarding(false);
       } finally {
         setIsCheckingOnboarding(false);
       }
     };
 
-    checkOnboarding();
+    // Add additional error boundary
+    try {
+      checkOnboarding();
+    } catch (error) {
+      console.error("❌ [Onboarding] Error crítico en checkOnboarding:", error);
+      setShowOnboarding(false);
+      setIsCheckingOnboarding(false);
+    }
   }, [user]);
 
   const handleOnboardingComplete = async () => {
