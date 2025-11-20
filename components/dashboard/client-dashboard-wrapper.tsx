@@ -8,12 +8,14 @@ import { ClientMilestones } from "@/components/dashboard/client-milestones"
 import { ConversionBanner } from "@/components/dashboard/conversion-banner"
 import { DemoTabs } from "@/components/dashboard/demo-tabs"
 import { MessagesPanel } from "@/components/dashboard/messages-panel"
+import { OnboardingModal } from "@/components/dashboard/onboarding-modal"
 import DecryptedText from "@/components/DecryptedText"
 import { useActivityTracker } from "@/hooks/use-activity-tracker"
 import type { Demo } from "@/lib/demos/types"
 import { shouldShowConversionBanner } from "@/lib/demos/utils"
 import { useUser } from "@clerk/nextjs"
 import { Bot } from "lucide-react"
+import { useEffect, useState } from "react"
 
 interface DashboardData {
   firstName: string
@@ -34,10 +36,59 @@ interface ClientDashboardWrapperProps {
 export function ClientDashboardWrapper({ initialData }: ClientDashboardWrapperProps) {
   const { user } = useUser()
   const { updateActivity } = useActivityTracker()
+  const [showOnboarding, setShowOnboarding] = useState(false)
+  const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(true)
 
   const { firstName, activeDemos, availableDemos, inDevelopmentDemos, activities, meetingMilestones, minDaysRemaining, criticalDemo, expiringDemos } = initialData
 
+  // Check if user needs to complete onboarding
+  useEffect(() => {
+    const checkOnboarding = async () => {
+      if (!user) {
+        setIsCheckingOnboarding(false)
+        return
+      }
+
+      try {
+        // Check if onboarding is already completed in metadata
+        const metadata = user.publicMetadata as any
+        const onboardingCompleted = metadata?.onboardingCompleted || false
+
+        if (!onboardingCompleted) {
+          console.log("🎯 [Onboarding] Usuario necesita completar perfil empresarial")
+          setShowOnboarding(true)
+        } else {
+          console.log("✅ [Onboarding] Usuario ya completó el perfil empresarial")
+        }
+      } catch (error) {
+        console.error("❌ [Onboarding] Error verificando estado:", error)
+      } finally {
+        setIsCheckingOnboarding(false)
+      }
+    }
+
+    checkOnboarding()
+  }, [user])
+
+  const handleOnboardingComplete = async () => {
+    console.log("✅ [Onboarding] Perfil completado, recargando metadata...")
+    setShowOnboarding(false)
+    
+    // Recargar el usuario para obtener metadata actualizada
+    if (user) {
+      await user.reload()
+    }
+  }
+
   return (
+    <>
+      {/* Onboarding Modal */}
+      <OnboardingModal 
+        isOpen={showOnboarding} 
+        onComplete={handleOnboardingComplete}
+      />
+
+      {/* Main Dashboard */}
     <div className="relative min-h-screen overflow-hidden bg-slate-950 text-white">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.18),_rgba(2,6,23,0.92))]" />
       <div className="relative z-10 py-16">
@@ -109,5 +160,6 @@ export function ClientDashboardWrapper({ initialData }: ClientDashboardWrapperPr
         </div>
       </div>
     </div>
+    </>
   )
 }
