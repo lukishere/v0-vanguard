@@ -9,6 +9,7 @@ import { ConversionBanner } from "@/components/dashboard/conversion-banner";
 import { DemoTabs } from "@/components/dashboard/demo-tabs";
 import { MessagesPanel } from "@/components/dashboard/messages-panel";
 import { OnboardingModal } from "@/components/dashboard/onboarding-modal";
+import { ProfileButton } from "@/components/dashboard/profile-button";
 import DecryptedText from "@/components/DecryptedText";
 import { useActivityTracker } from "@/hooks/use-activity-tracker";
 import type { Demo } from "@/lib/demos/types";
@@ -92,7 +93,24 @@ export function ClientDashboardWrapper({
 
     // Recargar el usuario para obtener metadata actualizada
     if (user) {
-      await user.reload();
+      try {
+        await user.reload();
+        
+        // Verificar que la metadata se haya actualizado
+        const metadata = user.publicMetadata as any;
+        if (metadata?.onboardingCompleted) {
+          console.log("✅ [Onboarding] Metadata actualizada correctamente");
+        } else {
+          console.warn("⚠️ [Onboarding] Metadata aún no se ha sincronizado, reintentando...");
+          // Esperar un poco más y reintentar
+          setTimeout(async () => {
+            await user.reload();
+            console.log("✅ [Onboarding] Segunda recarga completada");
+          }, 1000);
+        }
+      } catch (error) {
+        console.error("❌ [Onboarding] Error recargando usuario:", error);
+      }
     }
   };
 
@@ -132,6 +150,7 @@ export function ClientDashboardWrapper({
                   tu proyecto al siguiente nivel.
                 </p>
                 <div className="flex items-center gap-3">
+                  <ProfileButton />
                   <MessagesPanel />
                   <DashboardLogoutButton />
                 </div>

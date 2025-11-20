@@ -2,7 +2,7 @@
 
 **Fecha:** 2024-11-20
 **Tipo:** Bug Fix - Critical
-**Archivos:** 
+**Archivos:**
 - `app/api/admin/dashboard/route.ts`
 - `components/admin/admin-layout-client.tsx`
 - `components/DecryptedText.jsx`
@@ -17,7 +17,7 @@ El panel de administración mostraba el error:
 Application error: a client-side exception has occurred
 ```
 
-**Causa raíz:** 
+**Causa raíz:**
 El endpoint `/api/admin/dashboard` devolvía una estructura de datos incompatible con el componente `DashboardWrapper`:
 
 ```typescript
@@ -129,7 +129,7 @@ import { motion } from 'motion/react';
 import { motion } from 'framer-motion';
 ```
 
-**Razón:** 
+**Razón:**
 - `motion/react` es una importación experimental que puede no estar disponible en todos los entornos
 - `framer-motion` es la librería estándar y estable incluida en `package.json`
 
@@ -335,4 +335,3 @@ git push origin 19-11-25
 - [x] Push a GitHub completado
 - [ ] Vercel deploy completado
 - [ ] Validación en producción
-
