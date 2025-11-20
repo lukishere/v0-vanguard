@@ -41,11 +41,45 @@ export function DemoTabs({
   availableDemos,
   activities = [],
 }: DemoTabsProps) {
-  // Defensive programming: ensure arrays are valid
-  const safeActiveDemos = Array.isArray(activeDemos) ? activeDemos.filter(isValidDemo) : [];
-  const safeInDevelopmentDemos = Array.isArray(inDevelopmentDemos) ? inDevelopmentDemos.filter(isValidDemo) : [];
-  const safeAvailableDemos = Array.isArray(availableDemos) ? availableDemos.filter(isValidDemo) : [];
-  const safeActivities = Array.isArray(activities) ? activities : [];
+  // ULTRA defensive programming: validate all props first
+  const validActiveDemos = Array.isArray(activeDemos) ? activeDemos : [];
+  const validInDevelopmentDemos = Array.isArray(inDevelopmentDemos) ? inDevelopmentDemos : [];
+  const validAvailableDemos = Array.isArray(availableDemos) ? availableDemos : [];
+  const validActivities = Array.isArray(activities) ? activities : [];
+
+  // DEBUG: Log array states
+  console.log('🚀 [DemoTabs] Props received:', {
+    activeDemosLength: validActiveDemos.length,
+    inDevelopmentDemosLength: validInDevelopmentDemos.length,
+    availableDemosLength: validAvailableDemos.length,
+    activitiesLength: validActivities.length,
+    hasInvalidActive: validActiveDemos.some(d => !isValidDemo(d)),
+    hasInvalidInDev: validInDevelopmentDemos.some(d => !isValidDemo(d)),
+    hasInvalidAvailable: validAvailableDemos.some(d => !isValidDemo(d))
+  });
+
+  // Filter out invalid demos with error handling
+  let safeActiveDemos, safeInDevelopmentDemos, safeAvailableDemos, safeActivities;
+
+  try {
+    safeActiveDemos = validActiveDemos.filter(isValidDemo);
+    safeInDevelopmentDemos = validInDevelopmentDemos.filter(isValidDemo);
+    safeAvailableDemos = validAvailableDemos.filter(isValidDemo);
+    safeActivities = validActivities;
+
+    console.log('✅ [DemoTabs] Filtered arrays:', {
+      safeActiveDemosLength: safeActiveDemos.length,
+      safeInDevelopmentDemosLength: safeInDevelopmentDemos.length,
+      safeAvailableDemosLength: safeAvailableDemos.length
+    });
+  } catch (error) {
+    console.error('❌ [DemoTabs] Error filtering demos:', error);
+    // Fallback to empty arrays
+    safeActiveDemos = [];
+    safeInDevelopmentDemos = [];
+    safeAvailableDemos = [];
+    safeActivities = [];
+  }
 
   return (
     <Tabs defaultValue="active" className="w-full">

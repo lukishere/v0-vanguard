@@ -130,13 +130,13 @@ export default async function ClientDashboardPage() {
   // Calcular días mínimos restantes para el banner
   const minDaysRemaining =
     activeDemos.length > 0
-      ? Math.min(...activeDemos.map((d) => d.daysRemaining ?? Infinity))
+      ? Math.min(...activeDemos.filter(isValidDemo).map((d) => d.daysRemaining ?? Infinity))
       : null;
 
   // Encontrar la demo con menos días restantes para el banner (demo crítica)
   const criticalDemo =
     activeDemos.length > 0
-      ? activeDemos.reduce((min, demo) => {
+      ? activeDemos.filter(isValidDemo).reduce((min, demo) => {
           const daysMin = min.daysRemaining ?? Infinity;
           const daysCurrent = demo.daysRemaining ?? Infinity;
           return daysCurrent < daysMin ? demo : min;
@@ -152,15 +152,16 @@ export default async function ClientDashboardPage() {
   );
 
   // Debug básico para el banner (solo en desarrollo)
-  if (
-    process.env.NODE_ENV === "development" &&
-    minDaysRemaining !== null &&
-    minDaysRemaining <= 7
-  ) {
-    console.log("🚨 [Dashboard] Banner activo:", {
+  if (process.env.NODE_ENV === "development") {
+    console.log("📊 [Dashboard] Server state:", {
+      activeDemosCount: activeDemos.length,
+      availableDemosCount: availableDemos.length,
+      inDevelopmentDemosCount: inDevelopmentDemos.length,
       minDaysRemaining,
       criticalDemo: criticalDemo?.name,
-      activeDemosCount: activeDemos.length,
+      hasInvalidActive: activeDemos.some(d => !isValidDemo(d)),
+      hasInvalidAvailable: availableDemos.some(d => !isValidDemo(d)),
+      hasInvalidInDev: inDevelopmentDemos.some(d => !isValidDemo(d))
     });
   }
 
