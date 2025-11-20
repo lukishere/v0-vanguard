@@ -65,13 +65,7 @@ export function ClientDashboardWrapper({
       try {
         // Check if onboarding is already completed in metadata
         const metadata = user.publicMetadata as any;
-        const onboardingCompleted = metadata?.onboardingCompleted === true;
-
-        console.log("🔍 [Onboarding] Estado actual:", {
-          userId: user.id,
-          onboardingCompleted,
-          metadata: metadata?.companyProfile ? "Perfil existe" : "Sin perfil"
-        });
+        const onboardingCompleted = metadata?.onboardingCompleted || false;
 
         if (!onboardingCompleted) {
           console.log(
@@ -82,12 +76,9 @@ export function ClientDashboardWrapper({
           console.log(
             "✅ [Onboarding] Usuario ya completó el perfil empresarial"
           );
-          setShowOnboarding(false);
         }
       } catch (error) {
         console.error("❌ [Onboarding] Error verificando estado:", error);
-        // En caso de error, no mostrar el modal para evitar bloquear al usuario
-        setShowOnboarding(false);
       } finally {
         setIsCheckingOnboarding(false);
       }
@@ -103,31 +94,19 @@ export function ClientDashboardWrapper({
     // Recargar el usuario para obtener metadata actualizada
     if (user) {
       try {
-        // Multiple retries to ensure Clerk metadata is synchronized
-        let retries = 0;
-        const maxRetries = 5;
-
-        while (retries < maxRetries) {
-          await user.reload();
-          const metadata = user.publicMetadata as any;
-
-          if (metadata?.onboardingCompleted === true) {
-            console.log(`✅ [Onboarding] Metadata actualizada correctamente (intento ${retries + 1})`);
-            break;
-          }
-
-          if (retries < maxRetries - 1) {
-            console.warn(
-              `⚠️ [Onboarding] Metadata aún no sincronizada, reintentando... (${retries + 1}/${maxRetries})`
-            );
-            await new Promise(resolve => setTimeout(resolve, 1000 * (retries + 1)));
-          }
-
-          retries++;
-        }
-
-        if (retries === maxRetries) {
-          console.error("❌ [Onboarding] Metadata no se sincronizó después de múltiples intentos");
+        await user.reload();
+        
+        // Verificar que la metadata se haya actualizado
+        const metadata = user.publicMetadata as any;
+        if (metadata?.onboardingCompleted) {
+          console.log("✅ [Onboarding] Metadata actualizada correctamente");
+        } else {
+          console.warn("⚠️ [Onboarding] Metadata aún no se ha sincronizado, reintentando...");
+          // Esperar un poco más y reintentar
+          setTimeout(async () => {
+            await user.reload();
+            console.log("✅ [Onboarding] Segunda recarga completada");
+          }, 1000);
         }
       } catch (error) {
         console.error("❌ [Onboarding] Error recargando usuario:", error);

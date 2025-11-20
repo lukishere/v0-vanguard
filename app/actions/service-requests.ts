@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache"
 import { auth, clerkClient } from "@clerk/nextjs/server"
+import fs from "fs/promises"
+import path from "path"
 
 export type ServiceRequestType = "contract" | "extend"
 
@@ -16,10 +18,37 @@ export interface ServiceRequest {
   demoId?: string
   demoName?: string
   currentExpiration?: string
-  contactPreference?: string
 }
 
-// Solicitar contratación de servicio usando Clerk metadata
+// Persistencia con archivos JSON
+const DATA_DIR = path.join(process.cwd(), ".data")
+const SERVICE_REQUESTS_FILE = path.join(DATA_DIR, "service-requests.json")
+
+async function ensureDataDir() {
+  try {
+    await fs.mkdir(DATA_DIR, { recursive: true })
+  } catch (error) {
+    // Ignorar si ya existe
+  }
+}
+
+async function loadRequests(): Promise<Map<string, ServiceRequest>> {
+  try {
+    const data = await fs.readFile(SERVICE_REQUESTS_FILE, "utf-8")
+    const obj = JSON.parse(data)
+    return new Map(Object.entries(obj))
+  } catch (error) {
+    return new Map()
+  }
+}
+
+async function saveRequests(requests: Map<string, ServiceRequest>) {
+  await ensureDataDir()
+  const obj = Object.fromEntries(requests)
+  await fs.writeFile(SERVICE_REQUESTS_FILE, JSON.stringify(obj, null, 2), "utf-8")
+}
+
+// Solicitar contratación de servicio
 export async function requestServiceContract(message: string, contactPreference?: string, demoId?: string) {
   const { userId } = await auth()
 
@@ -28,9 +57,11 @@ export async function requestServiceContract(message: string, contactPreference?
   }
 
   try {
+    const requests = await loadRequests()
+
+    // Obtener información del cliente
     const clerk = await clerkClient()
     const user = await clerk.users.getUser(userId)
-    const metadata = (user.publicMetadata || {}) as any
 
     const clientName = `${user.firstName || ''} ${user.lastName || ''}`.trim() ||
                        user.username ||
@@ -49,19 +80,10 @@ export async function requestServiceContract(message: string, contactPreference?
       message: `${message}${contactPreference ? `\n\nPreferencia de contacto: ${contactPreference}` : ''}`,
       requestedAt: new Date().toISOString(),
       demoId,
-      contactPreference,
     }
 
-    // Store in user metadata
-    const serviceRequests = (metadata.serviceRequests || []) as ServiceRequest[]
-    serviceRequests.push(request)
-
-    await clerk.users.updateUser(userId, {
-      publicMetadata: {
-        ...metadata,
-        serviceRequests,
-      },
-    })
+    requests.set(requestId, request)
+    await saveRequests(requests)
 
     console.log("🚀 [Service Request] Solicitud de contratación:", {
       requestId,
@@ -78,7 +100,7 @@ export async function requestServiceContract(message: string, contactPreference?
   }
 }
 
-// Solicitar extensión de demo usando Clerk metadata
+// Solicitar extensión de demo
 export async function requestDemoExtension(demoId: string, demoName: string, currentExpiration: string, reason?: string) {
   const { userId } = await auth()
 
@@ -87,9 +109,11 @@ export async function requestDemoExtension(demoId: string, demoName: string, cur
   }
 
   try {
+    const requests = await loadRequests()
+
+    // Obtener información del cliente
     const clerk = await clerkClient()
     const user = await clerk.users.getUser(userId)
-    const metadata = (user.publicMetadata || {}) as any
 
     const clientName = `${user.firstName || ''} ${user.lastName || ''}`.trim() ||
                        user.username ||
@@ -112,16 +136,8 @@ export async function requestDemoExtension(demoId: string, demoName: string, cur
       currentExpiration,
     }
 
-    // Store in user metadata
-    const serviceRequests = (metadata.serviceRequests || []) as ServiceRequest[]
-    serviceRequests.push(request)
-
-    await clerk.users.updateUser(userId, {
-      publicMetadata: {
-        ...metadata,
-        serviceRequests,
-      },
-    })
+    requests.set(requestId, request)
+    await saveRequests(requests)
 
     console.log("⏰ [Service Request] Solicitud de extensión:", {
       requestId,
@@ -139,41 +155,17 @@ export async function requestDemoExtension(demoId: string, demoName: string, cur
   }
 }
 
-// Obtener todas las solicitudes de servicio (para admin)
+// Obtener todas las solicitudes de servicio
 export async function getAllServiceRequests(): Promise<ServiceRequest[]> {
-  try {
-    const clerk = await clerkClient()
-    const users = await clerk.users.getUserList({ limit: 500 })
-    const allRequests: ServiceRequest[] = []
-
-    for (const user of users.data) {
-      const metadata = (user.publicMetadata || {}) as any
-      const serviceRequests = (metadata.serviceRequests || []) as ServiceRequest[]
-      allRequests.push(...serviceRequests)
-    }
-
-    return allRequests.sort((a, b) =>
-      new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime()
-    )
-  } catch (error) {
-    console.error("Error getting all service requests:", error)
-    return []
-  }
+  const requests = await loadRequests()
+  return Array.from(requests.values())
+    .sort((a, b) => new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime())
 }
 
 // Obtener solicitudes de un cliente
 export async function getClientServiceRequests(clientId: string): Promise<ServiceRequest[]> {
-  try {
-    const clerk = await clerkClient()
-    const user = await clerk.users.getUser(clientId)
-    const metadata = (user.publicMetadata || {}) as any
-    const serviceRequests = (metadata.serviceRequests || []) as ServiceRequest[]
-
-    return serviceRequests.sort((a, b) =>
-      new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime()
-    )
-  } catch (error) {
-    console.error("Error getting client service requests:", error)
-    return []
-  }
+  const requests = await loadRequests()
+  return Array.from(requests.values())
+    .filter(req => req.clientId === clientId)
+    .sort((a, b) => new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime())
 }

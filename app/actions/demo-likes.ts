@@ -1,6 +1,8 @@
 "use server"
 
-import { auth, clerkClient } from "@clerk/nextjs/server"
+import { auth } from "@clerk/nextjs/server"
+import fs from "fs/promises"
+import path from "path"
 
 export interface DemoLike {
   demoId: string
@@ -14,7 +16,32 @@ export interface DemoLikeStats {
   likedByCurrentUser: boolean
 }
 
-// Toggle like usando Clerk metadata
+const DATA_DIR = path.join(process.cwd(), ".data")
+const LIKES_FILE = path.join(DATA_DIR, "demo-likes.json")
+
+async function ensureDataDir() {
+  try {
+    await fs.mkdir(DATA_DIR, { recursive: true })
+  } catch (error) {
+    // Ignorar si ya existe
+  }
+}
+
+async function loadLikes(): Promise<DemoLike[]> {
+  try {
+    const data = await fs.readFile(LIKES_FILE, "utf-8")
+    return JSON.parse(data)
+  } catch (error) {
+    return []
+  }
+}
+
+async function saveLikes(likes: DemoLike[]) {
+  await ensureDataDir()
+  await fs.writeFile(LIKES_FILE, JSON.stringify(likes, null, 2), "utf-8")
+}
+
+// Dar like a una demo
 export async function toggleDemoLike(demoId: string) {
   const { userId } = await auth()
 
@@ -23,29 +50,40 @@ export async function toggleDemoLike(demoId: string) {
   }
 
   try {
-    const clerk = await clerkClient()
-    const user = await clerk.users.getUser(userId)
-    const metadata = (user.publicMetadata || {}) as any
-    const likedDemos = (metadata.likedDemos || []) as string[]
+    const likes = await loadLikes()
+    const existingLikeIndex = likes.findIndex(
+      like => like.demoId === demoId && like.clientId === userId
+    )
 
-    const isLiked = likedDemos.includes(demoId)
-    const updatedLikes = isLiked
-      ? likedDemos.filter((id: string) => id !== demoId)
-      : [...likedDemos, demoId]
+    if (existingLikeIndex >= 0) {
+      // Ya tiene like, removerlo (unlike)
+      likes.splice(existingLikeIndex, 1)
+      await saveLikes(likes)
 
-    await clerk.users.updateUser(userId, {
-      publicMetadata: {
-        ...metadata,
-        likedDemos: updatedLikes,
-      },
-    })
+      console.log("👎 [Likes] Unlike registrado:", {
+        demoId,
+        clientId: userId,
+      })
 
-    console.log(isLiked ? "👎 [Likes] Unlike registrado:" : "👍 [Likes] Like registrado:", {
-      demoId,
-      clientId: userId,
-    })
+      return { success: true, liked: false }
+    } else {
+      // No tiene like, agregarlo
+      const newLike: DemoLike = {
+        demoId,
+        clientId: userId,
+        likedAt: new Date().toISOString(),
+      }
 
-    return { success: true, liked: !isLiked }
+      likes.push(newLike)
+      await saveLikes(likes)
+
+      console.log("👍 [Likes] Like registrado:", {
+        demoId,
+        clientId: userId,
+      })
+
+      return { success: true, liked: true }
+    }
   } catch (error) {
     console.error("Error al toggle like:", error)
     return { success: false, error: "Error al procesar el like" }
@@ -55,67 +93,26 @@ export async function toggleDemoLike(demoId: string) {
 // Obtener estadísticas de likes para una demo
 export async function getDemoLikeStats(demoId: string): Promise<DemoLikeStats> {
   const { userId } = await auth()
+  const likes = await loadLikes()
+  const demoLikes = likes.filter(like => like.demoId === demoId)
 
-  try {
-    const clerk = await clerkClient()
-
-    // Get current user's like status
-    let likedByCurrentUser = false
-    if (userId) {
-      const user = await clerk.users.getUser(userId)
-      const metadata = (user.publicMetadata || {}) as any
-      const likedDemos = (metadata.likedDemos || []) as string[]
-      likedByCurrentUser = likedDemos.includes(demoId)
-    }
-
-    // Count total likes for this demo across all users
-    const users = await clerk.users.getUserList({ limit: 500 })
-    let totalLikes = 0
-
-    for (const user of users.data) {
-      const metadata = (user.publicMetadata || {}) as any
-      const likedDemos = (metadata.likedDemos || []) as string[]
-      if (likedDemos.includes(demoId)) {
-        totalLikes++
-      }
-    }
-
-    return {
-      demoId,
-      totalLikes,
-      likedByCurrentUser,
-    }
-  } catch (error) {
-    console.error("Error getting demo like stats:", error)
-    return {
-      demoId,
-      totalLikes: 0,
-      likedByCurrentUser: false,
-    }
+  return {
+    demoId,
+    totalLikes: demoLikes.length,
+    likedByCurrentUser: userId ? demoLikes.some(like => like.clientId === userId) : false,
   }
 }
 
 // Obtener todas las estadísticas de likes (para admin)
 export async function getAllDemoLikes(): Promise<Record<string, number>> {
-  try {
-    const clerk = await clerkClient()
-    const users = await clerk.users.getUserList({ limit: 500 })
-    const stats: Record<string, number> = {}
+  const likes = await loadLikes()
+  const stats: Record<string, number> = {}
 
-    for (const user of users.data) {
-      const metadata = (user.publicMetadata || {}) as any
-      const likedDemos = (metadata.likedDemos || []) as string[]
+  likes.forEach(like => {
+    stats[like.demoId] = (stats[like.demoId] || 0) + 1
+  })
 
-      for (const demoId of likedDemos) {
-        stats[demoId] = (stats[demoId] || 0) + 1
-      }
-    }
-
-    return stats
-  } catch (error) {
-    console.error("Error getting all demo likes:", error)
-    return {}
-  }
+  return stats
 }
 
 // Obtener demos más populares

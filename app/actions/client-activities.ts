@@ -1,12 +1,39 @@
 "use server"
 
-import { auth, clerkClient } from "@clerk/nextjs/server"
+import { auth } from "@clerk/nextjs/server"
+import fs from "fs/promises"
+import path from "path"
 import type { ActivityType, ClientActivity } from "@/lib/activities/constants"
 
 // Re-export types for convenience
 export type { ActivityType, ClientActivity }
 
-// Registrar una actividad usando Clerk privateMetadata
+const DATA_DIR = path.join(process.cwd(), ".data")
+const ACTIVITIES_FILE = path.join(DATA_DIR, "client-activities.json")
+
+async function ensureDataDir() {
+  try {
+    await fs.mkdir(DATA_DIR, { recursive: true })
+  } catch (error) {
+    // Ignorar si ya existe
+  }
+}
+
+async function loadActivities(): Promise<ClientActivity[]> {
+  try {
+    const data = await fs.readFile(ACTIVITIES_FILE, "utf-8")
+    return JSON.parse(data)
+  } catch (error) {
+    return []
+  }
+}
+
+async function saveActivities(activities: ClientActivity[]) {
+  await ensureDataDir()
+  await fs.writeFile(ACTIVITIES_FILE, JSON.stringify(activities, null, 2), "utf-8")
+}
+
+// Registrar una actividad
 export async function logActivity(
   type: ActivityType,
   description: string,
@@ -20,11 +47,7 @@ export async function logActivity(
   }
 
   try {
-    const clerk = await clerkClient()
-    const user = await clerk.users.getUser(userId)
-    const privateData = (user.privateMetadata || {}) as any
-    const publicData = (user.publicMetadata || {}) as any
-    const activities = (privateData.activityLog || []) as ClientActivity[]
+    const activities = await loadActivities()
 
     const newActivity: ClientActivity = {
       id: `act_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -35,19 +58,8 @@ export async function logActivity(
       metadata,
     }
 
-    // Keep last 100 activities per user
-    const updatedActivities = [newActivity, ...activities].slice(0, 100)
-
-    await clerk.users.updateUser(userId, {
-      privateMetadata: {
-        ...privateData,
-        activityLog: updatedActivities,
-      },
-      publicMetadata: {
-        ...publicData,
-        lastActivity: newActivity.timestamp,
-      },
-    })
+    activities.push(newActivity)
+    await saveActivities(activities)
 
     console.log(`📊 [Activities] ${type}:`, {
       clientId: userId,
@@ -64,106 +76,59 @@ export async function logActivity(
 
 // Obtener actividades del cliente actual
 export async function getMyActivities(limit?: number): Promise<ClientActivity[]> {
-  try {
-    const { userId } = await auth()
+  const { userId } = await auth()
 
-    if (!userId) {
-      console.log("⚠️ [Activities] No userId found")
-      return []
-    }
-
-    const clerk = await clerkClient()
-    const user = await clerk.users.getUser(userId)
-    
-    if (!user) {
-      console.log("⚠️ [Activities] User not found in Clerk")
-      return []
-    }
-
-    const privateData = (user.privateMetadata || {}) as any
-    const activities = (privateData.activityLog || []) as ClientActivity[]
-
-    console.log(`📊 [Activities] Found ${activities.length} activities for user ${userId}`)
-
-    return limit ? activities.slice(0, limit) : activities
-  } catch (error) {
-    console.error("❌ [Activities] Error al obtener actividades:", error)
+  if (!userId) {
     return []
   }
-}
 
-// Obtener todas las actividades (para admin)
-export async function getAllActivities(): Promise<ClientActivity[]> {
-  try {
-    const clerk = await clerkClient()
-    const users = await clerk.users.getUserList({ limit: 500 })
-    const allActivities: ClientActivity[] = []
+  const activities = await loadActivities()
+  const myActivities = activities
+    .filter(act => act.clientId === userId)
+    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
 
-    for (const user of users.data) {
-      const privateData = (user.privateMetadata || {}) as any
-      const activities = (privateData.activityLog || []) as ClientActivity[]
-      allActivities.push(...activities)
-    }
-
-    // Sort by timestamp descending
-    return allActivities.sort((a, b) =>
-      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-    )
-  } catch (error) {
-    console.error("Error al obtener todas las actividades:", error)
-    return []
-  }
+  return limit ? myActivities.slice(0, limit) : myActivities
 }
 
 // Obtener actividades de un cliente específico (para admin)
 export async function getClientActivities(clientId: string): Promise<ClientActivity[]> {
-  try {
-    const clerk = await clerkClient()
-    const user = await clerk.users.getUser(clientId)
-    const privateData = (user.privateMetadata || {}) as any
-    return (privateData.activityLog || []) as ClientActivity[]
-  } catch (error) {
-    console.error("Error al obtener actividades del cliente:", error)
-    return []
-  }
+  const activities = await loadActivities()
+  return activities
+    .filter(act => act.clientId === clientId)
+    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
 }
 
-// Limpiar actividades antiguas (más de 90 días)
-export async function cleanOldActivities() {
-  const { userId } = await auth()
+// Obtener todas las actividades (para analytics admin)
+export async function getAllActivities(limit?: number): Promise<ClientActivity[]> {
+  const activities = await loadActivities()
+  const sorted = activities.sort(
+    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+  )
 
-  if (!userId) {
-    return { success: false, error: "Usuario no autenticado" }
-  }
+  return limit ? sorted.slice(0, limit) : sorted
+}
 
-  try {
-    const clerk = await clerkClient()
-    const user = await clerk.users.getUser(userId)
-    const privateData = (user.privateMetadata || {}) as any
-    const activities = (privateData.activityLog || []) as ClientActivity[]
+// Obtener estadísticas de actividad de un cliente
+export async function getClientActivityStats(clientId: string) {
+  const activities = await loadActivities()
+  const clientActivities = activities.filter(act => act.clientId === clientId)
 
-    const ninetyDaysAgo = new Date()
-    ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90)
+  const byType: Record<string, number> = {}
+  clientActivities.forEach(act => {
+    byType[act.type] = (byType[act.type] || 0) + 1
+  })
 
-    const recentActivities = activities.filter(
-      (activity) => new Date(activity.timestamp) > ninetyDaysAgo
-    )
+  const last7Days = clientActivities.filter(act => {
+    const daysDiff = (Date.now() - new Date(act.timestamp).getTime()) / (1000 * 60 * 60 * 24)
+    return daysDiff <= 7
+  })
 
-    if (recentActivities.length < activities.length) {
-      await clerk.users.updateUser(userId, {
-        privateMetadata: {
-          ...privateData,
-          activityLog: recentActivities,
-        },
-      })
-
-      console.log(`🧹 [Activities] Limpiadas ${activities.length - recentActivities.length} actividades antiguas`)
-      return { success: true, cleaned: activities.length - recentActivities.length }
-    }
-
-    return { success: true, cleaned: 0 }
-  } catch (error) {
-    console.error("Error al limpiar actividades:", error)
-    return { success: false, error: "Error al limpiar actividades" }
+  return {
+    total: clientActivities.length,
+    byType,
+    last7Days: last7Days.length,
+    lastActivity: clientActivities.length > 0
+      ? clientActivities.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0]
+      : null,
   }
 }
