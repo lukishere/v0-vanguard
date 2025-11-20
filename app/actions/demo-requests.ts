@@ -2,8 +2,6 @@
 
 import { revalidatePath } from "next/cache"
 import { auth, clerkClient } from "@clerk/nextjs/server"
-import fs from "fs/promises"
-import path from "path"
 import { upsertClientDemoAccess } from "@/lib/admin/clerk-metadata"
 import { sendMessageToClient } from "@/app/actions/messages"
 import type { ClientDemoAccess } from "@/lib/demos/types"
@@ -24,33 +22,106 @@ export interface DemoRequest {
   processedBy?: string
 }
 
-// Persistencia con archivos JSON
-const DATA_DIR = path.join(process.cwd(), ".data")
-const REQUESTS_FILE = path.join(DATA_DIR, "demo-requests.json")
+/**
+ * NUEVO SISTEMA DE PERSISTENCIA - Clerk privateMetadata
+ * 
+ * Las solicitudes se almacenan en el privateMetadata de un usuario "admin especial"
+ * o en una colección centralizada. Para simplificar, usaremos el privateMetadata
+ * del primer admin encontrado o crearemos un sistema de almacenamiento global.
+ * 
+ * Estructura en Clerk:
+ * privateMetadata: {
+ *   demoRequests: {
+ *     [requestId]: DemoRequest
+ *   }
+ * }
+ */
 
-async function ensureDataDir() {
+const STORAGE_USER_EMAIL = "demo-requests-storage@vanguard-ia.internal"
+
+/**
+ * Obtiene o crea un usuario especial para almacenar las solicitudes de demos
+ */
+async function getStorageUser() {
+  const clerk = await clerkClient()
+  
   try {
-    await fs.mkdir(DATA_DIR, { recursive: true })
+    // Buscar usuario de almacenamiento
+    const users = await clerk.users.getUserList({
+      emailAddress: [STORAGE_USER_EMAIL],
+    })
+    
+    if (users.data.length > 0) {
+      return users.data[0]
+    }
+    
+    // Si no existe, usar el sistema de metadata global
+    // En su lugar, almacenaremos en el privateMetadata de cada usuario individual
+    console.log("⚠️ [Demo Requests] Usando almacenamiento distribuido por usuario")
+    return null
   } catch (error) {
-    // Ignorar si ya existe
+    console.error("❌ [Demo Requests] Error obteniendo usuario de almacenamiento:", error)
+    return null
   }
 }
 
+/**
+ * Carga todas las solicitudes desde Clerk metadata
+ * Busca en todos los usuarios con rol admin para encontrar solicitudes almacenadas
+ */
 async function loadRequests(): Promise<Map<string, DemoRequest>> {
+  const clerk = await clerkClient()
+  const allRequests = new Map<string, DemoRequest>()
+  
   try {
-    const data = await fs.readFile(REQUESTS_FILE, "utf-8")
-    const obj = JSON.parse(data)
-    return new Map(Object.entries(obj))
+    // Obtener todos los usuarios para buscar solicitudes en sus privateMetadata
+    const users = await clerk.users.getUserList({ limit: 500 })
+    
+    for (const user of users.data) {
+      const metadata = user.privateMetadata as any
+      const userRequests = metadata?.demoRequests || {}
+      
+      // Agregar solicitudes de este usuario al mapa global
+      for (const [requestId, request] of Object.entries(userRequests)) {
+        allRequests.set(requestId, request as DemoRequest)
+      }
+    }
+    
+    return allRequests
   } catch (error) {
-    // Si el archivo no existe, retornar Map vacío
+    console.error("❌ [Demo Requests] Error cargando solicitudes:", error)
     return new Map()
   }
 }
 
-async function saveRequests(requests: Map<string, DemoRequest>) {
-  await ensureDataDir()
-  const obj = Object.fromEntries(requests)
-  await fs.writeFile(REQUESTS_FILE, JSON.stringify(obj, null, 2), "utf-8")
+/**
+ * Guarda una solicitud en el privateMetadata del usuario que la creó
+ */
+async function saveRequest(request: DemoRequest) {
+  const clerk = await clerkClient()
+  
+  try {
+    // Obtener metadata actual del usuario
+    const user = await clerk.users.getUser(request.clientId)
+    const metadata = user.privateMetadata as any
+    const userRequests = metadata?.demoRequests || {}
+    
+    // Agregar/actualizar la solicitud
+    userRequests[request.id] = request
+    
+    // Guardar en Clerk
+    await clerk.users.updateUser(request.clientId, {
+      privateMetadata: {
+        ...metadata,
+        demoRequests: userRequests,
+      },
+    })
+    
+    console.log("✅ [Demo Requests] Solicitud guardada en Clerk:", request.id)
+  } catch (error) {
+    console.error("❌ [Demo Requests] Error guardando solicitud:", error)
+    throw error
+  }
 }
 
 export async function requestDemoAccess(demoId: string, demoName: string, message?: string) {
@@ -61,20 +132,25 @@ export async function requestDemoAccess(demoId: string, demoName: string, messag
   }
 
   try {
-    const requestsStore = await loadRequests()
-
-    // Verificar si ya existe una solicitud pendiente
-    const existingRequest = Array.from(requestsStore.values()).find(
-      req => req.clientId === userId && req.demoId === demoId && req.status === "pending"
-    )
-
-    if (existingRequest) {
-      return { success: false, error: "Ya tienes una solicitud pendiente para esta demo", requestId: existingRequest.id }
-    }
-
     // Obtener información del cliente desde Clerk
     const clerk = await clerkClient()
     const user = await clerk.users.getUser(userId)
+    
+    // Verificar si ya existe una solicitud pendiente en el privateMetadata del usuario
+    const metadata = user.privateMetadata as any
+    const userRequests = metadata?.demoRequests || {}
+    
+    const existingRequest = Object.values(userRequests).find(
+      (req: any) => req.demoId === demoId && req.status === "pending"
+    )
+
+    if (existingRequest) {
+      return { 
+        success: false, 
+        error: "Ya tienes una solicitud pendiente para esta demo", 
+        requestId: (existingRequest as DemoRequest).id 
+      }
+    }
 
     const clientName = `${user.firstName || ''} ${user.lastName || ''}`.trim() ||
                        user.username ||
@@ -96,18 +172,15 @@ export async function requestDemoAccess(demoId: string, demoName: string, messag
       message,
     }
 
-    requestsStore.set(requestId, request)
-    await saveRequests(requestsStore)
+    // Guardar solicitud en Clerk privateMetadata del usuario
+    await saveRequest(request)
 
-    const pendingCount = Array.from(requestsStore.values()).filter(r => r.status === "pending").length
-
-    console.log("📋 [Demo Request] Nueva solicitud:", {
+    console.log("📋 [Demo Request] Nueva solicitud guardada en Clerk:", {
       requestId,
       cliente: clientName,
       email: clientEmail,
       demo: demoName,
       mensaje: message,
-      totalPendientes: pendingCount
     })
 
     revalidatePath("/admin/solicitudes")
@@ -116,7 +189,7 @@ export async function requestDemoAccess(demoId: string, demoName: string, messag
 
     return { success: true, requestId }
   } catch (error) {
-    console.error("Error al solicitar demo:", error)
+    console.error("❌ [Demo Request] Error al solicitar demo:", error)
     return { success: false, error: "Error al procesar la solicitud" }
   }
 }
@@ -164,8 +237,9 @@ export async function approveRequest(requestId: string, durationDays: number = 3
     request.status = "approved"
     request.processedAt = new Date().toISOString()
     request.processedBy = userId
-    requestsStore.set(requestId, request)
-    await saveRequests(requestsStore)
+    
+    // Guardar en Clerk privateMetadata del usuario
+    await saveRequest(request)
 
     // Asignar acceso real a la demo en Clerk
     const now = new Date()
@@ -270,8 +344,9 @@ export async function rejectRequest(requestId: string, reason?: string) {
     request.processedAt = new Date().toISOString()
     request.processedBy = userId
     request.message = reason
-    requestsStore.set(requestId, request)
-    await saveRequests(requestsStore)
+    
+    // Guardar en Clerk privateMetadata del usuario
+    await saveRequest(request)
 
     console.log("❌ [Demo Request] Solicitud rechazada:", {
       requestId,
