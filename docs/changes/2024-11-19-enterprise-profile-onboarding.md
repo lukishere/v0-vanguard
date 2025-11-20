@@ -7,6 +7,7 @@
 ## 📋 Problema
 
 Los usuarios nuevos no tenían un mecanismo para proporcionar información empresarial al iniciar sesión por primera vez. Esta información es crucial para:
+
 - Personalizar la experiencia del usuario
 - Ofrecer demos y servicios relevantes según la industria
 - Mejorar la comunicación con el equipo de ventas
@@ -17,19 +18,23 @@ Los usuarios nuevos no tenían un mecanismo para proporcionar información empre
 ### Archivos Creados:
 
 #### 1. **`components/dashboard/onboarding-modal.tsx`**
+
 Modal de onboarding con formulario para capturar:
 
 **Campos Requeridos:**
+
 - ✅ Nombre de la Empresa
 - ✅ Industria (select con opciones predefinidas)
 - ✅ Tamaño de la Empresa (rangos de empleados)
 - ✅ Cargo del Usuario
 
 **Campos Opcionales:**
+
 - Teléfono
 - Áreas de Interés (textarea)
 
 **Características:**
+
 - Validación de campos requeridos
 - Estados de carga (loading) durante el envío
 - Notificaciones toast para feedback
@@ -37,9 +42,11 @@ Modal de onboarding con formulario para capturar:
 - Diseño responsive y accesible
 
 #### 2. **`app/api/user/profile/route.ts`**
+
 API endpoint para gestionar perfiles empresariales:
 
 **POST `/api/user/profile`:**
+
 - Valida autenticación del usuario
 - Valida campos requeridos
 - Guarda perfil en `publicMetadata.companyProfile`
@@ -47,10 +54,12 @@ API endpoint para gestionar perfiles empresariales:
 - Retorna confirmación de éxito
 
 **GET `/api/user/profile`:**
+
 - Retorna perfil actual del usuario
 - Retorna estado de onboarding completado
 
 **Estructura de datos guardada:**
+
 ```typescript
 {
   companyProfile: {
@@ -67,9 +76,11 @@ API endpoint para gestionar perfiles empresariales:
 ```
 
 #### 3. **`components/dashboard/client-dashboard-wrapper.tsx`** (Modificado)
+
 Integración del modal de onboarding:
 
 **Lógica implementada:**
+
 - `useEffect` verifica `publicMetadata.onboardingCompleted` al montar
 - Si es `false` o `undefined`, muestra el modal
 - Al completar, recarga metadata del usuario
@@ -88,11 +99,13 @@ Integración del modal de onboarding:
 ## 🧪 Testing
 
 ### Build:
+
 - ✅ `pnpm build` exitoso sin errores
 - ✅ No hay errores de linter
 - ✅ API route correctamente registrada: `ƒ /api/user/profile`
 
 ### Validaciones necesarias en Vercel:
+
 - [ ] Modal aparece en primer login
 - [ ] Formulario valida campos requeridos
 - [ ] POST guarda correctamente en Clerk metadata
@@ -103,6 +116,7 @@ Integración del modal de onboarding:
 ## 📦 Impacto
 
 **Componentes afectados:**
+
 - `components/dashboard/client-dashboard-wrapper.tsx` (modificado)
 - `components/dashboard/onboarding-modal.tsx` (nuevo)
 - `app/api/user/profile/route.ts` (nuevo)
@@ -110,6 +124,7 @@ Integración del modal de onboarding:
 **Breaking changes:** Ninguno
 
 **Compatibilidad:**
+
 - Usuarios existentes sin `onboardingCompleted` verán el modal
 - Usuarios con perfil completado no se ven afectados
 
@@ -124,15 +139,15 @@ Integración del modal de onboarding:
 
 Los siguientes datos se almacenan en `publicMetadata.companyProfile`:
 
-| Campo | Tipo | Requerido | Descripción |
-|-------|------|-----------|-------------|
-| `companyName` | string | ✅ | Nombre de la empresa |
-| `industry` | string | ✅ | Industria (tecnología, finanzas, etc.) |
-| `companySize` | string | ✅ | Rango de empleados |
-| `position` | string | ✅ | Cargo del usuario |
-| `phone` | string | ❌ | Teléfono de contacto |
-| `interests` | string | ❌ | Áreas de interés |
-| `completedAt` | string | ✅ | Timestamp ISO de completado |
+| Campo         | Tipo   | Requerido | Descripción                            |
+| ------------- | ------ | --------- | -------------------------------------- |
+| `companyName` | string | ✅        | Nombre de la empresa                   |
+| `industry`    | string | ✅        | Industria (tecnología, finanzas, etc.) |
+| `companySize` | string | ✅        | Rango de empleados                     |
+| `position`    | string | ✅        | Cargo del usuario                      |
+| `phone`       | string | ❌        | Teléfono de contacto                   |
+| `interests`   | string | ❌        | Áreas de interés                       |
+| `completedAt` | string | ✅        | Timestamp ISO de completado            |
 
 ## 🎯 Próximos Pasos
 

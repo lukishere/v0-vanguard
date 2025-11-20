@@ -53,4 +53,3 @@ El botón "Acceso Clientes" en el header se mostraba para todos los usuarios, in
 - [ ] Verificar en Vercel que el botón desaparece al hacer login
 - [ ] Confirmar que el botón aparece al hacer logout
 - [ ] Probar en mobile y desktop
-

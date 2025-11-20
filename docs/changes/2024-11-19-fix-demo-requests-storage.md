@@ -10,11 +10,11 @@ El sistema de solicitudes de demos estaba almacenando datos en el **filesystem l
 
 ```typescript
 // ❌ CÓDIGO ANTERIOR (NO FUNCIONA EN VERCEL)
-const DATA_DIR = path.join(process.cwd(), ".data")
-const REQUESTS_FILE = path.join(DATA_DIR, "demo-requests.json")
+const DATA_DIR = path.join(process.cwd(), ".data");
+const REQUESTS_FILE = path.join(DATA_DIR, "demo-requests.json");
 
 async function saveRequests(requests: Map<string, DemoRequest>) {
-  await fs.writeFile(REQUESTS_FILE, JSON.stringify(obj, null, 2), "utf-8")
+  await fs.writeFile(REQUESTS_FILE, JSON.stringify(obj, null, 2), "utf-8");
 }
 ```
 
@@ -27,6 +27,7 @@ async function saveRequests(requests: Map<string, DemoRequest>) {
 5. ❌ No persistente entre instancias serverless
 
 ### **Error reportado:**
+
 ```
 Error al solicitar demo
 Error al procesar la solicitud
@@ -41,19 +42,19 @@ Migración completa a almacenamiento en **Clerk privateMetadata**, donde cada us
 ```typescript
 // ✅ NUEVO CÓDIGO (FUNCIONA EN VERCEL)
 async function saveRequest(request: DemoRequest) {
-  const clerk = await clerkClient()
-  const user = await clerk.users.getUser(request.clientId)
-  const metadata = user.privateMetadata as any
-  const userRequests = metadata?.demoRequests || {}
+  const clerk = await clerkClient();
+  const user = await clerk.users.getUser(request.clientId);
+  const metadata = user.privateMetadata as any;
+  const userRequests = metadata?.demoRequests || {};
 
-  userRequests[request.id] = request
+  userRequests[request.id] = request;
 
   await clerk.users.updateUser(request.clientId, {
     privateMetadata: {
       ...metadata,
       demoRequests: userRequests,
     },
-  })
+  });
 }
 ```
 
@@ -84,87 +85,94 @@ async function saveRequest(request: DemoRequest) {
 ## 🔄 Cambios Realizados
 
 ### **Funciones eliminadas:**
+
 - ❌ `ensureDataDir()` - Ya no necesitamos crear directorios
 - ❌ `saveRequests(Map)` - Reemplazada por `saveRequest(single)`
 
 ### **Funciones modificadas:**
 
 #### 1. **`loadRequests()`**
+
 **Antes:** Leía de archivo JSON
 **Ahora:** Agrega solicitudes de todos los usuarios
 
 ```typescript
 async function loadRequests(): Promise<Map<string, DemoRequest>> {
-  const clerk = await clerkClient()
-  const allRequests = new Map<string, DemoRequest>()
+  const clerk = await clerkClient();
+  const allRequests = new Map<string, DemoRequest>();
 
-  const users = await clerk.users.getUserList({ limit: 500 })
+  const users = await clerk.users.getUserList({ limit: 500 });
 
   for (const user of users.data) {
-    const metadata = user.privateMetadata as any
-    const userRequests = metadata?.demoRequests || {}
+    const metadata = user.privateMetadata as any;
+    const userRequests = metadata?.demoRequests || {};
 
     for (const [requestId, request] of Object.entries(userRequests)) {
-      allRequests.set(requestId, request as DemoRequest)
+      allRequests.set(requestId, request as DemoRequest);
     }
   }
 
-  return allRequests
+  return allRequests;
 }
 ```
 
 #### 2. **`requestDemoAccess()`**
+
 **Cambio:** Usa `saveRequest()` en lugar de `saveRequests()`
 
 ```typescript
 // Antes
-requestsStore.set(requestId, request)
-await saveRequests(requestsStore)
+requestsStore.set(requestId, request);
+await saveRequests(requestsStore);
 
 // Ahora
-await saveRequest(request)
+await saveRequest(request);
 ```
 
 #### 3. **`approveRequest()`**
+
 **Cambio:** Usa `saveRequest()` para actualizar estado
 
 ```typescript
-request.status = "approved"
-request.processedAt = new Date().toISOString()
-request.processedBy = userId
-await saveRequest(request) // ✅ Guarda en Clerk
+request.status = "approved";
+request.processedAt = new Date().toISOString();
+request.processedBy = userId;
+await saveRequest(request); // ✅ Guarda en Clerk
 ```
 
 #### 4. **`rejectRequest()`**
+
 **Cambio:** Usa `saveRequest()` para actualizar estado
 
 ```typescript
-request.status = "rejected"
-request.processedAt = new Date().toISOString()
-request.processedBy = userId
-request.message = reason
-await saveRequest(request) // ✅ Guarda en Clerk
+request.status = "rejected";
+request.processedAt = new Date().toISOString();
+request.processedBy = userId;
+request.message = reason;
+await saveRequest(request); // ✅ Guarda en Clerk
 ```
 
 ## 🎯 Beneficios
 
-| Aspecto | Antes (Filesystem) | Ahora (Clerk) |
-|---------|-------------------|---------------|
-| **Persistencia** | ❌ Se pierde en deploy | ✅ Permanente |
-| **Vercel** | ❌ No funciona | ✅ Compatible |
-| **Escalabilidad** | ❌ Un solo archivo | ✅ Distribuido |
-| **Seguridad** | ⚠️ Archivo local | ✅ privateMetadata |
-| **Backup** | ❌ Manual | ✅ Automático (Clerk) |
-| **Sincronización** | ❌ Problemas multi-instancia | ✅ Centralizado |
+| Aspecto            | Antes (Filesystem)           | Ahora (Clerk)         |
+| ------------------ | ---------------------------- | --------------------- |
+| **Persistencia**   | ❌ Se pierde en deploy       | ✅ Permanente         |
+| **Vercel**         | ❌ No funciona               | ✅ Compatible         |
+| **Escalabilidad**  | ❌ Un solo archivo           | ✅ Distribuido        |
+| **Seguridad**      | ⚠️ Archivo local             | ✅ privateMetadata    |
+| **Backup**         | ❌ Manual                    | ✅ Automático (Clerk) |
+| **Sincronización** | ❌ Problemas multi-instancia | ✅ Centralizado       |
 
 ## 🧪 Testing
 
 ### Build:
+
 - ✅ `pnpm build` exitoso sin errores
 - ✅ No hay errores de linter
 - ✅ Dependencia `fs/promises` removida
 
 ### Validaciones necesarias en Vercel:
+
 - [ ] Solicitar demo desde dashboard funciona
 - [ ] Solicitud se guarda en Clerk privateMetadata
 - [ ] Admin puede ver solicitudes en `/admin/solicitudes`
@@ -175,11 +183,13 @@ await saveRequest(request) // ✅ Guarda en Clerk
 ## 📦 Impacto
 
 **Archivos afectados:**
+
 - `app/actions/demo-requests.ts` (modificado)
 
 **Breaking changes:** Ninguno
 
 **Migración de datos:**
+
 - Las solicitudes antiguas en `.data/demo-requests.json` NO se migran automáticamente
 - Si existen solicitudes antiguas, se pueden migrar manualmente a Clerk
 - Nuevas solicitudes usan el nuevo sistema
@@ -194,10 +204,12 @@ await saveRequest(request) // ✅ Guarda en Clerk
 ## 📊 Estructura de Acceso
 
 ### **Usuario regular:**
+
 - Puede crear solicitudes (se guardan en su `privateMetadata`)
 - Puede ver sus propias solicitudes vía `getClientRequests(userId)`
 
 ### **Admin:**
+
 - Puede ver todas las solicitudes vía `getAllRequests()`
 - Puede aprobar/rechazar solicitudes
 - Puede filtrar por estado (pending, approved, rejected)
@@ -205,6 +217,7 @@ await saveRequest(request) // ✅ Guarda en Clerk
 ## ⚠️ Consideraciones
 
 ### **Límites de Clerk:**
+
 - `privateMetadata` tiene un límite de **~8KB por usuario**
 - Cada solicitud ocupa ~500 bytes
 - Límite estimado: **~16 solicitudes por usuario**
@@ -213,6 +226,7 @@ await saveRequest(request) // ✅ Guarda en Clerk
   - Mover a base de datos externa (Firebase, Supabase)
 
 ### **Performance:**
+
 - `loadRequests()` itera sobre todos los usuarios
 - Con 500 usuarios, puede tardar 2-3 segundos
 - Considerar caché si el volumen crece

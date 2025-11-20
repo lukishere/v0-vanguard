@@ -9,6 +9,7 @@
 El panel de administración mostraba el mensaje **"Verificando permisos de administrador..."** indefinidamente, sin permitir el acceso incluso a usuarios con permisos correctos.
 
 ### **Síntomas:**
+
 - ✅ Usuario con rol `admin` en `publicMetadata`
 - ❌ Pantalla de carga infinita
 - ❌ No redirige ni muestra error
@@ -18,25 +19,27 @@ El panel de administración mostraba el mensaje **"Verificando permisos de admin
 
 ```typescript
 // ❌ CÓDIGO PROBLEMÁTICO
-const [isAuthorized, setIsAuthorized] = useState(false)
+const [isAuthorized, setIsAuthorized] = useState(false);
 
 useEffect(() => {
   // ...
   if (!hasAdminRole) {
-    router.replace("/dashboard/")
-    return  // ⚠️ No actualiza isAuthorized
+    router.replace("/dashboard/");
+    return; // ⚠️ No actualiza isAuthorized
   }
-  
-  setIsAuthorized(true)  // ✅ Solo se ejecuta si es admin
-}, [user, isLoaded, router])
+
+  setIsAuthorized(true); // ✅ Solo se ejecuta si es admin
+}, [user, isLoaded, router]);
 
 // Condición de loading
-if (!isLoaded || !isAuthorized) {  // ⚠️ isAuthorized siempre false si no es admin
-  return <LoadingScreen />
+if (!isLoaded || !isAuthorized) {
+  // ⚠️ isAuthorized siempre false si no es admin
+  return <LoadingScreen />;
 }
 ```
 
 **Problema:**
+
 1. Si `isAdmin()` retorna `false` → Ejecuta `router.replace()` y hace `return`
 2. `isAuthorized` **nunca se actualiza** a `false` explícitamente
 3. Componente se queda en loading porque `!isAuthorized` es `true`
@@ -47,34 +50,34 @@ if (!isLoaded || !isAuthorized) {  // ⚠️ isAuthorized siempre false si no es
 ### **1. Nuevo estado: `isChecking`**
 
 ```typescript
-const [isChecking, setIsChecking] = useState(true)
+const [isChecking, setIsChecking] = useState(true);
 
 useEffect(() => {
-  if (!isLoaded) return
+  if (!isLoaded) return;
 
   if (!user) {
-    router.replace("/sign-in")
-    setIsChecking(false)  // ✅ Actualizar estado
-    return
+    router.replace("/sign-in");
+    setIsChecking(false); // ✅ Actualizar estado
+    return;
   }
 
-  const hasAdminRole = isAdmin(userForCheck)
+  const hasAdminRole = isAdmin(userForCheck);
 
   if (!hasAdminRole) {
     // Timeout para asegurar que el redirect ocurra
     const redirectTimer = setTimeout(() => {
-      router.replace("/dashboard/")
-    }, 100)
-    
-    setIsChecking(false)  // ✅ Actualizar estado
-    setIsAuthorized(false)  // ✅ Explícitamente false
-    
-    return () => clearTimeout(redirectTimer)
+      router.replace("/dashboard/");
+    }, 100);
+
+    setIsChecking(false); // ✅ Actualizar estado
+    setIsAuthorized(false); // ✅ Explícitamente false
+
+    return () => clearTimeout(redirectTimer);
   }
 
-  setIsAuthorized(true)
-  setIsChecking(false)  // ✅ Siempre actualizar
-}, [user, isLoaded, router])
+  setIsAuthorized(true);
+  setIsChecking(false); // ✅ Siempre actualizar
+}, [user, isLoaded, router]);
 ```
 
 ### **2. Condición de loading mejorada**
@@ -82,21 +85,21 @@ useEffect(() => {
 ```typescript
 // ✅ NUEVO CÓDIGO
 if (!isLoaded || isChecking) {
-  return <LoadingScreen />
+  return <LoadingScreen />;
 }
 
 // Pantalla de acceso denegado (fallback si redirect falla)
 if (!isAuthorized) {
-  return <AccessDeniedScreen />
+  return <AccessDeniedScreen />;
 }
 ```
 
 ### **3. Logging mejorado**
 
 ```typescript
-console.log('  PublicMetadata:', JSON.stringify(user.publicMetadata, null, 2))
-console.log('  🎭 Has admin role:', hasAdminRole)
-console.log('  📊 Role value:', user.publicMetadata?.role)
+console.log("  PublicMetadata:", JSON.stringify(user.publicMetadata, null, 2));
+console.log("  🎭 Has admin role:", hasAdminRole);
+console.log("  📊 Role value:", user.publicMetadata?.role);
 ```
 
 ### **4. Type safety**
@@ -106,13 +109,14 @@ console.log('  📊 Role value:', user.publicMetadata?.role)
 const userForCheck = {
   publicMetadata: user.publicMetadata,
   privateMetadata: (user as any).privateMetadata,
-}
-const hasAdminRole = isAdmin(userForCheck)
+};
+const hasAdminRole = isAdmin(userForCheck);
 ```
 
 ## 🔄 Flujo de Verificación
 
 ### **Antes (Problemático):**
+
 ```
 1. Usuario carga /admin
 2. useEffect verifica isAdmin()
@@ -126,6 +130,7 @@ const hasAdminRole = isAdmin(userForCheck)
 ```
 
 ### **Ahora (Corregido):**
+
 ```
 1. Usuario carga /admin
 2. useEffect verifica isAdmin()
@@ -142,23 +147,25 @@ const hasAdminRole = isAdmin(userForCheck)
 
 ## 📊 Estados del Componente
 
-| Estado | `isLoaded` | `isChecking` | `isAuthorized` | Resultado |
-|--------|-----------|-------------|---------------|-----------|
-| **Inicial** | false | true | false | Loading |
-| **Cargando user** | false | true | false | Loading |
-| **Verificando** | true | true | false | Loading |
-| **No autenticado** | true | false | false | Redirect → /sign-in |
-| **No admin** | true | false | false | Access Denied → /dashboard |
-| **Admin ✅** | true | false | true | Admin Panel |
+| Estado             | `isLoaded` | `isChecking` | `isAuthorized` | Resultado                  |
+| ------------------ | ---------- | ------------ | -------------- | -------------------------- |
+| **Inicial**        | false      | true         | false          | Loading                    |
+| **Cargando user**  | false      | true         | false          | Loading                    |
+| **Verificando**    | true       | true         | false          | Loading                    |
+| **No autenticado** | true       | false        | false          | Redirect → /sign-in        |
+| **No admin**       | true       | false        | false          | Access Denied → /dashboard |
+| **Admin ✅**       | true       | false        | true           | Admin Panel                |
 
 ## 🧪 Testing
 
 ### Build:
+
 - ✅ `pnpm build` exitoso sin errores
 - ✅ No hay errores de linter (TypeScript)
 - ✅ Type casting correcto para UserResource
 
 ### Validaciones necesarias en Vercel:
+
 - [ ] Admin con rol correcto accede inmediatamente
 - [ ] Usuario sin rol admin ve "Access Denied" y redirige
 - [ ] Usuario no autenticado redirige a sign-in
@@ -168,11 +175,13 @@ const hasAdminRole = isAdmin(userForCheck)
 ## 📦 Impacto
 
 **Archivos afectados:**
+
 - `components/admin/admin-layout-client.tsx` (modificado)
 
 **Breaking changes:** Ninguno
 
-**Compatibilidad:** 
+**Compatibilidad:**
+
 - Mejora la experiencia para todos los usuarios
 - Admins acceden más rápido
 - No admins reciben feedback claro
@@ -213,12 +222,14 @@ const hasAdminRole = isAdmin(userForCheck)
 ## 🎨 UI/UX Mejoras
 
 ### **Pantalla de Loading:**
+
 - Spinner animado
 - Mensaje claro: "Verificando permisos de administrador..."
 - Barra de progreso animada
 - Duración máxima: ~100-200ms
 
 ### **Pantalla de Access Denied (nueva):**
+
 - Emoji: 🚫
 - Título: "Acceso Denegado"
 - Mensaje: "No tienes permisos de administrador."
@@ -245,18 +256,21 @@ const hasAdminRole = isAdmin(userForCheck)
 ## 📝 Notas Técnicas
 
 ### **¿Por qué setTimeout de 100ms?**
+
 - `router.replace()` es asíncrono
 - Puede tardar si hay navegación en progreso
 - 100ms es imperceptible para el usuario
 - Garantiza que el redirect se ejecute
 
 ### **¿Por qué dos estados (isChecking + isAuthorized)?**
+
 - `isChecking`: Proceso de verificación en curso
 - `isAuthorized`: Resultado de la verificación
 - Separación clara de responsabilidades
 - Permite mostrar diferentes pantallas
 
 ### **¿Por qué cast a `any` para privateMetadata?**
+
 - `UserResource` de Clerk no expone `privateMetadata` en tipos
 - Existe en runtime pero no en definición de tipos
 - Cast seguro porque solo leemos, no escribimos
@@ -268,4 +282,3 @@ const hasAdminRole = isAdmin(userForCheck)
 - [ ] Crear página dedicada de "Access Denied" en `/admin/denied`
 - [ ] Implementar sistema de solicitud de permisos admin
 - [ ] Agregar notificación a admins cuando alguien intenta acceder
-
