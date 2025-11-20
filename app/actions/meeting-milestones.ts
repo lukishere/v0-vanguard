@@ -226,7 +226,7 @@ export async function deleteMeetingMilestone(milestoneId: string) {
   }
 }
 
-// Solicitar una reunión (usado desde el modal de reunión)
+// Solicitar una reunión (usado desde el modal de reunión) - ULTRA DEFENSIVE
 export async function requestMeetingMilestone(
   meetingType: string,
   productType: string,
@@ -235,33 +235,65 @@ export async function requestMeetingMilestone(
   notes?: string
 ) {
   const { userId } = await auth()
-
   if (!userId) {
     return { success: false, error: "Usuario no autenticado" }
   }
 
   try {
-    const clerk = await clerkClient()
-    const user = await clerk.users.getUser(userId)
-    const metadata = (user.publicMetadata || {}) as any
+    // 🛡️ PASO 1: Validar Clerk availability con timeout (10s)
+    let clerk, user;
+    try {
+      clerk = await Promise.race([
+        clerkClient(),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Clerk timeout')), 10000)
+        )
+      ]);
 
-    const clientName = `${user.firstName || ''} ${user.lastName || ''}`.trim() ||
-                       user.username ||
-                       user.emailAddresses[0]?.emailAddress ||
-                       'Cliente'
-
-    // Map meeting type to milestone type
-    const typeMap: Record<string, MeetingMilestoneType> = {
-      demo: "demo-call",
-      consultation: "technical-session",
-      implementation: "onboarding-session",
+      user = await clerk.users.getUser(userId);
+    } catch (clerkError) {
+      console.error('❌ [Meeting] Clerk API unavailable:', clerkError);
+      return { success: false, error: "Servicio temporalmente no disponible. Intenta de nuevo en unos minutos." };
     }
 
-    const milestoneType = typeMap[meetingType] || "demo-call"
-    const title = `${meetingType === "demo" ? "Demo" : meetingType === "consultation" ? "Consulta" : "Implementación"} - ${productType}`
-    const scheduledFor = `${preferredDate}T${preferredTime}:00`
+    // 🛡️ PASO 2: Validar user object integrity
+    if (!user || !user.id) {
+      console.error('❌ [Meeting] Invalid user object:', user);
+      return { success: false, error: "Error de autenticación. Por favor vuelve a iniciar sesión." };
+    }
 
-    const milestoneId = `mtg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    // 🛡️ PASO 3: Safe property access para construir clientName
+    const firstName = user.firstName || '';
+    const lastName = user.lastName || '';
+    const username = user.username || '';
+    const email = user.emailAddresses?.[0]?.emailAddress || '';
+
+    const clientName = `${firstName} ${lastName}`.trim() ||
+                       username ||
+                       email ||
+                       'Cliente';
+
+    // 🛡️ PASO 4: Validar y limpiar metadata size (Clerk limit: 5KB)
+    const metadata = (user.publicMetadata || {}) as any;
+    const existingMilestones = (metadata.meetingMilestones || []) as MeetingMilestone[];
+
+    // Limpiar si hay demasiados milestones (mantener últimos 20)
+    let cleanedMilestones = existingMilestones;
+    if (existingMilestones.length > 20) {
+      console.warn('⚠️ [Meeting] Too many milestones, keeping last 20');
+      cleanedMilestones = existingMilestones.slice(-20);
+    }
+
+    // 🛡️ PASO 5: Validar inputs y crear milestone
+    const validMeetingTypes = ['demo', 'consultation', 'implementation'];
+    const milestoneType = validMeetingTypes.includes(meetingType)
+      ? meetingType as MeetingMilestoneType
+      : 'demo';
+
+    const title = `${milestoneType === "demo" ? "Demo" : milestoneType === "consultation" ? "Consulta" : "Implementación"} - ${productType || 'Producto'}`;
+    const scheduledFor = `${preferredDate || new Date().toISOString().split('T')[0]}T${preferredTime || '09:00'}:00`;
+
+    const milestoneId = `mtg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
     const milestone: MeetingMilestone = {
       id: milestoneId,
@@ -269,37 +301,54 @@ export async function requestMeetingMilestone(
       clientName,
       type: milestoneType,
       title,
-      description: notes,
+      description: notes || `Solicitud de ${milestoneType}`,
       scheduledFor,
       demoName: productType,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+    };
+
+    // 🛡️ PASO 6: Safe metadata update con validación de tamaño
+    const updatedMilestones = [...cleanedMilestones, milestone];
+    const testMetadata = {
+      ...metadata,
+      meetingMilestones: updatedMilestones,
+    };
+
+    const metadataSize = JSON.stringify(testMetadata).length;
+    if (metadataSize > 4000) { // Dejar margen antes del límite de 5KB
+      console.warn('⚠️ [Meeting] Metadata too large, removing oldest milestones');
+      // Mantener solo los últimos 10
+      updatedMilestones.splice(0, updatedMilestones.length - 10);
     }
 
-    const meetingMilestones = (metadata.meetingMilestones || []) as MeetingMilestone[]
-    meetingMilestones.push(milestone)
+    try {
+      await clerk.users.updateUser(userId, {
+        publicMetadata: {
+          ...metadata,
+          meetingMilestones: updatedMilestones,
+        },
+      });
+    } catch (updateError) {
+      console.error('❌ [Meeting] Metadata update failed:', updateError);
+      return { success: false, error: "Error al guardar la solicitud. Intenta de nuevo." };
+    }
 
-    await clerk.users.updateUser(userId, {
-      publicMetadata: {
-        ...metadata,
-        meetingMilestones,
-      },
-    })
-
-    console.log("📅 [Meeting Request] Reunión solicitada:", {
+    console.log('✅ [Meeting] Successfully created milestone:', {
       id: milestoneId,
       type: milestoneType,
       title,
-      cliente: clientName,
-    })
+      client: clientName
+    });
 
-    revalidatePath("/admin")
-    revalidatePath("/dashboard")
+    revalidatePath("/admin");
+    revalidatePath("/dashboard");
 
-    return { success: true, milestoneId, milestone }
-  } catch (error) {
-    console.error("Error al solicitar reunión:", error)
-    return { success: false, error: "Error al procesar la solicitud" }
+    return { success: true, milestoneId, milestone };
+
+  } catch (unexpectedError) {
+    console.error('❌ [Meeting] Unexpected error:', unexpectedError);
+    return { success: false, error: "Error interno del servidor. Por favor contacta soporte si persiste." };
   }
 }
 

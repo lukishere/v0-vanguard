@@ -228,11 +228,11 @@ export function MeetingModal({ demo, open, onOpenChange, requestType = "meeting"
   const config = requestConfig[requestType]
 
   const handleSubmit = async () => {
-    // Validación según el tipo de solicitud
+    // 🛡️ PASO 1: Validación defensiva de inputs
     if (requestType === "access") {
       if (!firstName || !lastName || !email) {
         toast({
-          title: "Completa todos los campos",
+          title: "Datos incompletos",
           description: "Ingresa nombre, apellido y correo electrónico.",
           variant: "destructive",
         })
@@ -251,7 +251,7 @@ export function MeetingModal({ demo, open, onOpenChange, requestType = "meeting"
     } else if (requestType === "sales-chat") {
       if (!subject || !productType || !messageBody) {
         toast({
-          title: "Completa todos los campos",
+          title: "Datos incompletos",
           description: "Ingresa asunto, selecciona un tipo de servicio/producto y escribe tu mensaje.",
           variant: "destructive",
         })
@@ -260,7 +260,7 @@ export function MeetingModal({ demo, open, onOpenChange, requestType = "meeting"
     } else if (config.showMeetingType && config.showProductType) {
       if (!preferredDate || !preferredTime || !productType) {
         toast({
-          title: "Completa todos los campos",
+          title: "Datos incompletos",
           description: "Selecciona una fecha, hora y tipo de servicio/producto.",
           variant: "destructive",
         })
@@ -269,7 +269,7 @@ export function MeetingModal({ demo, open, onOpenChange, requestType = "meeting"
     } else if (config.showMeetingType) {
       if (!preferredDate || !preferredTime) {
         toast({
-          title: "Completa todos los campos",
+          title: "Datos incompletos",
           description: "Selecciona una fecha y hora preferida.",
           variant: "destructive",
         })
@@ -278,51 +278,91 @@ export function MeetingModal({ demo, open, onOpenChange, requestType = "meeting"
     }
 
     setIsSubmitting(true)
+
     try {
-      // Para solicitudes de reunión, guardar como hito
+      // 🛡️ PASO 2: Server action con timeout (15s)
+      let result;
+      try {
+        if (requestType === "meeting" && config.showMeetingType && productType) {
+          result = await Promise.race([
+            requestMeetingMilestone(meetingType, productType, preferredDate, preferredTime, notes),
+            new Promise((_, reject) =>
+              setTimeout(() => reject(new Error('La solicitud está tardando más de lo esperado.')), 15000)
+            )
+          ]);
+        }
+      } catch (serverError) {
+        console.error('❌ [Meeting Modal] Server action timeout/error:', serverError);
+        throw new Error('Servicio temporalmente no disponible. Por favor intenta de nuevo en unos minutos.');
+      }
+
+      // 🛡️ PASO 3: Validar respuesta del server
       if (requestType === "meeting" && config.showMeetingType && productType) {
-        const result = await requestMeetingMilestone(
-          meetingType,
-          productType,
-          preferredDate,
-          preferredTime,
-          notes
-        )
+        if (!result || typeof result !== 'object') {
+          throw new Error('Respuesta inválida del servidor');
+        }
 
         if (!result.success) {
-          throw new Error(result.error || "Error al solicitar la reunión")
+          throw new Error(result.error || 'Error desconocido al procesar la solicitud');
         }
       }
 
-      // También registrar como actividad para mantener compatibilidad
-      if (requestType === "meeting" || requestType === "quote") {
-        await logActivity(
-          "meeting-requested",
-          `Solicitó sesión de servicio de producto: ${productType || meetingType}`,
-          { productType, meetingType, preferredDate, preferredTime }
-        )
-      } else if (requestType === "access") {
-        await logActivity(
-          "access-additional",
-          `Solicitó acceso adicional para: ${firstName} ${lastName}`,
-          { firstName, lastName, email }
-        )
-      } else if (requestType === "sales-chat") {
-        await logActivity(
-          "chat-sales",
-          `Inició chat con ventas: ${subject}`,
-          { subject, productType }
-        )
+      // 🛡️ PASO 4: Registrar actividad (con error handling separado)
+      try {
+        if (requestType === "meeting" || requestType === "quote") {
+          await logActivity(
+            "meeting-requested",
+            `Solicitó sesión de servicio de producto: ${productType || meetingType}`,
+            { productType, meetingType, preferredDate, preferredTime }
+          )
+        } else if (requestType === "access") {
+          await logActivity(
+            "access-additional",
+            `Solicitó acceso adicional para: ${firstName} ${lastName}`,
+            { firstName, lastName, email }
+          )
+        } else if (requestType === "sales-chat") {
+          await logActivity(
+            "chat-sales",
+            `Inició chat con ventas: ${subject}`,
+            { subject, productType }
+          )
+        }
+      } catch (activityError) {
+        console.warn('⚠️ [Meeting Modal] Activity logging failed, but request succeeded:', activityError);
+        // No fallar la solicitud completa por error en logging
       }
 
+      // 🛡️ PASO 5: Success - mostrar mensaje y limpiar
       const successMessages = {
-        meeting: { title: "Reunión solicitada", description: "Tu petición ha sido registrada como hito. Te contactaremos pronto para confirmar la fecha y hora." },
-        quote: { title: "Cotización solicitada", description: "Recibirás un presupuesto personalizado en las próximas 24 horas." },
-        contracts: { title: "Solicitud recibida", description: "Te enviaremos acceso a los contratos digitales en breve." },
-        access: { title: "Solicitud recibida", description: "Revisaremos tu solicitud y te notificaremos cuando se active el acceso adicional." },
-        "success-cases": { title: "Información de Rendimientos", description: "Consulta los datos de ROI detallados arriba." },
-        resources: { title: "Acceso concedido", description: "Redirigiendo al centro de recursos..." },
-        "sales-chat": { title: "Chat iniciado", description: "Un representante de ventas se pondrá en contacto contigo." },
+        meeting: {
+          title: "Reunión solicitada",
+          description: "Tu petición ha sido registrada. Te contactaremos pronto para confirmar la fecha y hora."
+        },
+        quote: {
+          title: "Cotización solicitada",
+          description: "Recibirás un presupuesto personalizado en las próximas 24 horas."
+        },
+        contracts: {
+          title: "Solicitud recibida",
+          description: "Te enviaremos acceso a los contratos digitales en breve."
+        },
+        access: {
+          title: "Solicitud recibida",
+          description: "Revisaremos tu solicitud y te notificaremos cuando se active el acceso adicional."
+        },
+        "success-cases": {
+          title: "Información enviada",
+          description: "Consulta los datos de ROI detallados."
+        },
+        resources: {
+          title: "Acceso concedido",
+          description: "Redirigiendo al centro de recursos..."
+        },
+        "sales-chat": {
+          title: "Chat iniciado",
+          description: "Un representante de ventas se pondrá en contacto contigo."
+        },
       }
 
       const message = successMessages[requestType] || successMessages.meeting
@@ -331,6 +371,7 @@ export function MeetingModal({ demo, open, onOpenChange, requestType = "meeting"
         description: message.description,
       })
 
+      // Limpiar formulario y cerrar modal
       setMeetingType("demo")
       setProductType("")
       setPreferredDate("")
@@ -342,13 +383,22 @@ export function MeetingModal({ demo, open, onOpenChange, requestType = "meeting"
       setSubject("")
       setMessageBody("")
       onOpenChange(false)
+
     } catch (error) {
-      console.error("Error en la solicitud:", error)
+      console.error('❌ [Meeting Modal] Error completo:', error)
+
+      // 🛡️ PASO 6: Error handling sin crash - permitir reintento
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "No se pudo procesar la solicitud. Intenta de nuevo.",
+        title: "Error temporal",
+        description: `${errorMessage} Puedes intentar de nuevo.`,
         variant: "destructive",
       })
+
+      // ❌ CRÍTICO: NO cerrar modal automáticamente - permitir reintento
+      // onOpenChange(false); // ← Esta línea causaba que no pudiera volver al dashboard
+
     } finally {
       setIsSubmitting(false)
     }
