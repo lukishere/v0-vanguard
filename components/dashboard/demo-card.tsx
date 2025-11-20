@@ -38,6 +38,12 @@ export function DemoCard({ demo }: DemoCardProps) {
   const { toast } = useToast();
   const { openDemo, isLoading, error } = useDemo();
 
+  // Defensive check: ensure demo has required properties
+  if (!demo || !demo.id || !demo.name) {
+    console.error("❌ [DemoCard] Invalid demo object:", demo);
+    return null;
+  }
+
   const expirationStatus = getExpirationStatus(demo.daysRemaining ?? null);
   const usagePercentage =
     demo.usageDays && demo.totalDays

@@ -66,7 +66,16 @@ export default async function ClientDashboardPage() {
   let activeDemos: Demo[] = clientAccess
     .map((access) => {
       const demo = allDemos.find((d) => d.id === access.demoId);
-      return demo ? enrichDemoWithAccess(demo, access) : null;
+      if (!demo) {
+        console.warn(`⚠️ [Dashboard] Demo no encontrada en catálogo: ${access.demoId}`);
+        return null;
+      }
+      // Ensure demo has icon property
+      if (!demo.icon) {
+        console.warn(`⚠️ [Dashboard] Demo sin icon: ${demo.id}, usando default`);
+        demo.icon = "📦"; // Default icon
+      }
+      return enrichDemoWithAccess(demo, access);
     })
     .filter((demo): demo is Demo => demo !== null)
     .filter((demo) => demo.status === "active"); // Solo demos activas
@@ -79,12 +88,26 @@ export default async function ClientDashboardPage() {
   }
 
   // Demos DISPONIBLES: TODAS las del catálogo con status "available" (sin importar si están asignadas)
-  const availableDemos = allDemos.filter((demo) => demo.status === "available");
+  const availableDemos = allDemos
+    .filter((demo) => demo.status === "available")
+    .map((demo) => {
+      if (!demo.icon) {
+        console.warn(`⚠️ [Dashboard] Demo disponible sin icon: ${demo.id}`);
+        return { ...demo, icon: "📦" };
+      }
+      return demo;
+    });
 
   // Demos EN DESARROLLO: TODAS las con status "in-development" (sin importar si están asignadas)
-  const inDevelopmentDemos = allDemos.filter(
-    (demo) => demo.status === "in-development"
-  );
+  const inDevelopmentDemos = allDemos
+    .filter((demo) => demo.status === "in-development")
+    .map((demo) => {
+      if (!demo.icon) {
+        console.warn(`⚠️ [Dashboard] Demo en desarrollo sin icon: ${demo.id}`);
+        return { ...demo, icon: "🚧" };
+      }
+      return demo;
+    });
 
   // Calcular días mínimos restantes para el banner
   const minDaysRemaining =
