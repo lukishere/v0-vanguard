@@ -343,6 +343,37 @@ export function DemoCard({ demo }: DemoCardProps) {
               <>
                 <WaitlistButton demoId={demo.id} demoName={demo.name} />
                 <LikeButton demoId={demo.id} demoName={demo.name} />
+                
+                <Button
+                  onClick={async () => {
+                    // Registrar actividad
+                    await logActivity(
+                      "chat-opened",
+                      `Abrió consultas sobre "${demo.name}" (demo en desarrollo)`,
+                      { demoId: demo.id, demoName: demo.name }
+                    )
+
+                    // Trigger chatbot con contexto de esta demo
+                    const event = new CustomEvent('openChatbot', {
+                      detail: {
+                        demoName: demo.name,
+                        initialMessage: `Tengo preguntas sobre la demo "${demo.name}" que está en desarrollo. ¿Cuándo estará disponible?`
+                      }
+                    })
+                    window.dispatchEvent(event)
+                  }}
+                  variant="outline"
+                  className="h-10 border-vanguard-300/40 bg-vanguard-400/10 text-vanguard-300 hover:bg-vanguard-400/20 hover:border-vanguard-300/60 transition-all"
+                >
+                  <svg className="mr-1.5 h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="4" y="8" width="16" height="12" rx="2"/>
+                    <path d="M8 8V6a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                    <circle cx="9" cy="13" r="1" fill="currentColor"/>
+                    <circle cx="15" cy="13" r="1" fill="currentColor"/>
+                    <path d="M9 17h6" strokeLinecap="round"/>
+                  </svg>
+                  <span className="text-xs font-medium">Consultas</span>
+                </Button>
               </>
             )}
 
