@@ -75,7 +75,7 @@ const nextConfig = {
               "connect-src 'self' https://*.clerk.com https://clerk.com https://*.clerk.accounts.dev https://clerk-telemetry.com wss://*.clerk.com wss://clerk.com wss://*.clerk.accounts.dev https://vercel.live",
               "worker-src 'self' blob:",
               "frame-ancestors 'self'",
-              "frame-src 'self' https://vanguard-demos.vercel.app https://*.vercel.app https://*.web.app https://*.clerk.com https://clerk.com",
+              "frame-src 'self' https://vanguard-demos.vercel.app https://*.vercel.app https://*.web.app https://*.clerk.com https://clerk.com https://vercel.live",
               "object-src 'none'",
               "base-uri 'self'",
             ].join("; "),
