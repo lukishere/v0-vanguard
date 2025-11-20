@@ -63,9 +63,6 @@ export function ClientDashboardWrapper({
       }
 
       try {
-        // Force reload to get fresh metadata from Clerk
-        await user.reload();
-
         // Check if onboarding is already completed in metadata
         const metadata = user.publicMetadata as any;
         const onboardingCompleted = metadata?.onboardingCompleted === true;
@@ -89,6 +86,8 @@ export function ClientDashboardWrapper({
         }
       } catch (error) {
         console.error("❌ [Onboarding] Error verificando estado:", error);
+        // En caso de error, no mostrar el modal para evitar bloquear al usuario
+        setShowOnboarding(false);
       } finally {
         setIsCheckingOnboarding(false);
       }

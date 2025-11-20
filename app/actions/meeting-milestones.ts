@@ -170,19 +170,28 @@ export async function getClientMeetingMilestones(clientId?: string): Promise<Mee
     const targetUserId = clientId || currentUserId
 
     if (!targetUserId) {
+      console.log("⚠️ [Milestones] No targetUserId found")
       return []
     }
 
     const clerk = await clerkClient()
     const user = await clerk.users.getUser(targetUserId)
+    
+    if (!user) {
+      console.log("⚠️ [Milestones] User not found in Clerk")
+      return []
+    }
+
     const metadata = (user.publicMetadata || {}) as any
     const meetingMilestones = (metadata.meetingMilestones || []) as MeetingMilestone[]
 
-    return meetingMilestones.sort((a, b) =>
+    console.log(`📅 [Milestones] Found ${meetingMilestones.length} milestones for user ${targetUserId}`)
+
+    return meetingMilestones.sort((a, b) => 
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     )
   } catch (error) {
-    console.error("Error getting client meeting milestones:", error)
+    console.error("❌ [Milestones] Error getting client meeting milestones:", error)
     return []
   }
 }
@@ -300,9 +309,9 @@ export async function requestMeetingMilestone(
     return { success: true, milestoneId, milestone }
   } catch (error) {
     console.error("❌ [Meeting Request] Error al solicitar reunión:", error)
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : "Error al procesar la solicitud" 
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Error al procesar la solicitud"
     }
   }
 }

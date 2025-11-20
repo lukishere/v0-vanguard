@@ -64,21 +64,30 @@ export async function logActivity(
 
 // Obtener actividades del cliente actual
 export async function getMyActivities(limit?: number): Promise<ClientActivity[]> {
-  const { userId } = await auth()
-
-  if (!userId) {
-    return []
-  }
-
   try {
+    const { userId } = await auth()
+
+    if (!userId) {
+      console.log("⚠️ [Activities] No userId found")
+      return []
+    }
+
     const clerk = await clerkClient()
     const user = await clerk.users.getUser(userId)
+    
+    if (!user) {
+      console.log("⚠️ [Activities] User not found in Clerk")
+      return []
+    }
+
     const privateData = (user.privateMetadata || {}) as any
     const activities = (privateData.activityLog || []) as ClientActivity[]
 
+    console.log(`📊 [Activities] Found ${activities.length} activities for user ${userId}`)
+
     return limit ? activities.slice(0, limit) : activities
   } catch (error) {
-    console.error("Error al obtener actividades:", error)
+    console.error("❌ [Activities] Error al obtener actividades:", error)
     return []
   }
 }
