@@ -1,7 +1,7 @@
 # Estrategia de Almacenamiento de Datos - V0 Vanguard
 
-**Fecha de decisión:** 2024-11-20  
-**Estado:** Implementado  
+**Fecha de decisión:** 2024-11-20
+**Estado:** Implementado
 **Decisión:** Mantener datos de perfil en Clerk Metadata
 
 ---
@@ -242,6 +242,5 @@ if (!user.publicMetadata?.onboardingCompleted) {
 
 ---
 
-**Última actualización:** 2024-11-20  
+**Última actualización:** 2024-11-20
 **Próxima revisión:** Q1 2025 o cuando se alcancen 30 clientes activos
-

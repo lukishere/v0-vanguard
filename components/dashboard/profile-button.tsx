@@ -96,12 +96,12 @@ export function ProfileButton() {
       }
 
       toast.success("¡Perfil actualizado exitosamente!");
-      
+
       // Recargar metadata del usuario
       if (user) {
         await user.reload();
       }
-      
+
       setIsOpen(false);
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -297,4 +297,3 @@ export function ProfileButton() {
     </Dialog>
   );
 }
-
