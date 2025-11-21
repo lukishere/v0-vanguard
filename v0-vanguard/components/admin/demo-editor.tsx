@@ -96,9 +96,11 @@ export function DemoEditor({ demo, trigger, mode = "edit" }: DemoEditorProps) {
   const tagsArray = useMemo(
     () =>
       form.tags
-        .split(",")
-        .map((tag) => tag.trim())
-        .filter(Boolean),
+        ? form.tags
+            .split(",")
+            .map((tag) => tag.trim())
+            .filter(Boolean)
+        : [],
     [form.tags]
   )
 

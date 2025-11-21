@@ -61,8 +61,8 @@ export function ClientTable({ clients, demos }: ClientTableProps) {
           {/* Body */}
           <tbody className="bg-white divide-y divide-gray-200">
             {clients.map((client) => {
-              // Split name into first and last name
-              const nameParts = client.name.split(' ')
+              // Split name into first and last name (defensive check)
+              const nameParts = client.name ? client.name.split(' ') : ['']
               const firstName = nameParts[0] || ''
               const lastName = nameParts.slice(1).join(' ') || ''
 

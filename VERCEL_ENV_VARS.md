@@ -10,6 +10,10 @@ CLERK_SECRET_KEY = sk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 CLERK_WEBHOOK_SECRET = whsec_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 NEXT_PUBLIC_CLERK_SIGN_IN_URL = /auth
 NEXT_PUBLIC_CLERK_SIGN_UP_URL = /auth?mode=signup
+
+# ⚠️  IMPORTANTE: Para producción usar claves LIVE (no test)
+# NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = pk_live_...
+# CLERK_SECRET_KEY = sk_live_...
 ```
 
 **IMPORTANTE - Configurar Webhook:**

@@ -51,7 +51,7 @@ export function ClientDetailModal({ client, demos, isOpen, onClose }: ClientDeta
           <DialogTitle className="text-2xl text-white flex items-center gap-3">
             <div className="h-12 w-12 rounded-full bg-vanguard-blue/10 flex items-center justify-center">
               <span className="text-lg font-semibold text-vanguard-blue">
-                {client.name.split(' ')[0]?.charAt(0).toUpperCase()}
+                {client.name ? client.name.split(' ')[0]?.charAt(0).toUpperCase() : '?'}
               </span>
             </div>
             <div>
