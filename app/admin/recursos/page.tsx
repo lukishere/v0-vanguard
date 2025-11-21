@@ -62,7 +62,7 @@ export default async function AdminResourcesPage() {
             </CardHeader>
             <CardContent>
               <p className="text-3xl font-semibold">{totals.byType[type] ?? 0}</p>
-              <p className="text-xs text-white/50">Recursos clasificados como {config.label.toLowerCase()}.</p>
+              <p className="text-xs text-white/50">Recursos clasificados como {config.label ? config.label.toLowerCase() : 'desconocido'}.</p>
             </CardContent>
           </Card>
         ))}

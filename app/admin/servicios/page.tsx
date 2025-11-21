@@ -118,10 +118,10 @@ export default async function AdminServiciosPage() {
                     {request.message && (request.message.includes("Email") || request.message.includes("Teléfono")) && (
                       <div className="rounded-lg bg-blue-500/10 border border-blue-500/30 p-3">
                         <div className="flex items-center gap-2 text-sm text-blue-300">
-                          {request.message.includes("Email") && <Mail className="h-4 w-4" />}
-                          {request.message.includes("Teléfono") && <Phone className="h-4 w-4" />}
+                          {request.message && request.message.includes("Email") && <Mail className="h-4 w-4" />}
+                          {request.message && request.message.includes("Teléfono") && <Phone className="h-4 w-4" />}
                           <span className="font-medium">
-                            {request.message.split("Preferencia de contacto: ")[1] || "Contactar por email"}
+                            {request.message ? (request.message.split("Preferencia de contacto: ")[1] || "Contactar por email") : "Contactar por email"}
                           </span>
                         </div>
                       </div>

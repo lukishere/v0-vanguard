@@ -69,7 +69,7 @@ const nextConfig = {
             value: [
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.com https://clerk.com https://*.clerk.accounts.dev https://vercel.live",
-              "style-src 'self' 'unsafe-inline' https://*.clerk.com https://clerk.com https://*.clerk.accounts.dev https://vercel.live",
+              "style-src 'self' 'unsafe-inline' https://*.clerk.com https://clerk.com https://*.clerk.accounts.dev https://vercel.live https://fonts.googleapis.com",
               "img-src 'self' data: https: https://*.clerk.com https://clerk.com https://*.clerk.accounts.dev https://vercel.live",
               "font-src 'self' https://*.clerk.com https://clerk.com https://*.clerk.accounts.dev https://vercel.live",
               "connect-src 'self' https://*.clerk.com https://clerk.com https://*.clerk.accounts.dev https://clerk-telemetry.com wss://*.clerk.com wss://clerk.com wss://*.clerk.accounts.dev https://vercel.live",
