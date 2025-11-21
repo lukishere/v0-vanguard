@@ -79,4 +79,3 @@ PERPLEXITY_API_KEY=your_perplexity_key
 - **401 Unauthorized**: Missing Clerk environment variables
 - **500 Internal Server Error**: Check Clerk webhook configuration
 - **Client-side exception**: Verify metadata initialization in webhook
-

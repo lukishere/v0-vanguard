@@ -309,24 +309,24 @@ export function MeetingModal({ demo, open, onOpenChange, requestType = "meeting"
 
       // 🛡️ PASO 4: Registrar actividad (con error handling separado)
       try {
-        if (requestType === "meeting" || requestType === "quote") {
-          await logActivity(
-            "meeting-requested",
-            `Solicitó sesión de servicio de producto: ${productType || meetingType}`,
-            { productType, meetingType, preferredDate, preferredTime }
-          )
-        } else if (requestType === "access") {
-          await logActivity(
-            "access-additional",
-            `Solicitó acceso adicional para: ${firstName} ${lastName}`,
-            { firstName, lastName, email }
-          )
-        } else if (requestType === "sales-chat") {
-          await logActivity(
-            "chat-sales",
-            `Inició chat con ventas: ${subject}`,
-            { subject, productType }
-          )
+      if (requestType === "meeting" || requestType === "quote") {
+        await logActivity(
+          "meeting-requested",
+          `Solicitó sesión de servicio de producto: ${productType || meetingType}`,
+          { productType, meetingType, preferredDate, preferredTime }
+        )
+      } else if (requestType === "access") {
+        await logActivity(
+          "access-additional",
+          `Solicitó acceso adicional para: ${firstName} ${lastName}`,
+          { firstName, lastName, email }
+        )
+      } else if (requestType === "sales-chat") {
+        await logActivity(
+          "chat-sales",
+          `Inició chat con ventas: ${subject}`,
+          { subject, productType }
+        )
         }
       } catch (activityError) {
         console.warn('⚠️ [Meeting Modal] Activity logging failed, but request succeeded:', activityError);

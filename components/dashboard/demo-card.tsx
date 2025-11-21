@@ -38,11 +38,20 @@ export function DemoCard({ demo }: DemoCardProps) {
   const { toast } = useToast();
   const { openDemo, isLoading, error } = useDemo();
 
-  // Defensive check: ensure demo has required properties
-  if (!demo || !demo.id || !demo.name) {
-    console.error("❌ [DemoCard] Invalid demo object:", demo);
+  // ULTRA DEFENSIVE: Check if demo exists and is valid object
+  if (!demo || typeof demo !== 'object') {
+    console.error("🚨 [DemoCard] Demo prop is not an object:", demo);
     return null;
   }
+
+  // Check required properties exist
+  if (!demo.id || !demo.name) {
+    console.error("🚨 [DemoCard] Demo missing required properties:", demo);
+    return null;
+  }
+
+  // Safe access to icon with fallback
+  const safeIcon = demo.icon || "📦";
 
   const expirationStatus = getExpirationStatus(demo.daysRemaining ?? null);
   const usagePercentage =
@@ -72,7 +81,7 @@ export function DemoCard({ demo }: DemoCardProps) {
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
-                {demo.icon && <span className="text-2xl">{demo.icon}</span>}
+                {safeIcon && <span className="text-2xl">{safeIcon}</span>}
                 <h2 className="text-xl font-semibold">{demo.name}</h2>
               </div>
               <Badge

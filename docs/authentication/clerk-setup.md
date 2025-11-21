@@ -171,4 +171,3 @@ User accesses dashboard
 - `components/clerk-provider-wrapper.tsx` - Clerk provider wrapper
 - `lib/admin/permissions.ts` - Role checking utilities
 - `lib/admin/clerk-metadata.ts` - Metadata management
-

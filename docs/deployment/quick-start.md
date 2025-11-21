@@ -67,4 +67,3 @@ pnpm tsx scripts/make-admin.ts your@email.com
 - [Full Vercel Setup](./vercel-setup.md)
 - [Clerk Configuration](../authentication/clerk-setup.md)
 - [User Management](../authentication/user-management.md)
-
