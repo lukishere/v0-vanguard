@@ -155,3 +155,4 @@ Los siguientes datos se almacenan en `publicMetadata.companyProfile`:
 - [ ] Crear dashboard admin para visualizar perfiles empresariales
 - [ ] Implementar recomendaciones de demos basadas en industria
 - [ ] Agregar opción para editar perfil desde settings
+

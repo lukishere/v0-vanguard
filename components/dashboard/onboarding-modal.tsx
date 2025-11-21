@@ -238,3 +238,4 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
     </Dialog>
   );
 }
+

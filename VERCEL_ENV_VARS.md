@@ -8,8 +8,8 @@
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = pk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 CLERK_SECRET_KEY = sk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 CLERK_WEBHOOK_SECRET = whsec_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-NEXT_PUBLIC_CLERK_SIGN_IN_URL = /sign-in
-NEXT_PUBLIC_CLERK_SIGN_UP_URL = /sign-up
+NEXT_PUBLIC_CLERK_SIGN_IN_URL = /auth
+NEXT_PUBLIC_CLERK_SIGN_UP_URL = /auth?mode=signup
 ```
 
 **IMPORTANTE - Configurar Webhook:**

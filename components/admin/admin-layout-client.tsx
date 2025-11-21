@@ -22,9 +22,9 @@ export function AdminLayoutClient({ children }: AdminLayoutClientProps) {
 
     if (!user) {
       console.log(
-        "[Admin Layout Client] No user authenticated, redirecting to sign-in"
+        "[Admin Layout Client] No user authenticated, redirecting to auth"
       );
-      router.replace("/sign-in");
+      router.replace("/auth");
       setIsChecking(false);
       return;
     }

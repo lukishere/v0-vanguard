@@ -11,3 +11,4 @@ export function HtmlWrapper({ children }: { children: React.ReactNode }) {
     </html>
   )
 }
+

@@ -10,8 +10,8 @@
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_c2VsZWN0ZWQtcGFuZGEtMC5jbGVyay5hY2NvdW50cy5kZXYk
 CLERK_SECRET_KEY=sk_test_5Ej1XoMPNqjfBT4WEXiH0VTR0CjuNARhGHPSC4kO9O
 CLERK_WEBHOOK_SECRET=whsec_XXXXXXXXXXXXXXXXXXXXXXXXXX
-NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/auth
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/auth?mode=signup
 ```
 
 #### Firebase Configuration
@@ -79,3 +79,4 @@ PERPLEXITY_API_KEY=your_perplexity_key
 - **401 Unauthorized**: Missing Clerk environment variables
 - **500 Internal Server Error**: Check Clerk webhook configuration
 - **Client-side exception**: Verify metadata initialization in webhook
+

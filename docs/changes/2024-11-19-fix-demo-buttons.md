@@ -205,3 +205,4 @@ Para medir el impacto del nuevo botón:
 - Tasa de conversión: Consulta → Waitlist
 - Tiempo promedio de respuesta del chatbot
 - Preguntas más frecuentes sobre demos en desarrollo
+

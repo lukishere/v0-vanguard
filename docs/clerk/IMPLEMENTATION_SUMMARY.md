@@ -142,3 +142,4 @@ Admins:   /clientes/ → /auth → /dashboard → /admin ✅
 **Versión**: 1.0.0
 
 
+

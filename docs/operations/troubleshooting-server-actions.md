@@ -25,8 +25,8 @@ Create a `.env.local` file in the project root with:
 # Clerk Authentication (REQUIRED)
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
 CLERK_SECRET_KEY=sk_test_...
-NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/auth
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/auth?mode=signup
 
 # AI Provider Keys (Optional - only needed for chatbot)
 GEMINI_API_KEY=your_gemini_key
@@ -76,7 +76,7 @@ Open Developer Tools (F12) and check:
 ### Issue: "Unauthorized" Error
 **Cause:** Not signed in with Clerk
 **Solution:**
-- Visit `/sign-in` and authenticate
+- Visit `/auth` and authenticate
 - Ensure Clerk middleware is not blocking the route
 
 ### Issue: API Key Errors

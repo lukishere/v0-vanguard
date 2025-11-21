@@ -97,3 +97,4 @@ La apertura automática del chatbot se registra como actividad en el sistema con
 - Se limpia automáticamente el timer si el componente se desmonta antes de los 10 segundos
 
 
+

@@ -101,3 +101,4 @@ NEXT_PUBLIC_CLERK_SIGN_UP_URL=/auth?mode=signup
 **Estado**: ✅ Producción Ready
 
 
+

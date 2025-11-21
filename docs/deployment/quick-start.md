@@ -17,8 +17,8 @@
    ```
    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
    CLERK_SECRET_KEY=sk_test_...
-   NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-   NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+   NEXT_PUBLIC_CLERK_SIGN_IN_URL=/auth
+   NEXT_PUBLIC_CLERK_SIGN_UP_URL=/auth?mode=signup
    ```
 4. Deploy
 
@@ -67,3 +67,4 @@ pnpm tsx scripts/make-admin.ts your@email.com
 - [Full Vercel Setup](./vercel-setup.md)
 - [Clerk Configuration](../authentication/clerk-setup.md)
 - [User Management](../authentication/user-management.md)
+

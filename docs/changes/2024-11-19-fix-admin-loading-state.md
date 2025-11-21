@@ -282,3 +282,4 @@ const hasAdminRole = isAdmin(userForCheck);
 - [ ] Crear página dedicada de "Access Denied" en `/admin/denied`
 - [ ] Implementar sistema de solicitud de permisos admin
 - [ ] Agregar notificación a admins cuando alguien intenta acceder
+

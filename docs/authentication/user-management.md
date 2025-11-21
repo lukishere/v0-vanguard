@@ -201,3 +201,4 @@ await removeClientDemoAccess(userId, "automata-rrhh");
 - `scripts/make-admin.ts` - Admin creation script
 - `scripts/make-client.ts` - Client creation script
 - `app/api/webhooks/clerk/route.ts` - Webhook handler
+

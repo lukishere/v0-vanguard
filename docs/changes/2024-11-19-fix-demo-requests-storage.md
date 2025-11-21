@@ -238,3 +238,4 @@ await saveRequest(request); // ✅ Guarda en Clerk
 - [ ] Agregar paginación en `loadRequests()` para mejor performance
 - [ ] Considerar migración a Firebase/Supabase si escala
 - [ ] Agregar analytics de solicitudes (tasa de aprobación, tiempo de respuesta)
+
