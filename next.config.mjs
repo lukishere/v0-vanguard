@@ -7,6 +7,12 @@ const nextConfig = {
   trailingSlash: true,
   images: {
     unoptimized: true,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'media.licdn.com',
+      },
+    ],
   },
   allowedDevOrigins: ["192.168.92.1"],
   turbopack: {},

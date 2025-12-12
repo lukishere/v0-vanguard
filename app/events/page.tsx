@@ -32,14 +32,15 @@ export default function EventsPage() {
 
   const fetchEvents = async () => {
     try {
-      const response = await fetch('/api/news')
+      const response = await fetch('/api/events')
       if (response.ok) {
         const data = await response.json()
-        // Filtrar solo eventos activos
-        const activeEvents = data.filter((item: EventItem) =>
-          item.type === "evento" && item.isActive
-        )
-        setEvents(activeEvents)
+        setEvents(data)
+        console.log('Events fetched:', data.length, 'events')
+        console.log('Showcase events:', data.filter((e: EventItem) => e.showInShowcase).length)
+      } else {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+        console.error('Error fetching events:', response.status, errorData)
       }
     } catch (error) {
       console.error('Error fetching events:', error)
@@ -49,13 +50,21 @@ export default function EventsPage() {
   }
 
   // Eventos para el showcase (FlowingMenu)
+  // Require only showInShowcase, provide defaults for missing fields
   const showcaseEvents = events
-    .filter(e => e.showInShowcase && e.eventLink && e.eventImage)
+    .filter(e => e.showInShowcase)
     .map(e => ({
-      link: e.eventLink!,
+      link: e.eventLink || '#',
       text: e.title,
-      image: e.eventImage!
+      image: e.eventImage || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
     }))
+
+  // Fallback placeholder when no showcase events
+  const fallbackShowcaseEvents = showcaseEvents.length === 0 ? [{
+    link: '#',
+    text: language === "en" ? "No showcase events configured" : "No hay eventos en showcase",
+    image: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+  }] : showcaseEvents
 
   if (loading) {
     return (
@@ -133,13 +142,11 @@ export default function EventsPage() {
               </div>
 
               <div className="relative mx-auto flex max-w-6xl flex-col gap-12">
-                {/* FlowingMenu - Solo si hay eventos con showcase */}
-                {showcaseEvents.length > 0 && (
-                  <FlowingMenu
-                    className="w-full rounded-[32px] border border-white/10 bg-white/5 backdrop-blur"
-                    items={showcaseEvents}
-                  />
-                )}
+                {/* FlowingMenu - Always show, with fallback if no showcase events */}
+                <FlowingMenu
+                  className="w-full rounded-[32px] border border-white/10 bg-white/5 backdrop-blur"
+                  items={fallbackShowcaseEvents}
+                />
 
                 {/* Tarjetas de eventos */}
                 <div className="grid w-full gap-8 text-slate-200 md:grid-cols-2">

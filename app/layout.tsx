@@ -17,7 +17,7 @@ import { Toaster } from "sonner";
 import "./globals.css";
 
 // Force dynamic rendering for authentication and real-time features
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
 const inter = Inter({ subsets: ["latin"] });
 

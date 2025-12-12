@@ -28,10 +28,9 @@ const resolveBackgroundImage = (image: string) => {
   return `url(${image})`
 }
 
-const getClosestEdge = (mouseX: number, mouseY: number, width: number, height: number): Edge => {
-  const topEdge = (mouseX - width / 2) ** 2 + mouseY ** 2
-  const bottomEdge = (mouseX - width / 2) ** 2 + (mouseY - height) ** 2
-  return topEdge < bottomEdge ? "top" : "bottom"
+// Always animate from top to bottom
+const getClosestEdge = (): Edge => {
+  return "top"
 }
 
 const FlowingMenuEntry = ({ link, text, image }: FlowingMenuItem) => {
@@ -87,20 +86,16 @@ const FlowingMenuEntry = ({ link, text, image }: FlowingMenuItem) => {
   )
 
   const handlePointerEnter = useCallback(
-    (event: React.MouseEvent<HTMLAnchorElement>) => {
-      if (!wrapperRef.current) return
-      const rect = wrapperRef.current.getBoundingClientRect()
-      const edge = getClosestEdge(event.clientX - rect.left, event.clientY - rect.top, rect.width, rect.height)
+    () => {
+      const edge = getClosestEdge()
       animate(edge, "enter")
     },
     [animate]
   )
 
   const handlePointerLeave = useCallback(
-    (event: React.MouseEvent<HTMLAnchorElement>) => {
-      if (!wrapperRef.current) return
-      const rect = wrapperRef.current.getBoundingClientRect()
-      const edge = getClosestEdge(event.clientX - rect.left, event.clientY - rect.top, rect.width, rect.height)
+    () => {
+      const edge = getClosestEdge()
       animate(edge, "leave")
     },
     [animate]

@@ -20,7 +20,7 @@ export function Footer() {
     {
       icon: Linkedin,
       text: t("contact.linkedin.title") + "!",
-      href: "https://www.linkedin.com/company/vanguard-ia"
+      href: "https://www.linkedin.com/company/vanguard-lb-consulting"
     },
   ]
 

@@ -14,12 +14,18 @@ export function Header() {
   const { t } = useLanguage();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const pathname = usePathname();
   const { isSignedIn, isLoaded } = useUser();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
+
+  // Track client-side mount to prevent hydration mismatch
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Handle scroll effect
   useEffect(() => {
@@ -73,7 +79,7 @@ export function Header() {
             ))}
             <LanguageSwitcher />
             {/* Authentication Status & CTA */}
-            {!isLoaded ? (
+            {!isMounted || !isLoaded ? (
               <div className="h-10 w-32 bg-gray-100 animate-pulse rounded-md" />
             ) : !isSignedIn ? (
               <Button
@@ -130,7 +136,7 @@ export function Header() {
                 </Link>
               ))}
               {/* Authentication Status & CTA - Mobile */}
-              {!isLoaded ? (
+              {!isMounted || !isLoaded ? (
                 <div className="h-10 w-full bg-gray-100 animate-pulse rounded-md" />
               ) : !isSignedIn ? (
                 <Button

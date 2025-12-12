@@ -1,23 +1,41 @@
 export type AboutContent = {
-  title: string
-  subtitle: string
-  mission: { title: string; content: string }
-  vision: { title: string; content: string }
+  title: string;
+  subtitle: string;
+  origin: { title: string; content: string };
+  mission: { title: string; content: string };
+  vision: { title: string; content: string };
   values: {
-    title: string
-    items: { title: string; description: string }[]
-  }
-  team: { title: string; content: string }
+    title: string;
+    logos: {
+      name: string;
+      imageUrl: string;
+    }[];
+  };
+  team: {
+    title: string;
+    content: string;
+    members: {
+      name: string;
+      position: string;
+      linkedinUrl: string;
+      imageUrl: string;
+    }[];
+  };
   approach: {
-    title: string
-    steps: { number: string; title: string; description: string }[]
-  }
-}
+    title: string;
+    steps: { number: string; title: string; description: string }[];
+  };
+};
 
 export const aboutContent: Record<"en" | "es", AboutContent> = {
   en: {
     title: "About VANGUARD-IA",
     subtitle: "Innovation and creativity to transform your business",
+    origin: {
+      title: "Origin",
+      content:
+        "Backed by certified expertise in Mission-Critical Infrastructure (IBM, HP, NetApp, Brocade, Cisco, Cohesity, Dell EMC). We bring 18+ years of enterprise data experience to the world of AI. While currently pursuing advanced AI certifications (NVIDIA and Data Governance), our practical approach focuses on the most neglected aspect of AI adoption: The Infrastructure & Security Layer.",
+    },
     mission: {
       title: "Our Mission",
       content:
@@ -26,42 +44,77 @@ export const aboutContent: Record<"en" | "es", AboutContent> = {
     vision: {
       title: "Our Vision",
       content:
-        "To be the leading technology consultancy that transforms businesses through innovation, creativity, and strategic implementation of advanced technologies.",
+        "To be the leading technology consultancy in data governance and artificial intelligence infrastructure through constant innovation and strategic implementation of advanced technologies.",
     },
     values: {
-      title: "Our Values",
-      items: [
+      title: "Experience",
+      logos: [
         {
-          title: "Innovation",
-          description:
-            "We constantly seek new and better ways to solve problems and create opportunities.",
+          name: "IBM",
+          imageUrl: "/images/logos/ibm.svg",
         },
         {
-          title: "Excellence",
-          description:
-            "We are committed to delivering the highest quality in everything we do.",
+          name: "HP",
+          imageUrl: "https://cdn.simpleicons.org/hp/FFFFFF",
         },
         {
-          title: "Integrity",
-          description:
-            "We operate with honesty, transparency, and ethical standards in all our interactions.",
+          name: "EY",
+          imageUrl: "/images/logos/ey.svg",
         },
         {
-          title: "Collaboration",
-          description:
-            "We believe in the power of teamwork and partnership with our clients.",
+          name: "Logicalis",
+          imageUrl: "/images/logos/logicalis.png",
         },
         {
-          title: "Client Focus",
-          description:
-            "We prioritize understanding and meeting our clients' unique needs and goals.",
+          name: "Microsoft",
+          imageUrl: "/images/logos/microsoft.svg",
+        },
+        {
+          name: "Revolut",
+          imageUrl: "/images/logos/revolut.png",
+        },
+        {
+          name: "Additional Partner",
+          imageUrl: "/images/logos/additional-logo.png",
         },
       ],
     },
     team: {
-      title: "Our Team",
+      title: "Executive Team",
       content:
         "Our team consists of experienced professionals with diverse backgrounds in technology, business strategy, and industry-specific expertise. We bring together the best talent to deliver comprehensive solutions for our clients.",
+      members: [
+        {
+          name: "Lucas Ballestero Lunghini",
+          position: "Founder & General Director",
+          linkedinUrl: "https://www.linkedin.com/in/luballest/",
+          imageUrl: "/images/team/lucas-ballestero.jpg",
+        },
+        {
+          name: "Nicolás Crespo",
+          position: "QUAN LLC. Founder",
+          linkedinUrl: "https://www.linkedin.com/in/nicolasmcrespo/",
+          imageUrl: "/images/team/nicolas-crespo.jpg",
+        },
+        {
+          name: "Diego Peccini",
+          position: "Gerente de Ventas",
+          linkedinUrl: "https://www.linkedin.com/in/example",
+          imageUrl: "/images/team/member3.jpg",
+        },
+        {
+          name: "Javier García",
+          position: "Asesor Financiero",
+          linkedinUrl: "https://www.linkedin.com/in/example",
+          imageUrl: "/images/team/member4.jpg",
+        },
+        {
+          name: "Gerardo Fernández",
+          position: "Lider de Infraestructura/Cloud Computing",
+          linkedinUrl: "https://www.linkedin.com/in/example",
+          imageUrl: "/images/team/member5.jpg",
+        },
+      ],
     },
     approach: {
       title: "Our Approach",
@@ -102,6 +155,11 @@ export const aboutContent: Record<"en" | "es", AboutContent> = {
   es: {
     title: "Sobre VANGUARD-IA",
     subtitle: "Innovación y creatividad para transformar tu negocio",
+    origin: {
+      title: "Origen",
+      content:
+        "Respaldados por experiencia certificada en Infraestructura de Misión Crítica (IBM, HP, NetApp, Brocade, Cisco, Cohesity, Dell EMC). Traemos más de 18 años de experiencia en datos empresariales al mundo de la IA. Mientras perseguimos actualmente certificaciones avanzadas en IA (NVIDIA y Gobernanza de Datos), nuestro enfoque práctico se centra en el aspecto más descuidado de la adopción de IA: La Capa de Infraestructura y Seguridad.",
+    },
     mission: {
       title: "Nuestra Misión",
       content:
@@ -110,42 +168,77 @@ export const aboutContent: Record<"en" | "es", AboutContent> = {
     vision: {
       title: "Nuestra Visión",
       content:
-        "Ser la consultora tecnológica líder que transforma empresas a través de la innovación, la creatividad y la implementación estratégica de tecnologías avanzadas.",
+        "Ser la consultora tecnológica líder en gobernanza de datos e infraestructura de inteligencia artificial a través de la innovación constante y la implementación estratégica de tecnologías avanzadas.",
     },
     values: {
-      title: "Nuestros Valores",
-      items: [
+      title: "Experiencia",
+      logos: [
         {
-          title: "Innovación",
-          description:
-            "Buscamos constantemente nuevas y mejores formas de resolver problemas y crear oportunidades.",
+          name: "IBM",
+          imageUrl: "/images/logos/ibm.svg",
         },
         {
-          title: "Excelencia",
-          description:
-            "Estamos comprometidos a ofrecer la más alta calidad en todo lo que hacemos.",
+          name: "HP",
+          imageUrl: "https://cdn.simpleicons.org/hp/FFFFFF",
         },
         {
-          title: "Integridad",
-          description:
-            "Operamos con honestidad, transparencia y estándares éticos en todas nuestras interacciones.",
+          name: "EY",
+          imageUrl: "/images/logos/ey.svg",
         },
         {
-          title: "Colaboración",
-          description:
-            "Creemos en el poder del trabajo en equipo y la asociación con nuestros clientes.",
+          name: "Logicalis",
+          imageUrl: "/images/logos/logicalis.png",
         },
         {
-          title: "Enfoque en el Cliente",
-          description:
-            "Priorizamos entender y satisfacer las necesidades y objetivos únicos de nuestros clientes.",
+          name: "Microsoft",
+          imageUrl: "/images/logos/microsoft.svg",
+        },
+        {
+          name: "Revolut",
+          imageUrl: "/images/logos/revolut.png",
+        },
+        {
+          name: "Additional Partner",
+          imageUrl: "/images/logos/additional-logo.png",
         },
       ],
     },
     team: {
-      title: "Nuestro Equipo",
+      title: "Equipo Directivo",
       content:
         "Nuestro equipo está formado por profesionales experimentados con diversos antecedentes en tecnología, estrategia empresarial y experiencia específica de la industria. Reunimos al mejor talento para ofrecer soluciones integrales para nuestros clientes.",
+      members: [
+        {
+          name: "Lucas Ballestero Lunghini",
+          position: "Fundador & Director General",
+          linkedinUrl: "https://www.linkedin.com/in/luballest/",
+          imageUrl: "/images/team/lucas-ballestero.jpg",
+        },
+        {
+          name: "Nicolás Crespo",
+          position: "Fundador QUAN LLC.",
+          linkedinUrl: "https://www.linkedin.com/in/nicolasmcrespo/",
+          imageUrl: "/images/team/nicolas-crespo.jpg",
+        },
+        {
+          name: "Diego Peccini",
+          position: "Gerente de Ventas",
+          linkedinUrl: "https://www.linkedin.com/in/example",
+          imageUrl: "/images/team/member3.jpg",
+        },
+        {
+          name: "Javier García",
+          position: "Asesor Financiero",
+          linkedinUrl: "https://www.linkedin.com/in/example",
+          imageUrl: "/images/team/member4.jpg",
+        },
+        {
+          name: "Gerardo Fernández",
+          position: "Líder de Infraestructura/Cloud Computing",
+          linkedinUrl: "https://www.linkedin.com/in/example",
+          imageUrl: "/images/team/member5.jpg",
+        },
+      ],
     },
     approach: {
       title: "Nuestro Enfoque",
@@ -183,5 +276,4 @@ export const aboutContent: Record<"en" | "es", AboutContent> = {
       ],
     },
   },
-}
-
+};

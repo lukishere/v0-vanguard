@@ -39,7 +39,7 @@ export function DemoCard({ demo }: DemoCardProps) {
   const { openDemo, isLoading, error } = useDemo();
 
   // ULTRA DEFENSIVE: Check if demo exists and is valid object
-  if (!demo || typeof demo !== 'object') {
+  if (!demo || typeof demo !== "object") {
     console.error("🚨 [DemoCard] Demo prop is not an object:", demo);
     return null;
   }
