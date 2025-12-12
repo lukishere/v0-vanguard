@@ -516,7 +516,7 @@ async function getRecentActivities(): Promise<DashboardActivity[]> {
     const getPriority = (type: string, description: string): "high" | "medium" | "low" | undefined => {
       if (type === "meeting-requested") return "high"
       if (type === "demo-requested") return "medium"
-      if (description.toLowerCase().includes("urgente") || description.toLowerCase().includes("importante")) return "high"
+      if (description && (description.toLowerCase().includes("urgente") || description.toLowerCase().includes("importante"))) return "high"
       return "low"
     }
 

@@ -1,39 +1,40 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { formatDistanceToNow } from "date-fns"
-import { es } from "date-fns/locale"
-import type { Demo } from "@/lib/demos/types"
-import { ClientDetailModal } from "@/components/admin/client-detail-modal"
+import { ClientDetailModal } from "@/components/admin/client-detail-modal";
+import type { Demo } from "@/lib/demos/types";
+import { formatDistanceToNow } from "date-fns";
+import { es } from "date-fns/locale";
+import { useState } from "react";
 
 interface Client {
-  id: string
-  name: string
-  email: string | null
-  metadata: any
-  lastActive: string | null
+  id: string;
+  name: string;
+  email: string | null;
+  metadata: any;
+  lastActive: string | null;
 }
 
 interface ClientTableProps {
-  clients: Client[]
-  demos: Demo[]
+  clients: Client[];
+  demos: Demo[];
 }
 
 export function ClientTable({ clients, demos }: ClientTableProps) {
-  const [selectedClient, setSelectedClient] = useState<Client | null>(null)
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleClientClick = (client: Client) => {
-    setSelectedClient(client)
-    setIsModalOpen(true)
-  }
+    setSelectedClient(client);
+    setIsModalOpen(true);
+  };
 
   if (clients.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-gray-200 bg-gray-50 p-10 text-center text-sm text-gray-500">
-        Aún no hay clientes con acceso asignado. Usa el panel de Clerk para invitarlos y luego otorga demos desde aquí.
+        Aún no hay clientes con acceso asignado. Usa el panel de Clerk para
+        invitarlos y luego otorga demos desde aquí.
       </div>
-    )
+    );
   }
 
   return (
@@ -61,10 +62,10 @@ export function ClientTable({ clients, demos }: ClientTableProps) {
           {/* Body */}
           <tbody className="bg-white divide-y divide-gray-200">
             {clients.map((client) => {
-              // Split name into first and last name
-              const nameParts = client.name.split(' ')
-              const firstName = nameParts[0] || ''
-              const lastName = nameParts.slice(1).join(' ') || ''
+              // Split name into first and last name (defensive check)
+              const nameParts = client.name ? client.name.split(" ") : [""];
+              const firstName = nameParts[0] || "";
+              const lastName = nameParts.slice(1).join(" ") || "";
 
               return (
                 <tr
@@ -83,11 +84,14 @@ export function ClientTable({ clients, demos }: ClientTableProps) {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {client.lastActive
-                      ? formatDistanceToNow(new Date(client.lastActive), { locale: es, addSuffix: true })
+                      ? formatDistanceToNow(new Date(client.lastActive), {
+                          locale: es,
+                          addSuffix: true,
+                        })
                       : "Sin actividad registrada"}
                   </td>
                 </tr>
-              )
+              );
             })}
           </tbody>
         </table>
@@ -100,11 +104,11 @@ export function ClientTable({ clients, demos }: ClientTableProps) {
           demos={demos}
           isOpen={isModalOpen}
           onClose={() => {
-            setIsModalOpen(false)
-            setSelectedClient(null)
+            setIsModalOpen(false);
+            setSelectedClient(null);
           }}
         />
       )}
     </>
-  )
+  );
 }

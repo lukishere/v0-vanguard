@@ -18,11 +18,18 @@ import {
 import { cn } from "@/lib/utils"
 import { format, isToday, isTomorrow, isThisWeek, parseISO } from "date-fns"
 import { es } from "date-fns/locale"
-import type { MeetingMilestone, MilestoneStatus } from "@/app/actions/meeting-milestones"
+import type { MeetingMilestone } from "@/app/actions/meeting-milestones"
 
 type ClientMilestone = MeetingMilestone
 
-const meetingTypeConfig = {
+type MilestoneStatus = "pending" | "confirmed" | "upcoming" | "completed" | "cancelled"
+
+const meetingTypeConfig: Record<string, {
+  icon: React.ComponentType<{ className?: string }>
+  color: string
+  bgColor: string
+  label: string
+}> = {
   demo: {
     icon: Calendar,
     color: "text-blue-400",
@@ -40,7 +47,57 @@ const meetingTypeConfig = {
     color: "text-purple-400",
     bgColor: "bg-purple-500/10 border-purple-500/20",
     label: "Implementación"
+  },
+  "demo-call": {
+    icon: Calendar,
+    color: "text-blue-400",
+    bgColor: "bg-blue-500/10 border-blue-500/20",
+    label: "Llamada demo"
+  },
+  "technical-session": {
+    icon: Users,
+    color: "text-emerald-400",
+    bgColor: "bg-emerald-500/10 border-emerald-500/20",
+    label: "Sesión técnica"
+  },
+  "contract-review": {
+    icon: ExternalLink,
+    color: "text-purple-400",
+    bgColor: "bg-purple-500/10 border-purple-500/20",
+    label: "Revisión de contrato"
+  },
+  "onboarding-session": {
+    icon: Users,
+    color: "text-indigo-400",
+    bgColor: "bg-indigo-500/10 border-indigo-500/20",
+    label: "Sesión de onboarding"
+  },
+  "follow-up": {
+    icon: Phone,
+    color: "text-cyan-400",
+    bgColor: "bg-cyan-500/10 border-cyan-500/20",
+    label: "Seguimiento"
+  },
+  training: {
+    icon: Users,
+    color: "text-amber-400",
+    bgColor: "bg-amber-500/10 border-amber-500/20",
+    label: "Entrenamiento"
+  },
+  "support-call": {
+    icon: Phone,
+    color: "text-rose-400",
+    bgColor: "bg-rose-500/10 border-rose-500/20",
+    label: "Llamada de soporte"
   }
+}
+
+// Default config for unknown types
+const defaultMeetingTypeConfig = {
+  icon: Calendar,
+  color: "text-gray-400",
+  bgColor: "bg-gray-500/10 border-gray-500/20",
+  label: "Reunión"
 }
 
 const statusConfig = {
@@ -55,24 +112,44 @@ interface ClientMilestonesProps {
   milestones: ClientMilestone[]
 }
 
+// Helper to derive status from milestone
+const getMilestoneStatus = (milestone: ClientMilestone): MilestoneStatus => {
+  if (milestone.completedAt) {
+    return "completed"
+  }
+  if (milestone.scheduledFor) {
+    const scheduledDate = parseISO(milestone.scheduledFor)
+    const now = new Date()
+    if (scheduledDate < now) {
+      return "completed"
+    }
+    if (isToday(scheduledDate) || isTomorrow(scheduledDate)) {
+      return "upcoming"
+    }
+    return "confirmed"
+  }
+  return "pending"
+}
+
 export function ClientMilestones({ milestones }: ClientMilestonesProps) {
   const [filter, setFilter] = useState<"all" | "upcoming" | "pending" | "confirmed">("all")
 
   // Filtrar solo hitos activos (no completados ni cancelados)
-  const activeMilestones = milestones.filter(m =>
-    m.status !== "completed" && m.status !== "cancelled"
-  )
+  const activeMilestones = milestones.filter(m => {
+    const status = getMilestoneStatus(m)
+    return status !== "completed" && status !== "cancelled"
+  })
 
   const getFilteredMilestones = () => {
-    const now = new Date()
     return activeMilestones.filter(milestone => {
+      const status = getMilestoneStatus(milestone)
       switch (filter) {
         case "upcoming":
-          return milestone.status === "confirmed" || milestone.status === "upcoming"
+          return status === "confirmed" || status === "upcoming"
         case "pending":
-          return milestone.status === "pending"
+          return status === "pending"
         case "confirmed":
-          return milestone.status === "confirmed"
+          return status === "confirmed"
         default:
           return true
       }
@@ -87,9 +164,12 @@ export function ClientMilestones({ milestones }: ClientMilestonesProps) {
   }
 
   const filteredMilestones = getFilteredMilestones()
-  const pendingCount = activeMilestones.filter(m => m.status === "pending").length
-  const confirmedCount = activeMilestones.filter(m => m.status === "confirmed").length
-  const upcomingCount = activeMilestones.filter(m => m.status === "upcoming" || m.status === "confirmed").length
+  const pendingCount = activeMilestones.filter(m => getMilestoneStatus(m) === "pending").length
+  const confirmedCount = activeMilestones.filter(m => getMilestoneStatus(m) === "confirmed").length
+  const upcomingCount = activeMilestones.filter(m => {
+    const status = getMilestoneStatus(m)
+    return status === "upcoming" || status === "confirmed"
+  }).length
 
   return (
     <section className="rounded-3xl border border-white/10 bg-gradient-to-r from-vanguard-blue/20 via-white/5 to-vanguard-red/30 p-8 shadow-2xl backdrop-blur">
@@ -157,9 +237,17 @@ export function ClientMilestones({ milestones }: ClientMilestonesProps) {
 
       <div className="space-y-4">
         {filteredMilestones.length > 0 ? filteredMilestones.map((milestone) => {
-          const meetingType = meetingTypeConfig[milestone.meetingType]
-          const status = statusConfig[milestone.status]
+          // Map milestone.type to meetingTypeConfig, with fallback
+          const meetingTypeKey = milestone.type || "demo"
+          const meetingType = meetingTypeConfig[meetingTypeKey] || defaultMeetingTypeConfig
+          const status = getMilestoneStatus(milestone)
+          const statusConfigItem = statusConfig[status] || statusConfig.pending
           const MeetingTypeIcon = meetingType.icon
+
+          // Parse scheduledFor to get date and time
+          const scheduledDate = milestone.scheduledFor ? parseISO(milestone.scheduledFor) : null
+          const dateStr = scheduledDate ? format(scheduledDate, "yyyy-MM-dd") : ""
+          const timeStr = scheduledDate ? format(scheduledDate, "HH:mm") : ""
 
           return (
             <div
@@ -173,7 +261,7 @@ export function ClientMilestones({ milestones }: ClientMilestonesProps) {
                 <div className="flex items-start gap-3 flex-1">
                   <div className={cn(
                     "mt-0.5 inline-flex h-8 w-8 items-center justify-center rounded-full border",
-                    status.bgColor
+                    statusConfigItem.bgColor
                   )}>
                     <MeetingTypeIcon className={cn("h-4 w-4", meetingType.color)} />
                   </div>
@@ -181,29 +269,33 @@ export function ClientMilestones({ milestones }: ClientMilestonesProps) {
                   <div className="flex-1 space-y-1">
                     <div className="flex items-center gap-2">
                       <h3 className="font-medium text-white">{milestone.title}</h3>
-                      <Badge className={cn("text-xs", status.color, "bg-white/10 border-white/20 text-white")}>
-                        {status.label}
+                      <Badge className={cn("text-xs", statusConfigItem.color, "bg-white/10 border-white/20 text-white")}>
+                        {statusConfigItem.label}
                       </Badge>
                     </div>
 
-                    <p className="text-sm text-white/70">{milestone.description}</p>
+                    {milestone.description && (
+                      <p className="text-sm text-white/70">{milestone.description}</p>
+                    )}
 
-                    <div className="flex items-center gap-4 text-xs text-white/60">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="h-3 w-3" />
-                        <span className={cn(
-                          milestone.status === "pending" && "text-amber-300 font-medium"
-                        )}>
-                          {getDateLabel(milestone.preferredDate)} a las {milestone.preferredTime}
-                        </span>
-                      </div>
-
-                      {milestone.productType && (
+                    {scheduledDate && (
+                      <div className="flex items-center gap-4 text-xs text-white/60">
                         <div className="flex items-center gap-1">
-                          <span className="font-medium text-white/80">{milestone.productType}</span>
+                          <Calendar className="h-3 w-3" />
+                          <span className={cn(
+                            status === "pending" && "text-amber-300 font-medium"
+                          )}>
+                            {getDateLabel(dateStr)} a las {timeStr}
+                          </span>
                         </div>
-                      )}
-                    </div>
+
+                        {milestone.demoName && (
+                          <div className="flex items-center gap-1">
+                            <span className="font-medium text-white/80">{milestone.demoName}</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
 
                     {milestone.notes && (
                       <p className="text-xs text-white/50 italic">
@@ -214,15 +306,15 @@ export function ClientMilestones({ milestones }: ClientMilestonesProps) {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  {milestone.status === "confirmed" && (
+                  {status === "confirmed" && (
                     <div className="text-right text-xs text-white/70">
                       <div>Confirmada</div>
-                      {milestone.confirmedAt && (
-                        <div>{format(parseISO(milestone.confirmedAt), "d/MM/yyyy")}</div>
+                      {milestone.scheduledFor && (
+                        <div>{format(parseISO(milestone.scheduledFor), "d/MM/yyyy")}</div>
                       )}
                     </div>
                   )}
-                  {milestone.status === "pending" && (
+                  {status === "pending" && (
                     <div className="text-right text-xs text-amber-300">
                       <div>Esperando</div>
                       <div>confirmación</div>

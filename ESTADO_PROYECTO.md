@@ -433,3 +433,5 @@ Variables requeridas (verificar en `env.example`):
 **Mantenido por:** Equipo de desarrollo VANGUARD-IA
 
 
+
+

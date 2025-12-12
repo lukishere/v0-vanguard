@@ -7,6 +7,12 @@ const nextConfig = {
   trailingSlash: true,
   images: {
     unoptimized: true,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'media.licdn.com',
+      },
+    ],
   },
   allowedDevOrigins: ["192.168.92.1"],
   turbopack: {},
@@ -68,14 +74,14 @@ const nextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.com https://clerk.com https://*.clerk.accounts.dev",
-              "style-src 'self' 'unsafe-inline' https://*.clerk.com https://clerk.com https://*.clerk.accounts.dev",
-              "img-src 'self' data: https: https://*.clerk.com https://clerk.com https://*.clerk.accounts.dev",
-              "font-src 'self' https://*.clerk.com https://clerk.com https://*.clerk.accounts.dev",
-              "connect-src 'self' https://*.clerk.com https://clerk.com https://*.clerk.accounts.dev https://clerk-telemetry.com wss://*.clerk.com wss://clerk.com wss://*.clerk.accounts.dev",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.com https://clerk.com https://*.clerk.accounts.dev https://vercel.live",
+              "style-src 'self' 'unsafe-inline' https://*.clerk.com https://clerk.com https://*.clerk.accounts.dev https://vercel.live https://fonts.googleapis.com",
+              "img-src 'self' data: https: https://*.clerk.com https://clerk.com https://*.clerk.accounts.dev https://vercel.live",
+              "font-src 'self' https://*.clerk.com https://clerk.com https://*.clerk.accounts.dev https://vercel.live https://fonts.gstatic.com",
+              "connect-src 'self' https://*.clerk.com https://clerk.com https://*.clerk.accounts.dev https://clerk-telemetry.com wss://*.clerk.com wss://clerk.com wss://*.clerk.accounts.dev https://vercel.live",
               "worker-src 'self' blob:",
               "frame-ancestors 'self'",
-              "frame-src 'self' https://vanguard-demos.vercel.app https://*.vercel.app https://*.web.app https://*.clerk.com https://clerk.com",
+              "frame-src 'self' https://vanguard-demos.vercel.app https://*.vercel.app https://*.web.app https://*.clerk.com https://clerk.com https://vercel.live",
               "object-src 'none'",
               "base-uri 'self'",
             ].join("; "),

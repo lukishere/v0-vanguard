@@ -1,9 +1,11 @@
 "use client"
 
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { useLanguage } from "@/contexts/language-context"
 import { ArrowRight, ExternalLink } from "lucide-react"
+import { AuditModal } from "@/components/audit-modal"
 
 type CTAType = "learn" | "contact" | "quote" | "external"
 
@@ -17,6 +19,7 @@ interface CTAButtonProps {
 
 export function CTAButton({ type, className = "", href, text, isExternal = false }: CTAButtonProps) {
   const { t } = useLanguage()
+  const [modalOpen, setModalOpen] = useState(false)
 
   const ctaConfig = {
     learn: {
@@ -47,7 +50,7 @@ export function CTAButton({ type, className = "", href, text, isExternal = false
   const buttonContent = (
     <>
       <span className="relative z-10">{config.text}</span>
-      <IconComponent className="h-4 w-4 ml-1 transform translate-x-0 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300" />
+      <IconComponent className="h-4 w-4 ml-1 transform translate-x-0 opacity-100 group-hover:translate-x-1 transition-all duration-300" />
       <span
         className={`absolute inset-0 w-0 ${
           type === "quote" ? "bg-vanguard-red" : "bg-vanguard-blue/10"
@@ -55,6 +58,26 @@ export function CTAButton({ type, className = "", href, text, isExternal = false
       ></span>
     </>
   )
+
+  // For "learn" type, open modal instead of navigating
+  if (type === "learn") {
+    return (
+      <>
+        <Button
+          variant={config.variant}
+          onClick={() => setModalOpen(true)}
+          className={`${className} group relative overflow-hidden transition-all duration-300 ${
+            type === "quote" ? "bg-vanguard-blue hover:bg-vanguard-blue/90" : ""
+          }`}
+        >
+          <span className="flex items-center gap-1">
+            {buttonContent}
+          </span>
+        </Button>
+        <AuditModal open={modalOpen} onOpenChange={setModalOpen} />
+      </>
+    )
+  }
 
   return (
     <Button

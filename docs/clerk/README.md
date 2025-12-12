@@ -100,3 +100,5 @@ NEXT_PUBLIC_CLERK_SIGN_UP_URL=/auth?mode=signup
 **Última actualización**: November 16, 2025
 **Estado**: ✅ Producción Ready
 
+
+

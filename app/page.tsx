@@ -5,7 +5,6 @@ import { CTAButton } from "@/components/cta-button"
 import { ServiceCard } from "@/components/service-card"
 import { BlogCard } from "@/components/blog-card"
 import { ClientReview } from "@/components/client-review"
-import { Brain, Server, Globe, Database, Shield } from "lucide-react"
 import Image from "next/image"
 import type { BusinessType } from "@/components/client-review"
 import { SectionTitle } from "@/components/section-title"
@@ -20,10 +19,10 @@ export default function Home() {
   const currentContent = useMemo(() => servicesContent[language], [language])
   const services = useMemo(
     () =>
-      currentContent.services.map((service, index) => ({
-        icon: [Brain, Server, Globe, Globe, Database, Shield][index] ?? Brain,
+      currentContent.services.map((service) => ({
         title: service.title,
         description: service.description,
+        benefit: service.benefit,
       })),
     [currentContent.services, language]
   )
@@ -130,7 +129,7 @@ export default function Home() {
       {/* Services Section */}
       <section className="relative overflow-hidden bg-slate-950">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.18),_rgba(2,6,23,0.92))]" />
-        <div className="vanguard-container relative z-10 py-24">
+        <div className="vanguard-container relative z-10 py-24 pl-4 md:pl-0">
           {/* LogoLoop moved here - above "Nuestros Servicios" */}
           <div className="mb-16">
             <LogoLoop
@@ -141,9 +140,9 @@ export default function Home() {
                   href: "https://aws.amazon.com"
                 },
                 {
-                  src: "https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg",
-                  alt: "Microsoft",
-                  href: "https://www.microsoft.com"
+                  src: "https://cdn.simpleicons.org/githubcopilot/FFFFFF",
+                  alt: "Copilot",
+                  href: "https://github.com/features/copilot"
                 },
                 {
                   src: "https://cdn.simpleicons.org/anthropic/FFFFFF",
@@ -151,7 +150,7 @@ export default function Home() {
                   href: "https://www.anthropic.com"
                 },
                 {
-                  src: "https://cursor.com/favicon.svg",
+                  src: "https://cdn.simpleicons.org/cursor/FFFFFF",
                   alt: "Cursor AI",
                   href: "https://cursor.sh"
                 },
@@ -166,7 +165,7 @@ export default function Home() {
                   href: "https://n8n.io"
                 },
                 {
-                  src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg",
+                  src: "https://cdn.simpleicons.org/google/FFFFFF",
                   alt: "Google",
                   href: "https://www.google.com"
                 },
@@ -176,7 +175,7 @@ export default function Home() {
                   href: "https://www.perplexity.ai"
                 },
                 {
-                  src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg",
+                  src: "https://cdn.simpleicons.org/figma/FFFFFF",
                   alt: "Figma",
                   href: "https://www.figma.com"
                 },
@@ -191,9 +190,9 @@ export default function Home() {
                   href: "https://www.alibabacloud.com"
                 },
                 {
-                  src: "https://cdn.simpleicons.org/openai/FFFFFF",
-                  alt: "Kimi (Moonshot AI)",
-                  href: "https://www.moonshot.cn"
+                  src: "https://cdn.simpleicons.org/nvidia/FFFFFF",
+                  alt: "NVIDIA",
+                  href: "https://www.nvidia.com"
                 },
               ]}
               speed={60}
@@ -211,10 +210,38 @@ export default function Home() {
             />
             <div className="vanguard-divider mx-auto"></div>
           </div>
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 lg:gap-12">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 lg:gap-12 items-stretch">
             {services.map((service, index) => (
-              <ServiceCard key={index} icon={service.icon} title={service.title} description={service.description} />
+              <ServiceCard
+                key={index}
+                title={service.title}
+                description={service.description}
+                benefit={service.benefit}
+              />
             ))}
+          </div>
+
+          {/* QUAN Partnership Section */}
+          <div className="mt-16 border-t border-slate-800/70 pt-16">
+            <div className="flex flex-col items-center gap-4 text-center">
+              <div className="flex items-center gap-3">
+                <h3 className="text-xl font-semibold text-white sm:text-2xl">
+                  {t("quan.title")} ({t("quan.poweredBy")})
+                </h3>
+                <div className="flex items-center justify-center">
+                  <Image
+                    src="/images/quan-logo.png"
+                    alt="QUAN LLC Logo"
+                    width={150}
+                    height={150}
+                    className="ml-3"
+                  />
+                </div>
+              </div>
+              <p className="max-w-3xl text-base text-slate-300 sm:text-lg">
+                {t("quan.description")}
+              </p>
+            </div>
           </div>
         </div>
       </section>

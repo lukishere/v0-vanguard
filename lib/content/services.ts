@@ -1,18 +1,19 @@
 export type ServiceFeature = {
-  title: string
-  description: string
-  features: string[]
-}
+  title: string;
+  description: string;
+  benefit: string;
+  features: string[];
+};
 
 export type ServicesContent = {
-  title: string
-  subtitle: string
+  title: string;
+  subtitle: string;
   cta: {
-    getStarted: string
-    discuss: string
-  }
-  services: ServiceFeature[]
-}
+    getStarted: string;
+    discuss: string;
+  };
+  services: ServiceFeature[];
+};
 
 export const servicesContent: Record<"en" | "es", ServicesContent> = {
   en: {
@@ -25,76 +26,42 @@ export const servicesContent: Record<"en" | "es", ServicesContent> = {
     },
     services: [
       {
-        title: "AI Development",
+        title: "Sovereign AI",
         description:
-          "Leverage the power of artificial intelligence to optimize your business processes and gain competitive advantage.",
+          "Deploy Private AI models within your own perimeter. Maximum data privacy, zero data leakage to public clouds. Ideal for Government, Legal, and Healthcare sectors.",
+        benefit: "AI power without compliance risks.",
         features: [
-          "AI Strategy Development",
-          "Machine Learning Implementation",
-          "Natural Language Processing",
-          "Chatbots, Conversational AI Development",
-          "AI Integration with Existing Systems (Automatization)",
+          "Private AI Model Deployment",
+          "Local LLM Implementation",
+          "Data Sovereignty Solutions",
+          "Compliance & Privacy Assurance",
+          "On-Premises AI Infrastructure",
         ],
       },
       {
-        title: "AI-Powered CRM Solutions",
+        title: "High-Performance Infrastructure",
         description:
-          "Strategic technology planning and implementation to align with your business goals.",
+          "Architecting critical storage and compute environments for AI workloads. Expertise in Hybrid Cloud, Disaster Recovery, and Ransomware Protection.",
+        benefit: "Build the foundation your AI needs to scale.",
         features: [
-          "Behavior Prediction",
-          "Task Automation & Personalized Recommendations",
-          "Automatic Analysis of Millions of Data Points",
-          "Custom Reports",
-          "RPA",
-          "Intelligent Document Processing",
+          "AI-Optimized Infrastructure",
+          "Hybrid Cloud Architecture",
+          "Disaster Recovery Solutions",
+          "Ransomware Protection",
+          "High-Performance Storage",
         ],
       },
       {
-        title: "Web Branding",
+        title: "Business Process Automation",
         description:
-          "Create a powerful online presence that reflects your brand's values and connects with your audience.",
+          "End-to-end workflow automation using code development and orchestration. We integrate legacy ERPs or Cloud computing with modern AI agents to reduce operational costs.",
+        benefit: "Transform manual tasks into automated profit.",
         features: [
-          "Brand Identity Development",
-          "Website Design & Development",
-          "User Experience Optimization",
-          "Content Strategy",
-          "SEO & Digital Marketing",
-        ],
-      },
-      {
-        title: "Web Development",
-        description:
-          "Comprehensive web development and design services to create cutting-edge digital experiences.",
-        features: [
-          "Custom Web Application Development",
-          "Responsive Design",
-          "Progressive Web Apps",
-          "E-commerce Solutions",
-          "Interactive User Interfaces",
-        ],
-      },
-      {
-        title: "Infrastructure Consulting Design",
-        description:
-          "Design and implement robust, scalable infrastructure solutions for your business needs.",
-        features: [
-          "Cloud Infrastructure Design",
-          "On-Premises Solutions",
-          "Hybrid Cloud Strategies",
-          "Infrastructure Optimization",
-          "Scalability Planning",
-        ],
-      },
-      {
-        title: "Security",
-        description:
-          "Protect your business with comprehensive security solutions and best practices.",
-        features: [
-          "Security Assessment & Auditing",
-          "Threat Detection & Prevention",
-          "Data Protection Strategies",
-          "Compliance Management",
-          "Security Training & Awareness",
+          "Workflow Automation",
+          "ERP Integration",
+          "AI Agent Development",
+          "Process Optimization",
+          "Cost Reduction Solutions",
         ],
       },
     ],
@@ -109,78 +76,44 @@ export const servicesContent: Record<"en" | "es", ServicesContent> = {
     },
     services: [
       {
-        title: "Desarrollo de IA",
+        title: "IA Soberana",
         description:
-          "Aprovecha el poder de la inteligencia artificial para optimizar tus procesos de negocio y obtener ventaja competitiva.",
+          "Despliega modelos de IA privados dentro de tu propio perímetro. Máxima privacidad de datos, cero fugas de datos a nubes públicas. Ideal para sectores Gubernamental, Legal y Sanitario.",
+        benefit: "Poder de IA sin riesgos de cumplimiento.",
         features: [
-          "Desarrollo de Estrategia de IA",
-          "Implementación de Machine Learning",
-          "Procesamiento de Lenguaje Natural",
-          "Desarrollo de Chatbots, Agentes inteligentes conversacionales",
-          "Integración de IA con Sistemas Existentes (Automatización)",
+          "Despliegue de Modelos de IA Privados",
+          "Implementación de LLMs Locales",
+          "Soluciones de Soberanía de Datos",
+          "Garantía de Cumplimiento y Privacidad",
+          "Infraestructura de IA On-Premises",
         ],
       },
       {
-        title: "Soluciones CRM con IA",
+        title: "Infraestructura de Alto Rendimiento",
         description:
-          "Planificación e implementación estratégica de tecnología alineada con tus objetivos de negocio.",
+          "Arquitectura de entornos críticos de almacenamiento y computación para cargas de trabajo de IA. Experiencia en Nube Híbrida, Recuperación ante Desastres y Protección contra Ransomware.",
+        benefit: "Construye la base que tu IA necesita para escalar.",
         features: [
-          "Predicción de comportamiento",
-          "Automatización de tareas y recomendaciones personalizadas",
-          "Análisis automáticos de millones de puntos de datos",
-          "Reportes a medida",
-          "RPA",
-          "Procesamiento inteligente de documentos",
+          "Infraestructura Optimizada para IA",
+          "Arquitectura de Nube Híbrida",
+          "Soluciones de Recuperación ante Desastres",
+          "Protección contra Ransomware",
+          "Almacenamiento de Alto Rendimiento",
         ],
       },
       {
-        title: "Branding Web",
+        title: "Automatización de Procesos de Negocio",
         description:
-          "Crea una poderosa presencia online que refleje los valores de tu marca y conecte con tu audiencia.",
+          "Automatización de flujos de trabajo de extremo a extremo usando desarrollo de código y orquestación. Integramos ERPs legacy o computación en la nube con agentes de IA modernos para reducir costos operativos.",
+        benefit: "Transforma tareas manuales en ganancias automatizadas.",
         features: [
-          "Desarrollo de Identidad de Marca",
-          "Diseño y Desarrollo Web",
-          "Optimización de Experiencia de Usuario",
-          "Estrategia de Contenido",
-          "SEO y Marketing Digital",
-        ],
-      },
-      {
-        title: "Desarrollo Web",
-        description:
-          "Servicios completos de desarrollo y diseño web para crear experiencias digitales de vanguardia.",
-        features: [
-          "Desarrollo de Aplicaciones Web Personalizadas",
-          "Diseño Responsivo",
-          "Aplicaciones Web Progresivas",
-          "Soluciones de Comercio Electrónico",
-          "Interfaces de Usuario Interactivas",
-        ],
-      },
-      {
-        title: "Consultoría de Infraestructura | Cloud",
-        description:
-          "Diseño e implementación de soluciones de infraestructura robustas y escalables para las necesidades de tu negocio.",
-        features: [
-          "Diseño de Infraestructura en la Nube",
-          "Soluciones On-Premises",
-          "Estrategias de Nube Híbrida",
-          "Optimización de Infraestructura",
-          "Planificación de Escalabilidad",
-        ],
-      },
-      {
-        title: "Seguridad",
-        description:
-          "Protege tu negocio con soluciones de seguridad integrales y mejores prácticas.",
-        features: [
-          "Evaluación y Auditoría de Seguridad",
-          "Detección y Prevención de Amenazas",
-          "Estrategias de Protección de Datos",
-          "Gestión de Cumplimiento",
-          "Capacitación y Concientización en Seguridad",
+          "Automatización de Flujos de Trabajo",
+          "Integración de ERPs",
+          "Desarrollo de Agentes de IA",
+          "Optimización de Procesos",
+          "Soluciones de Reducción de Costos",
         ],
       },
     ],
   },
-}
+};

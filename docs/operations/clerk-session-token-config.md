@@ -242,3 +242,5 @@ Si tienes problemas configurando esto:
 **Una vez configurado, el sistema funcionará de forma óptima con el middleware bloqueando acceso desde el primer request.** 🚀
 
 
+
+

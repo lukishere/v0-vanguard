@@ -256,3 +256,5 @@ const isPublicRoute = createRouteMatcher([
 **Versión Clerk**: Latest
 **Estado**: ✅ Completamente funcional
 
+
+

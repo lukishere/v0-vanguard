@@ -1,7 +1,6 @@
-"use client"
+"use client";
 
-import { useEffect, useMemo, useState } from "react"
-import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,50 +8,51 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { useToast } from "@/hooks/use-toast"
-import type { Demo, DemoStatus, DemoType } from "@/lib/demos/types"
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
+import type { Demo, DemoStatus, DemoType } from "@/lib/demos/types";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
 type DemoEditorProps = {
-  demo?: Demo
-  trigger?: React.ReactNode
-  mode?: "create" | "edit"
-}
+  demo?: Demo;
+  trigger?: React.ReactNode;
+  mode?: "create" | "edit";
+};
 
 type DemoFormState = {
-  id: string
-  name: string
-  summary: string
-  description: string
-  status: DemoStatus
-  demoType: DemoType
-  interactiveUrl: string
-  tags: string
-  nextStep?: string
-  cta?: string
-  estimatedDelivery?: string
-  progress?: number
-}
+  id: string;
+  name: string;
+  summary: string;
+  description: string;
+  status: DemoStatus;
+  demoType: DemoType;
+  interactiveUrl: string;
+  tags: string;
+  nextStep?: string;
+  cta?: string;
+  estimatedDelivery?: string;
+  progress?: number;
+};
 
 // Solo "available" e "in-development" - Las demos activas se asignan desde Admin > Clientes
-const STATUS_OPTIONS: DemoStatus[] = ["available", "in-development"]
-const TYPE_OPTIONS: DemoType[] = ["bot", "dashboard", "api", "guided"]
+const STATUS_OPTIONS: DemoStatus[] = ["available", "in-development"];
+const TYPE_OPTIONS: DemoType[] = ["bot", "dashboard", "api", "guided"];
 
 const STATUS_DISPLAY: Record<string, string> = {
-  "available": "📘 Disponible (aparece en Catálogo de clientes)",
+  available: "📘 Disponible (aparece en Catálogo de clientes)",
   "in-development": "🔨 En Desarrollo (aparece en En Desarrollo de clientes)",
-}
+};
 
 const DEFAULT_FORM_STATE: DemoFormState = {
   id: "",
@@ -67,14 +67,14 @@ const DEFAULT_FORM_STATE: DemoFormState = {
   cta: "",
   estimatedDelivery: "",
   progress: 0,
-}
+};
 
 export function DemoEditor({ demo, trigger, mode = "edit" }: DemoEditorProps) {
-  const [open, setOpen] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [form, setForm] = useState<DemoFormState>(DEFAULT_FORM_STATE)
-  const router = useRouter()
-  const { toast } = useToast()
+  const [open, setOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [form, setForm] = useState<DemoFormState>(DEFAULT_FORM_STATE);
+  const router = useRouter();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (open) {
@@ -92,39 +92,45 @@ export function DemoEditor({ demo, trigger, mode = "edit" }: DemoEditorProps) {
           cta: demo.cta ?? "",
           estimatedDelivery: demo.estimatedDelivery ?? "",
           progress: demo.progress ?? 0,
-        })
+        });
       } else {
-        setForm(DEFAULT_FORM_STATE)
+        setForm(DEFAULT_FORM_STATE);
       }
     }
-  }, [open, demo])
+  }, [open, demo]);
 
   const tagsArray = useMemo(
     () =>
       form.tags
-        .split(",")
-        .map((tag) => tag.trim())
-        .filter(Boolean),
+        ? form.tags
+            .split(",")
+            .map((tag) => tag.trim())
+            .filter(Boolean)
+        : [],
     [form.tags]
-  )
+  );
 
-  const isCreateMode = mode === "create" || !demo
+  const isCreateMode = mode === "create" || !demo;
 
-  const handleChange = <Key extends keyof DemoFormState>(key: Key, value: DemoFormState[Key]) => {
-    setForm((prev) => ({ ...prev, [key]: value }))
-  }
+  const handleChange = <Key extends keyof DemoFormState>(
+    key: Key,
+    value: DemoFormState[Key]
+  ) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  };
 
   const handleSubmit = async () => {
     if (!form.id || !form.name || !form.summary || !form.description) {
       toast({
         title: "Campos requeridos",
-        description: "Completa los campos obligatorios (ID, nombre, resumen y descripción).",
+        description:
+          "Completa los campos obligatorios (ID, nombre, resumen y descripción).",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     try {
       const response = await fetch("/api/admin/demos", {
         method: isCreateMode ? "POST" : "PATCH",
@@ -136,11 +142,11 @@ export function DemoEditor({ demo, trigger, mode = "edit" }: DemoEditorProps) {
             tags: tagsArray,
           },
         }),
-      })
+      });
 
       if (!response.ok) {
-        const error = await response.json().catch(() => ({}))
-        throw new Error(error?.message ?? "No se pudo guardar la demo.")
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error?.message ?? "No se pudo guardar la demo.");
       }
 
       toast({
@@ -148,20 +154,23 @@ export function DemoEditor({ demo, trigger, mode = "edit" }: DemoEditorProps) {
         description: isCreateMode
           ? "La demo ha sido añadida al catálogo."
           : "Los cambios fueron guardados correctamente.",
-      })
+      });
 
-      setOpen(false)
-      router.refresh()
+      setOpen(false);
+      router.refresh();
     } catch (error) {
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Intenta nuevamente en unos minutos.",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Intenta nuevamente en unos minutos.",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -175,7 +184,9 @@ export function DemoEditor({ demo, trigger, mode = "edit" }: DemoEditorProps) {
       <DialogContent className="max-h-[90vh] overflow-y-auto border-white/10 bg-slate-950 text-white sm:max-w-3xl">
         <DialogHeader>
           <DialogTitle className="text-2xl font-semibold">
-            {isCreateMode ? "Crear nueva demo" : `Editar demo: ${demo?.name ?? ""}`}
+            {isCreateMode
+              ? "Crear nueva demo"
+              : `Editar demo: ${demo?.name ?? ""}`}
           </DialogTitle>
         </DialogHeader>
 
@@ -191,7 +202,9 @@ export function DemoEditor({ demo, trigger, mode = "edit" }: DemoEditorProps) {
                 disabled={!isCreateMode}
                 className="bg-slate-900/60 text-white"
               />
-              <p className="text-xs text-white/40">Debe ser único. Úsalo para relacionar accesos y reportes.</p>
+              <p className="text-xs text-white/40">
+                Debe ser único. Úsalo para relacionar accesos y reportes.
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="demo-name">Nombre</Label>
@@ -208,7 +221,12 @@ export function DemoEditor({ demo, trigger, mode = "edit" }: DemoEditorProps) {
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label>Estado</Label>
-              <Select value={form.status} onValueChange={(value: DemoStatus) => handleChange("status", value)}>
+              <Select
+                value={form.status}
+                onValueChange={(value: DemoStatus) =>
+                  handleChange("status", value)
+                }
+              >
                 <SelectTrigger className="bg-slate-900/60 text-white">
                   <SelectValue>
                     {STATUS_DISPLAY[form.status] || form.status}
@@ -226,7 +244,12 @@ export function DemoEditor({ demo, trigger, mode = "edit" }: DemoEditorProps) {
             </div>
             <div className="space-y-2">
               <Label>Tipo de demo</Label>
-              <Select value={form.demoType} onValueChange={(value: DemoType) => handleChange("demoType", value)}>
+              <Select
+                value={form.demoType}
+                onValueChange={(value: DemoType) =>
+                  handleChange("demoType", value)
+                }
+              >
                 <SelectTrigger className="bg-slate-900/60 text-white">
                   <SelectValue />
                 </SelectTrigger>
@@ -256,7 +279,9 @@ export function DemoEditor({ demo, trigger, mode = "edit" }: DemoEditorProps) {
             <Textarea
               id="demo-description"
               value={form.description}
-              onChange={(event) => handleChange("description", event.target.value)}
+              onChange={(event) =>
+                handleChange("description", event.target.value)
+              }
               className="min-h-[140px] bg-slate-900/60 text-white"
             />
           </div>
@@ -277,7 +302,9 @@ export function DemoEditor({ demo, trigger, mode = "edit" }: DemoEditorProps) {
               <Input
                 id="demo-url"
                 value={form.interactiveUrl}
-                onChange={(event) => handleChange("interactiveUrl", event.target.value)}
+                onChange={(event) =>
+                  handleChange("interactiveUrl", event.target.value)
+                }
                 placeholder="https://..."
                 className="bg-slate-900/60 text-white"
               />
@@ -300,7 +327,9 @@ export function DemoEditor({ demo, trigger, mode = "edit" }: DemoEditorProps) {
               <Input
                 id="demo-nextstep"
                 value={form.nextStep ?? ""}
-                onChange={(event) => handleChange("nextStep", event.target.value)}
+                onChange={(event) =>
+                  handleChange("nextStep", event.target.value)
+                }
                 placeholder="Acción recomendada para el cliente"
                 className="bg-slate-900/60 text-white"
               />
@@ -314,7 +343,9 @@ export function DemoEditor({ demo, trigger, mode = "edit" }: DemoEditorProps) {
                 id="demo-estimated"
                 type="date"
                 value={form.estimatedDelivery ?? ""}
-                onChange={(event) => handleChange("estimatedDelivery", event.target.value)}
+                onChange={(event) =>
+                  handleChange("estimatedDelivery", event.target.value)
+                }
                 className="bg-slate-900/60 text-white"
               />
             </div>
@@ -326,10 +357,14 @@ export function DemoEditor({ demo, trigger, mode = "edit" }: DemoEditorProps) {
                 min={0}
                 max={100}
                 value={form.progress ?? 0}
-                onChange={(event) => handleChange("progress", Number(event.target.value))}
+                onChange={(event) =>
+                  handleChange("progress", Number(event.target.value))
+                }
                 className="bg-slate-900/60 text-white"
               />
-              <p className="text-xs text-white/40">Utiliza este campo principalmente para demos en desarrollo.</p>
+              <p className="text-xs text-white/40">
+                Utiliza este campo principalmente para demos en desarrollo.
+              </p>
             </div>
           </div>
 
@@ -349,11 +384,15 @@ export function DemoEditor({ demo, trigger, mode = "edit" }: DemoEditorProps) {
               disabled={isSubmitting}
               className="bg-vanguard-blue text-white hover:bg-vanguard-blue/90"
             >
-              {isSubmitting ? "Guardando..." : isCreateMode ? "Crear demo" : "Guardar cambios"}
+              {isSubmitting
+                ? "Guardando..."
+                : isCreateMode
+                ? "Crear demo"
+                : "Guardar cambios"}
             </Button>
           </DialogFooter>
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

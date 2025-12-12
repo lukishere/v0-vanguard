@@ -227,6 +227,9 @@ importers:
       sonner:
         specifier: ^1.7.1
         version: 1.7.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      svix:
+        specifier: ^1.81.0
+        version: 1.81.0
       tailwind-merge:
         specifier: ^2.5.5
         version: 2.6.0
@@ -7420,6 +7423,9 @@ packages:
   supports-preserve-symlinks-flag@1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
+
+  svix@1.81.0:
+    resolution: {integrity: sha512-Q4DiYb1ydhRYqez65vZES8AkGY2oxn26qP7mLVbMf8Orrveb54TZLkaVG5zr7eJT4T3zYRThkKf6aOnvzgwhYw==}
 
   swr@2.3.4:
     resolution: {integrity: sha512-bYd2lrhc+VarcpkgWclcUi92wYCpOgMws9Sd1hG1ntAu0NEy+14CbotuFjshBU2kt9rYj9TSmDcybpxpeTU1fg==}
@@ -16800,6 +16806,12 @@ snapshots:
       has-flag: 4.0.0
 
   supports-preserve-symlinks-flag@1.0.0: {}
+
+  svix@1.81.0:
+    dependencies:
+      '@stablelib/base64': 1.0.1
+      fast-sha256: 1.3.0
+      uuid: 10.0.0
 
   swr@2.3.4(react@19.1.0):
     dependencies:

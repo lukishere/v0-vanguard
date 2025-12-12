@@ -156,7 +156,7 @@ function ContactPageContent() {
       icon: Linkedin,
       title: t("contact.linkedin.title"),
       content: t("contact.linkedin.content"),
-      href: "https://www.linkedin.com/company/vanguard-ia",
+      href: "https://www.linkedin.com/company/vanguard-lb-consulting",
     },
   ]
 

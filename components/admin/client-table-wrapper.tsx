@@ -39,8 +39,9 @@ export function ClientTableWrapper() {
         if (!response.ok) {
           throw new Error('Failed to fetch clients')
         }
-        const clientsData = await response.json()
-        setClients(clientsData)
+        const data = await response.json()
+        // ✅ Extract clients array from response
+        setClients(data.clients || [])
       } catch (err) {
         console.error('Error loading clients data:', err)
         setError(err instanceof Error ? err.message : 'Unknown error')

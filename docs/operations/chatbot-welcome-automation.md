@@ -96,3 +96,5 @@ La apertura automática del chatbot se registra como actividad en el sistema con
 - La funcionalidad es no intrusiva y no interfiere con otras interacciones del usuario
 - Se limpia automáticamente el timer si el componente se desmonta antes de los 10 segundos
 
+
+

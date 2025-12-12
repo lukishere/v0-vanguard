@@ -12,3 +12,5 @@ window.resetPortalWelcome = () => {
   console.log('✅ Estado de bienvenida reseteado. Refresca la página para probar.');
 };
 
+
+

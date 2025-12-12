@@ -52,24 +52,24 @@ export function ClientReview({ name, position, company, review, rating, business
   }
 
   return (
-    <Card className="border-0 shadow-sm hover:shadow-md transition-all duration-300 h-full min-h-[280px] overflow-hidden">
-      <div className={`${getBackgroundColor()} p-4 flex justify-between items-center border-b`}>
+    <Card className="border border-slate-600/50 bg-gradient-to-br from-slate-700/80 to-slate-800/90 shadow-lg hover:shadow-xl transition-all duration-300 h-full min-h-[280px] overflow-hidden hover:-translate-y-1">
+      <div className="p-4 flex justify-between items-center border-b border-slate-600/50">
         <div className="flex items-center">
           <div className="mr-3">{getBusinessIcon()}</div>
           <div>
-            <h4 className="font-semibold text-gray-900">{company}</h4>
-            <p className="text-sm text-gray-600">{position}</p>
+            <h4 className="font-semibold text-slate-100">{company}</h4>
+            <p className="text-sm text-slate-300">{position}</p>
           </div>
         </div>
         <div className="flex">
           {Array.from({ length: 5 }).map((_, i) => (
-            <Star key={i} className={`h-4 w-4 ${i < rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`} />
+            <Star key={i} className={`h-4 w-4 ${i < rating ? "text-yellow-400 fill-yellow-400" : "text-slate-500"}`} />
           ))}
         </div>
       </div>
       <CardContent className="p-5">
-        <blockquote className="text-gray-700 italic mb-4">"{review}"</blockquote>
-        <div className="text-right text-sm font-medium text-gray-900">— {name}</div>
+        <blockquote className="text-slate-200 italic mb-4">"{review}"</blockquote>
+        <div className="text-right text-sm font-medium text-slate-100">— {name}</div>
       </CardContent>
     </Card>
   )

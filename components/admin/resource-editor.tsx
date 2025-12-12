@@ -295,3 +295,5 @@ export function ResourceEditor({ resource, categoryId, trigger, mode = "edit" }:
 }
 
 
+
+
