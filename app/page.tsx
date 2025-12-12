@@ -87,7 +87,7 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-slate-950">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.18),_rgba(2,6,23,0.92))]" />
-        <div className="relative z-10 vanguard-container py-24">
+        <div className="relative z-10 vanguard-container pt-24 pb-32">
           <div className="grid grid-cols-1 items-center gap-16 lg:grid-cols-2 lg:gap-20">
             <div className="space-y-8">
               <div className="space-y-4">

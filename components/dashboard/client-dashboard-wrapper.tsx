@@ -16,7 +16,7 @@ import type { Demo } from "@/lib/demos/types";
 import { shouldShowConversionBanner } from "@/lib/demos/utils";
 import { useUser } from "@clerk/nextjs";
 import { Bot } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 interface DashboardData {
   firstName: string;
@@ -41,6 +41,7 @@ export function ClientDashboardWrapper({
   const { updateActivity } = useActivityTracker();
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(true);
+  const hasCheckedOnboarding = useRef(false);
 
   const {
     firstName,
@@ -54,13 +55,21 @@ export function ClientDashboardWrapper({
     expiringDemos,
   } = initialData;
 
-  // Check if user needs to complete onboarding
+  // Check if user needs to complete onboarding - Solo una vez al montar
   useEffect(() => {
+    // Evitar múltiples ejecuciones
+    if (hasCheckedOnboarding.current) {
+      return;
+    }
+
     const checkOnboarding = async () => {
       if (!user) {
         setIsCheckingOnboarding(false);
         return;
       }
+
+      // Marcar como verificado antes de hacer la verificación
+      hasCheckedOnboarding.current = true;
 
       try {
         // Force reload to get fresh metadata from Clerk
@@ -123,6 +132,8 @@ export function ClientDashboardWrapper({
 
           if (metadata?.onboardingCompleted === true) {
             console.log(`✅ [Onboarding] Metadata actualizada correctamente (intento ${retries + 1})`);
+            // Resetear el flag para permitir verificación en próximos montajes si es necesario
+            // Pero no volver a verificar inmediatamente
             break;
           }
 

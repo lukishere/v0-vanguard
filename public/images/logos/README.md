@@ -21,3 +21,4 @@ Esta carpeta debe contener los siguientes archivos SVG de los logos de las empre
 - Los logos deben estar en formato SVG para mejor calidad
 - Si no encuentras SVG, puedes usar PNG pero cambia la extensión en `lib/content/about.ts`
 - Los logos se mostrarán en escala de grises por defecto y en color al pasar el cursor
+

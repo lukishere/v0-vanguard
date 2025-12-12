@@ -5,7 +5,7 @@ import { Suspense } from "react"
 
 import { useLanguage } from "@/contexts/language-context"
 import { useSearchParams } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -20,6 +20,10 @@ declare global {
     grecaptcha: {
       ready: (callback: () => void) => void
       execute: (siteKey: string, options: { action: string }) => Promise<string>
+      enterprise: {
+        ready: (callback: () => void) => void
+        execute: (siteKey: string, options: { action: string }) => Promise<string>
+      }
     }
   }
 }
@@ -41,44 +45,99 @@ function ContactPageContent() {
   })
   const [recaptchaLoaded, setRecaptchaLoaded] = useState(false)
 
+  // Debug: Log site key status (only in development)
   useEffect(() => {
-    if (!recaptchaSiteKey) return
+    if (process.env.NODE_ENV === 'development') {
+      console.log('reCAPTCHA Site Key:', recaptchaSiteKey ? `${recaptchaSiteKey.substring(0, 10)}...` : 'NOT CONFIGURED')
+      console.log('reCAPTCHA Loaded:', recaptchaLoaded)
+      console.log('reCAPTCHA Available:', typeof window !== 'undefined' && window.grecaptcha?.enterprise ? 'YES' : 'NO')
+    }
+  }, [recaptchaSiteKey, recaptchaLoaded])
 
-    const script = document.createElement("script")
-    script.src = `https://www.google.com/recaptcha/api.js?render=${recaptchaSiteKey}`
-    script.async = true
-    script.defer = true
-    script.onload = () => {
-      if (window.grecaptcha) {
-        window.grecaptcha.ready(() => {
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    if (!recaptchaSiteKey) {
+      console.warn('reCAPTCHA Site Key not configured - form will work without captcha')
+      setRecaptchaLoaded(true) // Allow form to work without captcha
+      return
+    }
+
+    // Check if script already exists
+    const existingScript = document.querySelector(`script[src*="recaptcha"]`)
+    if (existingScript) {
+      // Script already loaded, check if enterprise is available
+      if (window.grecaptcha?.enterprise) {
+        window.grecaptcha.enterprise.ready(() => {
           setRecaptchaLoaded(true)
         })
+      } else {
+        // Wait a bit for script to fully load
+        setTimeout(() => {
+          if (window.grecaptcha?.enterprise) {
+            window.grecaptcha.enterprise.ready(() => {
+              setRecaptchaLoaded(true)
+            })
+          } else {
+            console.warn('reCAPTCHA Enterprise not available - form will work without captcha')
+            setRecaptchaLoaded(true)
+          }
+        }, 1000)
       }
+      return
     }
+
+    const script = document.createElement("script")
+    const scriptUrl = `https://www.google.com/recaptcha/enterprise.js?render=${recaptchaSiteKey}`
+    script.src = scriptUrl
+    script.async = true
+    script.defer = true
+
+    script.onload = () => {
+      console.log('reCAPTCHA script loaded, checking Enterprise API...')
+      // Wait a bit for the API to be available
+      setTimeout(() => {
+        if (window.grecaptcha?.enterprise) {
+          window.grecaptcha.enterprise.ready(() => {
+            console.log('reCAPTCHA Enterprise loaded successfully')
+            setRecaptchaLoaded(true)
+          })
+        } else {
+          console.warn('reCAPTCHA Enterprise API not available after script load')
+          console.warn('This might be because:')
+          console.warn('1. Domain not authorized in Google reCAPTCHA console')
+          console.warn('2. Site key is incorrect')
+          console.warn('3. Network/CORS issues')
+          console.warn('Form will work without captcha verification')
+          setRecaptchaLoaded(true) // Allow form submission
+        }
+      }, 500)
+    }
+
+    script.onerror = (error) => {
+      console.error('Failed to load reCAPTCHA Enterprise script:', error)
+      console.error('Script URL:', scriptUrl)
+      console.warn('Possible causes:')
+      console.warn('1. Domain (localhost) not authorized in Google reCAPTCHA console')
+      console.warn('2. Network connectivity issues')
+      console.warn('3. CORS or security policy blocking the script')
+      console.warn('Form will work without captcha verification')
+      setRecaptchaLoaded(true) // Allow form submission even if script fails
+    }
+
     document.body.appendChild(script)
 
     return () => {
-      const existingScript = document.querySelector(`script[src*="recaptcha"]`)
-      if (existingScript) {
-        document.body.removeChild(existingScript)
+      const scriptToRemove = document.querySelector(`script[src*="recaptcha"]`)
+      if (scriptToRemove && scriptToRemove === script) {
+        document.body.removeChild(scriptToRemove)
       }
     }
   }, [recaptchaSiteKey])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
+  // Callback function for reCAPTCHA Enterprise
+  const onSubmit = useCallback(async (token: string) => {
     if (formState.honeypot.trim() !== "") {
-      return
-    }
-
-    if (!recaptchaSiteKey) {
-      alert("Captcha configuration missing. Please contact the site administrator.")
-      return
-    }
-
-    if (!recaptchaLoaded || !window.grecaptcha) {
-      alert("Security verification is loading. Please wait a moment and try again.")
       return
     }
 
@@ -88,20 +147,9 @@ function ContactPageContent() {
       return
     }
 
-    setFormState({ ...formState, loading: true })
+    setFormState(prev => ({ ...prev, loading: true }))
 
     try {
-      let captchaToken = ""
-      try {
-        captchaToken = await window.grecaptcha.execute(recaptchaSiteKey, {
-          action: "submit_contact_form",
-        })
-      } catch (captchaError) {
-        setFormState({ ...formState, loading: false })
-        alert(t("contact.form.captchaError"))
-        return
-      }
-
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -110,7 +158,7 @@ function ContactPageContent() {
           email: formState.email,
           message: formState.message,
           honeypot: formState.honeypot,
-          captchaToken,
+          captchaToken: token,
         }),
       })
       if (response.ok) {
@@ -124,11 +172,92 @@ function ContactPageContent() {
           lastSubmittedAt: now,
         })
       } else {
-        setFormState({ ...formState, loading: false })
+        setFormState(prev => ({ ...prev, loading: false }))
         alert("There was an error sending your message. Please try again later.")
       }
     } catch {
-      setFormState({ ...formState, loading: false })
+      setFormState(prev => ({ ...prev, loading: false }))
+      alert("There was an error sending your message. Please try again later.")
+    }
+  }, [formState])
+
+  // Expose onSubmit to window for reCAPTCHA callback
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).onSubmit = onSubmit
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        delete (window as any).onSubmit
+      }
+    }
+  }, [onSubmit])
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (formState.honeypot.trim() !== "") {
+      return
+    }
+
+    const now = Date.now()
+    if (now - formState.lastSubmittedAt < 15000) {
+      alert("Please wait a few seconds before submitting again.")
+      return
+    }
+
+    setFormState(prev => ({ ...prev, loading: true }))
+
+    // Try to get reCAPTCHA token if available
+    let captchaToken = ""
+
+    if (recaptchaSiteKey && window.grecaptcha?.enterprise) {
+      try {
+        captchaToken = await window.grecaptcha.enterprise.execute(recaptchaSiteKey, {
+          action: "submit_contact_form",
+        })
+        console.log('reCAPTCHA token obtained successfully')
+      } catch (captchaError) {
+        console.warn('reCAPTCHA execution error, submitting without token:', captchaError)
+        // Continue without token
+      }
+    } else {
+      console.warn('reCAPTCHA not available, submitting without token')
+      // Continue without token - form will still work
+    }
+
+    // Submit form with or without token
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formState.name,
+          email: formState.email,
+          message: formState.message,
+          honeypot: formState.honeypot,
+          captchaToken: captchaToken,
+        }),
+      })
+
+      if (response.ok) {
+        setFormState({
+          name: "",
+          email: "",
+          message: "",
+          submitted: true,
+          loading: false,
+          honeypot: "",
+          lastSubmittedAt: now,
+        })
+      } else {
+        const errorData = await response.json().catch(() => ({}))
+        setFormState(prev => ({ ...prev, loading: false }))
+        alert(errorData.message || "There was an error sending your message. Please try again later.")
+      }
+    } catch (error) {
+      console.error('Form submission error:', error)
+      setFormState(prev => ({ ...prev, loading: false }))
       alert("There was an error sending your message. Please try again later.")
     }
   }
@@ -261,8 +390,13 @@ function ContactPageContent() {
                           )}
                           <Button
                             type="submit"
-                            className="group w-full h-12 rounded-xl bg-gradient-to-r from-vanguard-blue via-sky-500 to-cyan-500 text-sm font-semibold uppercase tracking-[0.3em] text-white shadow-[0_20px_40px_rgba(56,189,248,0.35)] transition-all duration-300 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
-                            disabled={formState.loading || !recaptchaSiteKey || !recaptchaLoaded}
+                            className={`g-recaptcha group w-full h-12 rounded-xl bg-gradient-to-r from-vanguard-blue via-sky-500 to-cyan-500 text-sm font-semibold uppercase tracking-[0.3em] text-white shadow-[0_20px_40px_rgba(56,189,248,0.35)] transition-all duration-300 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70`}
+                            disabled={formState.loading}
+                            {...(recaptchaSiteKey && {
+                              'data-sitekey': recaptchaSiteKey,
+                              'data-callback': 'onSubmit',
+                              'data-action': 'submit_contact_form'
+                            })}
                           >
                             <span className="inline-flex items-center gap-2">
                               {formState.loading ? t("contact.form.sending") : t("contact.form.submit")}

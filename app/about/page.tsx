@@ -1,12 +1,12 @@
 "use client";
 
+import Image from "next/image";
 import { CTAButton } from "@/components/cta-button";
 import { SectionTitle } from "@/components/section-title";
 import { useLanguage } from "@/contexts/language-context";
 import { aboutContent } from "@/lib/content/about";
-import Image from "next/image";
 
-export default function AboutPage() {
+function AboutPage() {
   const { language, t } = useLanguage();
   const currentContent = aboutContent[language];
 
@@ -38,8 +38,8 @@ export default function AboutPage() {
       <section className="relative overflow-hidden bg-slate-950">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.18),_rgba(2,6,23,0.92))]" />
         <div className="vanguard-container relative z-10 py-24">
-          <div className="grid grid-cols-1 gap-12 md:grid-cols-3">
-            <div>
+          <div className="grid grid-cols-1 gap-12 md:grid-cols-3 md:items-start">
+            <div className="flex flex-col">
               <SectionTitle
                 text={currentContent.origin.title}
                 as="h2"
@@ -47,9 +47,9 @@ export default function AboutPage() {
                 initialDelay={160}
               />
               <div className="mb-6 h-1 w-16 bg-vanguard-red"></div>
-              <p className="text-slate-300">{currentContent.origin.content}</p>
+              <p className="text-slate-300 leading-relaxed">{currentContent.origin.content}</p>
             </div>
-            <div>
+            <div className="flex flex-col">
               <SectionTitle
                 text={currentContent.mission.title}
                 as="h2"
@@ -57,17 +57,17 @@ export default function AboutPage() {
                 initialDelay={180}
               />
               <div className="mb-6 h-1 w-16 bg-vanguard-red"></div>
-              <p className="text-slate-300">{currentContent.mission.content}</p>
+              <p className="text-slate-300 leading-relaxed">{currentContent.mission.content}</p>
             </div>
-            <div>
+            <div className="flex flex-col">
               <SectionTitle
                 text={currentContent.vision.title}
                 as="h2"
                 className="mb-4 text-xl text-slate-100 sm:text-2xl"
-                initialDelay={220}
+                initialDelay={200}
               />
               <div className="mb-6 h-1 w-16 bg-vanguard-red"></div>
-              <p className="text-slate-300">{currentContent.vision.content}</p>
+              <p className="text-slate-300 leading-relaxed">{currentContent.vision.content}</p>
             </div>
           </div>
         </div>
@@ -227,3 +227,5 @@ export default function AboutPage() {
     </>
   );
 }
+
+export default AboutPage;

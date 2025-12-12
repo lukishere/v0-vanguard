@@ -23,8 +23,8 @@ export function ServiceCard({ title, description, benefit }: ServiceCardProps) {
         <CardContent className="flex flex-1 flex-col">
           <CardDescription className="mb-4 text-slate-300">{description}</CardDescription>
           {benefit && (
-            <div className="mb-6 rounded-md border-l-2 border-vanguard-red/50 bg-slate-900/50 p-3">
-              <p className="text-sm font-medium text-vanguard-red/90">{benefit}</p>
+            <div className="mb-6 rounded-md border-l-2 border-vanguard-gold/50 bg-slate-900/50 p-3">
+              <p className="text-sm font-medium text-vanguard-gold/90">{benefit}</p>
             </div>
           )}
           <CTAArrow href="/services" label={title} icon={ArrowUpRight} />

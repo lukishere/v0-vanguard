@@ -39,7 +39,7 @@ export const aboutContent: Record<"en" | "es", AboutContent> = {
     mission: {
       title: "Our Mission",
       content:
-        "At VANGUARD-IA, our mission is to empower businesses through innovative technology solutions that drive growth, efficiency, and competitive advantage. We are committed to delivering exceptional value to our clients by combining cutting-edge expertise with a deep understanding of business challenges.",
+        "At VANGUARD-IA, our mission is to empower businesses/projects through innovative technology solutions that share our same values and objectives. Focusing on impact that is not only social but also ecological and sustainability.",
     },
     vision: {
       title: "Our Vision",
@@ -72,6 +72,11 @@ export const aboutContent: Record<"en" | "es", AboutContent> = {
         {
           name: "Revolut",
           imageUrl: "/images/logos/revolut.png",
+        },
+        {
+          name: "IESF",
+          imageUrl:
+            "https://mma.prnewswire.com/media/1971015/IESF_Logo.jpg?p=facebook",
         },
         {
           name: "Additional Partner",
@@ -163,7 +168,7 @@ export const aboutContent: Record<"en" | "es", AboutContent> = {
     mission: {
       title: "Nuestra Misión",
       content:
-        "En VANGUARD-IA, nuestra misión es potenciar a las empresas a través de soluciones tecnológicas innovadoras que impulsen el crecimiento, la eficiencia y la ventaja competitiva. Estamos comprometidos a ofrecer un valor excepcional a nuestros clientes combinando experiencia de vanguardia con una profunda comprensión de los desafíos empresariales.",
+        "En VANGUARD-IA, nuestra misión es potenciar a las empresas/proyectos a través de soluciones tecnológicas innovadoras que compartan nuestros mismos valores y objetivos. Enfocándonos en el impacto no solo social sino también ecológico y sustentabilidad.",
     },
     vision: {
       title: "Nuestra Visión",
@@ -196,6 +201,11 @@ export const aboutContent: Record<"en" | "es", AboutContent> = {
         {
           name: "Revolut",
           imageUrl: "/images/logos/revolut.png",
+        },
+        {
+          name: "IESF",
+          imageUrl:
+            "https://mma.prnewswire.com/media/1971015/IESF_Logo.jpg?p=facebook",
         },
         {
           name: "Additional Partner",

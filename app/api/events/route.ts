@@ -11,11 +11,12 @@ export async function GET() {
 
     return NextResponse.json(events)
   } catch (error) {
+    // In production (Vercel), filesystem may be read-only or ephemeral
+    // Return empty array instead of error to prevent page crashes
     console.error("Error al obtener eventos:", error)
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    )
+    console.warn("⚠️ [Events API] Filesystem may not be available in production. Returning empty array.")
+
+    // Return empty array instead of error to allow page to render
+    return NextResponse.json([])
   }
 }
-

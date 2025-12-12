@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache"
 import { auth } from "@clerk/nextjs/server"
 import fs from "fs/promises"
 import path from "path"
+import { getKvClient, isKvAvailable } from "@/lib/kv"
 
 export interface NewsItem {
   id: string
@@ -28,6 +29,7 @@ export interface NewsItem {
 
 const DATA_DIR = path.join(process.cwd(), ".data")
 const NEWS_FILE = path.join(DATA_DIR, "news.json")
+const KV_NEWS_KEY = "news:all"
 
 async function ensureDataDir() {
   try {
@@ -37,19 +39,60 @@ async function ensureDataDir() {
   }
 }
 
+/**
+ * Load news from KV (production) or filesystem (development fallback)
+ */
 async function loadNews(): Promise<Map<string, NewsItem>> {
+  const kv = getKvClient()
+
+  // Try KV first (production)
+  if (kv) {
+    try {
+      const data = await kv.get<Record<string, NewsItem>>(KV_NEWS_KEY)
+      if (data) {
+        return new Map(Object.entries(data))
+      }
+      return new Map()
+    } catch (error) {
+      console.error("⚠️ [News] Error loading from KV:", error)
+      // Fall through to filesystem fallback
+    }
+  }
+
+  // Fallback to filesystem (development)
   try {
     const data = await fs.readFile(NEWS_FILE, "utf-8")
     const obj = JSON.parse(data)
     return new Map(Object.entries(obj))
   } catch (error) {
+    // File doesn't exist or can't be read - return empty Map
+    if (process.env.NODE_ENV === "development") {
+      console.warn("⚠️ [News] Could not load news file:", error instanceof Error ? error.message : String(error))
+    }
     return new Map()
   }
 }
 
+/**
+ * Save news to KV (production) or filesystem (development fallback)
+ */
 async function saveNews(news: Map<string, NewsItem>) {
-  await ensureDataDir()
+  const kv = getKvClient()
   const obj = Object.fromEntries(news)
+
+  // Try KV first (production)
+  if (kv) {
+    try {
+      await kv.set(KV_NEWS_KEY, obj)
+      return
+    } catch (error) {
+      console.error("⚠️ [News] Error saving to KV:", error)
+      // Fall through to filesystem fallback
+    }
+  }
+
+  // Fallback to filesystem (development)
+  await ensureDataDir()
   await fs.writeFile(NEWS_FILE, JSON.stringify(obj, null, 2), "utf-8")
 }
 

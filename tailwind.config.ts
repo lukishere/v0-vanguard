@@ -1,4 +1,4 @@
-import type { Config } from "tailwindcss"
+import type { Config } from "tailwindcss";
 
 const config = {
   content: [
@@ -27,6 +27,7 @@ const config = {
         vanguard: {
           blue: "#0047AB", // Metallic blue color from the business card
           red: "#D32F2F", // Red accent color
+          gold: "#F4D03F", // Yellow-gold color for text
           700: "#0047AB",
           600: "#005FCC",
           500: "#0A72E9",
@@ -36,9 +37,12 @@ const config = {
         admin: {
           // Vibrant background gradients
           bg: {
-            primary: "linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)",
-            secondary: "linear-gradient(135deg, #1e293b 0%, #334155 50%, #1e293b 100%)",
-            accent: "linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%)",
+            primary:
+              "linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)",
+            secondary:
+              "linear-gradient(135deg, #1e293b 0%, #334155 50%, #1e293b 100%)",
+            accent:
+              "linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%)",
           },
           // Vibrant status colors
           success: {
@@ -248,6 +252,6 @@ const config = {
     },
   },
   plugins: [require("tailwindcss-animate")],
-} satisfies Config
+} satisfies Config;
 
-export default config
+export default config;

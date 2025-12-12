@@ -46,6 +46,7 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
     phone: "",
     interests: "",
   });
+  const [canClose, setCanClose] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,6 +66,8 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
       }
 
       toast.success("¡Perfil completado exitosamente!");
+      // Permitir cerrar después de completar
+      setCanClose(true);
       onComplete();
     } catch (error) {
       console.error("Error saving profile:", error);
@@ -84,9 +87,34 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
     formData.companySize !== "" &&
     formData.position.trim() !== "";
 
+  const handleOpenChange = (open: boolean) => {
+    // Si intenta cerrar y el perfil ya está completado, permitir cerrar
+    if (!open) {
+      if (canClose) {
+        onComplete();
+      }
+      // Si no está completado, no hacer nada (el modal permanecerá abierto)
+      // El onPointerDownOutside y onEscapeKeyDown ya previenen el cierre
+    }
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={() => {}}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+      <DialogContent
+        className={`max-w-2xl max-h-[90vh] overflow-y-auto ${!canClose ? '[&_button[data-radix-dialog-close]]:hidden' : ''}`}
+        onPointerDownOutside={(e) => {
+          // Prevenir cerrar haciendo clic fuera si no está completado
+          if (!canClose) {
+            e.preventDefault();
+          }
+        }}
+        onEscapeKeyDown={(e) => {
+          // Prevenir cerrar con ESC si no está completado
+          if (!canClose) {
+            e.preventDefault();
+          }
+        }}
+      >
         <DialogHeader>
           <div className="flex items-center gap-2 mb-2">
             <Building2 className="h-6 w-6 text-vanguard-blue" />
@@ -238,4 +266,3 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
     </Dialog>
   );
 }
-

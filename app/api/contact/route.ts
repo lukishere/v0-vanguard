@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
+import { RecaptchaEnterpriseServiceClient } from '@google-cloud/recaptcha-enterprise';
 import {
   AppError,
   ValidationError,
@@ -59,7 +60,11 @@ const rateLimitMap = new Map<string, RateLimitEntry>();
 const RATE_LIMIT_WINDOW = 15 * 60 * 1000; // 15 minutes
 const RATE_LIMIT_MAX_REQUESTS = 5;
 const RATE_LIMIT_BLOCK_DURATION = 60 * 60 * 1000; // 1 hour block after exceeding
-const RECAPTCHA_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify';
+
+// reCAPTCHA Enterprise configuration
+const RECAPTCHA_PROJECT_ID = process.env.RECAPTCHA_PROJECT_ID || process.env.GOOGLE_CLOUD_PROJECT_ID;
+const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+const RECAPTCHA_ACTION = 'submit_contact_form';
 
 // Enhanced HTML sanitization
 function sanitizeInput(input: string): string {
@@ -199,20 +204,106 @@ type RecaptchaVerificationResponse = {
   action?: string;
 };
 
+/**
+ * Create an assessment using Google Cloud reCAPTCHA Enterprise SDK
+ * This provides better integration and more detailed risk analysis
+ */
 async function verifyRecaptchaToken(token: string, remoteIp?: string): Promise<RecaptchaVerificationResponse> {
+  // Try SDK method first if PROJECT_ID is configured
+  if (RECAPTCHA_PROJECT_ID && RECAPTCHA_SITE_KEY) {
+    try {
+      // Create the reCAPTCHA Enterprise client
+      const client = new RecaptchaEnterpriseServiceClient();
+      const projectPath = client.projectPath(RECAPTCHA_PROJECT_ID);
+
+      // Build the assessment request
+      const request = {
+        assessment: {
+          event: {
+            token: token,
+            siteKey: RECAPTCHA_SITE_KEY,
+          },
+        },
+        parent: projectPath,
+      };
+
+      const [response] = await client.createAssessment(request);
+
+      // Check if the token is valid
+      if (!response.tokenProperties?.valid) {
+        const invalidReason = response.tokenProperties?.invalidReason || 'UNKNOWN';
+        logger.warn('reCAPTCHA token invalid', LogCategory.API, {}, {
+          invalidReason,
+          token: token.substring(0, 20) + '...'
+        });
+
+        return {
+          success: false,
+          'error-codes': [invalidReason],
+          score: 0,
+        };
+      }
+
+      // Check if the expected action was executed
+      if (response.tokenProperties.action !== RECAPTCHA_ACTION) {
+        logger.warn('reCAPTCHA action mismatch', LogCategory.API, {}, {
+          expected: RECAPTCHA_ACTION,
+          received: response.tokenProperties.action
+        });
+
+        return {
+          success: false,
+          'error-codes': ['ACTION_MISMATCH'],
+          score: 0,
+        };
+      }
+
+      // Get the risk score
+      const score = response.riskAnalysis?.score ?? 0;
+      const reasons = response.riskAnalysis?.reasons || [];
+
+      if (reasons.length > 0) {
+        logger.info('reCAPTCHA risk analysis reasons', LogCategory.API, {}, {
+          score,
+          reasons: reasons.map(r => r.toString())
+        });
+      }
+
+      return {
+        success: true,
+        score,
+        action: response.tokenProperties.action,
+      };
+    } catch (error) {
+      logger.warn('reCAPTCHA Enterprise SDK failed, falling back to HTTP', LogCategory.API, {}, {
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      // Fall through to HTTP method
+    }
+  }
+
+  // Fallback to HTTP method
+  return await verifyRecaptchaTokenHttp(token, remoteIp);
+}
+
+/**
+ * Fallback HTTP method for reCAPTCHA verification
+ * Used if SDK is not configured or fails
+ */
+async function verifyRecaptchaTokenHttp(token: string, remoteIp?: string): Promise<RecaptchaVerificationResponse> {
   const secretKey = process.env.RECAPTCHA_SECRET_KEY;
 
-  const formData = new URLSearchParams();
   if (!secretKey) {
     throw new AppError(
       'ConfigurationError',
       ErrorCodes.INTERNAL_SERVER_ERROR,
       ErrorTypes.CONFIGURATION_ERROR,
-      'Missing RECAPTCHA_SECRET_KEY environment variable',
+      'Missing RECAPTCHA_SECRET_KEY environment variable (fallback method)',
       false
     );
   }
 
+  const formData = new URLSearchParams();
   formData.append('secret', secretKey);
   formData.append('response', token);
   if (remoteIp) {
@@ -302,30 +393,46 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify reCAPTCHA v3 token
-    const remoteIp = clientIP === 'unknown' ? undefined : clientIP;
-    const captchaVerification = await verifyRecaptchaToken(captchaToken, remoteIp);
-    if (!captchaVerification.success) {
-      logger.warn('Captcha verification failed', LogCategory.API, logContext, {
-        captchaErrors: captchaVerification['error-codes'] ?? []
-      });
+    // In development, allow submission without token if it's empty
+    const isDevelopment = process.env.NODE_ENV === 'development';
+
+    if (!captchaToken && !isDevelopment) {
+      logger.warn('Captcha token missing in production', LogCategory.API, logContext);
       throw new ValidationError(
-        `Captcha verification failed${captchaVerification['error-codes']?.length ? `: ${captchaVerification['error-codes']?.join(', ')}` : ''}`,
+        'Captcha verification required',
         requestContext
       );
     }
 
-    // Verify score (reCAPTCHA v3 returns a score from 0.0 to 1.0)
-    // Lower scores indicate higher risk. Typically, scores below 0.5 are considered suspicious
-    const score = captchaVerification.score ?? 0;
-    if (score < 0.5) {
-      logger.warn('Captcha score too low', LogCategory.API, logContext, {
-        score,
-        action: captchaVerification.action
-      });
-      throw new ValidationError(
-        'Captcha verification failed: Low security score',
-        requestContext
-      );
+    if (captchaToken) {
+      const remoteIp = clientIP === 'unknown' ? undefined : clientIP;
+      const captchaVerification = await verifyRecaptchaToken(captchaToken, remoteIp);
+      if (!captchaVerification.success) {
+        logger.warn('Captcha verification failed', LogCategory.API, logContext, {
+          captchaErrors: captchaVerification['error-codes'] ?? []
+        });
+        throw new ValidationError(
+          `Captcha verification failed${captchaVerification['error-codes']?.length ? `: ${captchaVerification['error-codes']?.join(', ')}` : ''}`,
+          requestContext
+        );
+      }
+
+      // Verify score (reCAPTCHA v3 returns a score from 0.0 to 1.0)
+      // Lower scores indicate higher risk. Typically, scores below 0.5 are considered suspicious
+      const score = captchaVerification.score ?? 0;
+      if (score < 0.5) {
+        logger.warn('Captcha score too low', LogCategory.API, logContext, {
+          score,
+          action: captchaVerification.action
+        });
+        throw new ValidationError(
+          'Captcha verification failed: Low security score',
+          requestContext
+        );
+      }
+    } else {
+      // Development mode: log warning but allow submission
+      logger.warn('Skipping captcha verification in development mode', LogCategory.API, logContext);
     }
 
     // Send email with performance measurement
