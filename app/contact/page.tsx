@@ -272,8 +272,8 @@ function ContactPageContent() {
     {
       icon: Phone,
       title: t("contact.phone"),
-      content: defaultContactInfo.phone,
-      href: `tel:${defaultContactInfo.phone.replace(/\s+/g, "")}`,
+      content: "Whatsapp Chat",
+      href: "#",
     },
     {
       icon: MapPin,
@@ -425,53 +425,47 @@ function ContactPageContent() {
             </div>
 
             {/* Contact Information */}
-            <div className="space-y-12 text-white">
-              <div className="rounded-[28px] border border-white/10 bg-gradient-to-br from-slate-900/80 via-slate-950/60 to-slate-950/90 p-10 shadow-[0_30px_60px_rgba(15,23,42,0.5)] backdrop-blur">
-                <SectionTitle
-                  text={t("contact.info")}
-                  as="h2"
-                  className="mb-6 text-xl text-white sm:text-2xl"
-                  initialDelay={160}
-                />
-                <div className="grid gap-6">
-                  {contactInfo.map((item, index) => (
-                    <a
-                      key={index}
-                      href={item.href}
-                      className="group flex items-start gap-4 rounded-2xl border border-white/5 bg-white/5 p-5 transition-all duration-300 hover:border-vanguard-blue/50 hover:bg-vanguard-blue/10"
-                    >
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-slate-900/60 transition-all duration-300 group-hover:border-vanguard-blue/50 group-hover:bg-vanguard-blue/20">
-                        <item.icon className="h-6 w-6 text-vanguard-blue" />
+            <div className="relative">
+              <div className="absolute inset-0 blur-3xl opacity-70 [background:radial-gradient(circle_at_top,_rgba(14,165,233,0.35),_rgba(15,23,42,0))] -z-10" />
+              <div className="relative z-10 rounded-[28px] border border-white/10 bg-gradient-to-br from-slate-900/90 via-slate-950/65 to-slate-950/90 p-[1px] shadow-[0_35px_65px_rgba(2,6,23,0.6)] backdrop-blur">
+                <div className="rounded-[26px] border border-white/10 bg-slate-950/80">
+                  <Card className="h-full border-0 bg-transparent text-slate-100">
+                    <CardHeader className="space-y-4 border-b border-white/10 bg-gradient-to-br from-slate-900/60 via-slate-950/40 to-slate-950/80">
+                      <div className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-1 text-xs uppercase tracking-[0.4em] text-slate-300">
+                        <ShieldCheck className="h-4 w-4 text-vanguard-blue" />
+                        <span>{t("contact.info")}</span>
                       </div>
-                      <div>
-                        <h3 className="text-base font-semibold text-white">{item.title}</h3>
-                        <p className="text-sm text-slate-300 group-hover:text-slate-200">{item.content}</p>
-                      </div>
-                    </a>
-                  ))}
-                </div>
-              </div>
+                      <CardTitle className="text-2xl font-semibold text-white md:text-3xl">
+                        {t("contact.info")}
+                      </CardTitle>
+                      <CardDescription className="max-w-2xl text-sm leading-relaxed text-slate-300">
+                        {t("contact.form.fill")}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="p-8">
+                      <div className="grid gap-6">
+                        {contactInfo.map((item, index) => {
+                          const isNonClickable = item.href === "#" && item.content === "Whatsapp Chat"
+                          const Component = isNonClickable ? "div" : "a"
+                          const props = isNonClickable
+                            ? { className: "group flex items-start gap-4 rounded-2xl border border-white/5 bg-white/5 p-5" }
+                            : { href: item.href, className: "group flex items-start gap-4 rounded-2xl border border-white/5 bg-white/5 p-5 transition-all duration-300 hover:border-vanguard-blue/50 hover:bg-vanguard-blue/10" }
 
-              <div className="rounded-[28px] border border-white/10 bg-gradient-to-br from-slate-900/80 via-slate-950/60 to-slate-950/90 p-10 shadow-[0_30px_60px_rgba(15,23,42,0.5)] backdrop-blur">
-                <SectionTitle
-                  text={t("contact.hours")}
-                  as="h2"
-                  className="mb-6 text-xl text-white sm:text-2xl"
-                  initialDelay={220}
-                />
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between rounded-2xl border border-white/5 bg-white/5 p-4 text-slate-200">
-                    <span className="font-semibold text-white">{t("contact.hours.weekdays")}</span>
-                    <span>9:00 AM - 6:00 PM</span>
-                  </div>
-                  <div className="flex items-center justify-between rounded-2xl border border-white/5 bg-white/5 p-4 text-slate-200">
-                    <span className="font-semibold text-white">{t("contact.hours.saturday")}</span>
-                    <span>10:00 AM - 2:00 PM</span>
-                  </div>
-                  <div className="flex items-center justify-between rounded-2xl border border-white/5 bg-white/5 p-4 text-slate-200">
-                    <span className="font-semibold text-white">{t("contact.hours.sunday")}</span>
-                    <span className="text-slate-300">{t("contact.hours.closed")}</span>
-                  </div>
+                          return (
+                            <Component key={index} {...props}>
+                              <div className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-slate-900/60 transition-all duration-300 group-hover:border-vanguard-blue/50 group-hover:bg-vanguard-blue/20">
+                                <item.icon className="h-6 w-6 text-vanguard-blue" />
+                              </div>
+                              <div>
+                                <h3 className="text-base font-semibold text-white">{item.title}</h3>
+                                <p className="text-sm text-slate-300 group-hover:text-slate-200">{item.content}</p>
+                              </div>
+                            </Component>
+                          )
+                        })}
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
               </div>
             </div>

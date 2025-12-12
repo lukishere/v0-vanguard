@@ -103,19 +103,19 @@ export const aboutContent: Record<"en" | "es", AboutContent> = {
         },
         {
           name: "Diego Peccini",
-          position: "Gerente de Ventas",
+          position: "Sales Manager",
           linkedinUrl: "https://www.linkedin.com/in/example",
           imageUrl: "/images/team/member3.jpg",
         },
         {
           name: "Javier García",
-          position: "Asesor Financiero",
+          position: "Financial Advisor",
           linkedinUrl: "https://www.linkedin.com/in/example",
           imageUrl: "/images/team/member4.jpg",
         },
         {
           name: "Gerardo Fernández",
-          position: "Lider de Infraestructura/Cloud Computing",
+          position: "Infrastructure/Cloud Computing Leader",
           linkedinUrl: "https://www.linkedin.com/in/example",
           imageUrl: "/images/team/member5.jpg",
         },

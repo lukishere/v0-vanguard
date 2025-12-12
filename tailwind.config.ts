@@ -223,10 +223,6 @@ const config = {
           "25%": { transform: "translateY(-3px)" },
           "75%": { transform: "translateY(3px)" },
         },
-        "cursor-trail": {
-          "0%": { opacity: "0.7", transform: "scale(1)" },
-          "100%": { opacity: "0", transform: "scale(2)" },
-        },
         vibrate: {
           "0%, 100%": { transform: "translate(0)" },
           "10%, 30%, 50%, 70%, 90%": { transform: "translate(-1px)" },

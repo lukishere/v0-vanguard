@@ -683,7 +683,7 @@ function generateContact(language: Locale) {
   if (language === "en") {
     return formatResponse(
       [
-        `You can write to us at ${contactInfo.email} or call ${contactInfo.phone}.`,
+        `You can write to us at ${contactInfo.email}.`,
         `We operate from ${contactInfo.city}, ${contactInfo.country}.`,
       ],
       language,
@@ -696,7 +696,7 @@ function generateContact(language: Locale) {
 
   return formatResponse(
     [
-      `Puedes escribirnos a ${contactInfo.email} o llamar al ${contactInfo.phone}.`,
+      `Puedes escribirnos a ${contactInfo.email}.`,
       `Operamos desde ${contactInfo.city}, ${contactInfo.country}.`,
     ],
     language,

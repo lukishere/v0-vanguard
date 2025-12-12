@@ -1,7 +1,6 @@
 import { ClerkProviderWrapper } from "@/components/clerk-provider-wrapper";
 import { CookieBanner } from "@/components/cookie-banner";
 import { CookieSettings } from "@/components/cookie-settings";
-import { CursorTrail } from "@/components/cursor-trail";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { HtmlWrapper } from "@/components/html-wrapper";
@@ -69,7 +68,6 @@ export default function RootLayout({
                       {children}
                     </main>
                     <Footer />
-                    <CursorTrail />
                     <CookieBanner />
                     <CookieSettings />
                     {/* <LiveChat /> */}

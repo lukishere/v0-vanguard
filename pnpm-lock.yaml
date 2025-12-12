@@ -25,7 +25,7 @@ importers:
         version: 1.9.0(@types/react@19.1.2)(graphql@16.11.0)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)
       '@copilotkit/runtime':
         specifier: ^1.9.0
-        version: 1.9.0(@ag-ui/client@0.0.28)(@ag-ui/core@0.0.28)(@ag-ui/encoder@0.0.28)(@ag-ui/proto@0.0.28)(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-bedrock-agent-runtime@3.828.0)(@aws-sdk/client-bedrock-runtime@3.828.0)(@aws-sdk/client-kendra@3.828.0)(@aws-sdk/credential-provider-node@3.828.0)(@browserbasehq/sdk@2.6.0)(@browserbasehq/stagehand@1.14.0(@playwright/test@1.53.0)(deepmerge@4.3.1)(dotenv@16.6.1)(openai@5.3.0(ws@8.18.3)(zod@3.24.3))(zod@3.24.3))(@google-cloud/storage@7.17.3)(@ibm-cloud/watsonx-ai@1.6.7)(@smithy/util-utf8@2.3.0)(@upstash/redis@1.35.6)(@vercel/kv@3.0.0)(axios@1.13.2)(cheerio@1.0.0)(fast-xml-parser@4.5.3)(firebase-admin@13.6.0)(google-auth-library@10.5.0)(handlebars@4.7.8)(ibm-cloud-sdk-core@5.4.0)(ignore@5.3.2)(jsdom@26.1.0)(jsonwebtoken@9.0.2)(lodash@4.17.21)(playwright@1.53.0)(react@19.1.2)(weaviate-client@3.6.2)(ws@8.18.3)
+        version: 1.9.0(@ag-ui/client@0.0.28)(@ag-ui/core@0.0.28)(@ag-ui/encoder@0.0.28)(@ag-ui/proto@0.0.28)(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-bedrock-agent-runtime@3.828.0)(@aws-sdk/client-bedrock-runtime@3.828.0)(@aws-sdk/client-kendra@3.828.0)(@aws-sdk/credential-provider-node@3.828.0)(@browserbasehq/sdk@2.6.0)(@browserbasehq/stagehand@1.14.0(@playwright/test@1.53.0)(deepmerge@4.3.1)(dotenv@16.6.1)(openai@5.3.0(ws@8.18.3)(zod@3.24.3))(zod@3.24.3))(@google-cloud/storage@7.17.3)(@ibm-cloud/watsonx-ai@1.6.7)(@smithy/util-utf8@2.3.0)(@upstash/redis@1.35.8)(@vercel/kv@3.0.0)(axios@1.13.2)(cheerio@1.0.0)(fast-xml-parser@4.5.3)(firebase-admin@13.6.0)(google-auth-library@10.5.0)(handlebars@4.7.8)(ibm-cloud-sdk-core@5.4.0)(ignore@5.3.2)(jsdom@26.1.0)(jsonwebtoken@9.0.2)(lodash@4.17.21)(playwright@1.53.0)(react@19.1.2)(weaviate-client@3.6.2)(ws@8.18.3)
       '@google-cloud/recaptcha-enterprise':
         specifier: ^6.3.1
         version: 6.3.1
@@ -130,7 +130,10 @@ importers:
         version: 13.15.1
       '@upstash/realtime':
         specifier: ^0.3.0
-        version: 0.3.0(@upstash/redis@1.35.6)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(zod@3.24.3)
+        version: 0.3.0(@upstash/redis@1.35.8)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(zod@3.24.3)
+      '@upstash/redis':
+        specifier: ^1.35.8
+        version: 1.35.8
       '@vercel/kv':
         specifier: ^3.0.0
         version: 3.0.0
@@ -3651,8 +3654,8 @@ packages:
       react-dom: '>=16.8.0'
       zod: ^3.25.0 || ^4.0.0
 
-  '@upstash/redis@1.35.6':
-    resolution: {integrity: sha512-aSEIGJgJ7XUfTYvhQcQbq835re7e/BXjs8Janq6Pvr6LlmTZnyqwT97RziZLO/8AVUL037RLXqqiQC6kCt+5pA==}
+  '@upstash/redis@1.35.8':
+    resolution: {integrity: sha512-QqLpVCD9PCPE6hlRzOkz864nfijSdazxtyJLIy9ZeTh6kU2nBIKKfjT5HMHjIRD4BCm6TK1dbUT9pxhFjcvpng==}
 
   '@urql/core@5.1.1':
     resolution: {integrity: sha512-aGh024z5v2oINGD/In6rAtVKTm4VmQ2TxKQBAtk2ZSME5dunZFcjltw4p5ENQg+5CBhZ3FHMzl0Oa+rwqiWqlg==}
@@ -8996,7 +8999,7 @@ snapshots:
       - encoding
       - graphql
 
-  '@copilotkit/runtime@1.9.0(@ag-ui/client@0.0.28)(@ag-ui/core@0.0.28)(@ag-ui/encoder@0.0.28)(@ag-ui/proto@0.0.28)(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-bedrock-agent-runtime@3.828.0)(@aws-sdk/client-bedrock-runtime@3.828.0)(@aws-sdk/client-kendra@3.828.0)(@aws-sdk/credential-provider-node@3.828.0)(@browserbasehq/sdk@2.6.0)(@browserbasehq/stagehand@1.14.0(@playwright/test@1.53.0)(deepmerge@4.3.1)(dotenv@16.6.1)(openai@5.3.0(ws@8.18.3)(zod@3.24.3))(zod@3.24.3))(@google-cloud/storage@7.17.3)(@ibm-cloud/watsonx-ai@1.6.7)(@smithy/util-utf8@2.3.0)(@upstash/redis@1.35.6)(@vercel/kv@3.0.0)(axios@1.13.2)(cheerio@1.0.0)(fast-xml-parser@4.5.3)(firebase-admin@13.6.0)(google-auth-library@10.5.0)(handlebars@4.7.8)(ibm-cloud-sdk-core@5.4.0)(ignore@5.3.2)(jsdom@26.1.0)(jsonwebtoken@9.0.2)(lodash@4.17.21)(playwright@1.53.0)(react@19.1.2)(weaviate-client@3.6.2)(ws@8.18.3)':
+  '@copilotkit/runtime@1.9.0(@ag-ui/client@0.0.28)(@ag-ui/core@0.0.28)(@ag-ui/encoder@0.0.28)(@ag-ui/proto@0.0.28)(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-bedrock-agent-runtime@3.828.0)(@aws-sdk/client-bedrock-runtime@3.828.0)(@aws-sdk/client-kendra@3.828.0)(@aws-sdk/credential-provider-node@3.828.0)(@browserbasehq/sdk@2.6.0)(@browserbasehq/stagehand@1.14.0(@playwright/test@1.53.0)(deepmerge@4.3.1)(dotenv@16.6.1)(openai@5.3.0(ws@8.18.3)(zod@3.24.3))(zod@3.24.3))(@google-cloud/storage@7.17.3)(@ibm-cloud/watsonx-ai@1.6.7)(@smithy/util-utf8@2.3.0)(@upstash/redis@1.35.8)(@vercel/kv@3.0.0)(axios@1.13.2)(cheerio@1.0.0)(fast-xml-parser@4.5.3)(firebase-admin@13.6.0)(google-auth-library@10.5.0)(handlebars@4.7.8)(ibm-cloud-sdk-core@5.4.0)(ignore@5.3.2)(jsdom@26.1.0)(jsonwebtoken@9.0.2)(lodash@4.17.21)(playwright@1.53.0)(react@19.1.2)(weaviate-client@3.6.2)(ws@8.18.3)':
     dependencies:
       '@ag-ui/client': 0.0.28
       '@ag-ui/core': 0.0.28
@@ -9007,7 +9010,7 @@ snapshots:
       '@copilotkit/shared': 1.9.0
       '@graphql-yoga/plugin-defer-stream': 3.13.5(graphql-yoga@5.13.5(graphql@16.11.0))(graphql@16.11.0)
       '@langchain/aws': 0.1.11(@langchain/core@0.3.58(openai@4.104.0(ws@8.18.3)(zod@3.24.3)))
-      '@langchain/community': 0.3.46(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-bedrock-agent-runtime@3.828.0)(@aws-sdk/client-bedrock-runtime@3.828.0)(@aws-sdk/client-kendra@3.828.0)(@aws-sdk/credential-provider-node@3.828.0)(@browserbasehq/sdk@2.6.0)(@browserbasehq/stagehand@1.14.0(@playwright/test@1.53.0)(deepmerge@4.3.1)(dotenv@16.6.1)(openai@5.3.0(ws@8.18.3)(zod@3.24.3))(zod@3.24.3))(@google-cloud/storage@7.17.3)(@ibm-cloud/watsonx-ai@1.6.7)(@langchain/aws@0.1.11(@langchain/core@0.3.58(openai@4.104.0(ws@8.18.3)(zod@3.24.3))))(@langchain/core@0.3.58(openai@4.104.0(ws@8.18.3)(zod@3.24.3)))(@smithy/util-utf8@2.3.0)(@upstash/redis@1.35.6)(@vercel/kv@3.0.0)(axios@1.13.2)(cheerio@1.0.0)(fast-xml-parser@4.5.3)(firebase-admin@13.6.0)(google-auth-library@10.5.0)(handlebars@4.7.8)(ibm-cloud-sdk-core@5.4.0)(ignore@5.3.2)(jsdom@26.1.0)(jsonwebtoken@9.0.2)(lodash@4.17.21)(openai@4.104.0(ws@8.18.3)(zod@3.24.3))(playwright@1.53.0)(weaviate-client@3.6.2)(ws@8.18.3)
+      '@langchain/community': 0.3.46(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-bedrock-agent-runtime@3.828.0)(@aws-sdk/client-bedrock-runtime@3.828.0)(@aws-sdk/client-kendra@3.828.0)(@aws-sdk/credential-provider-node@3.828.0)(@browserbasehq/sdk@2.6.0)(@browserbasehq/stagehand@1.14.0(@playwright/test@1.53.0)(deepmerge@4.3.1)(dotenv@16.6.1)(openai@5.3.0(ws@8.18.3)(zod@3.24.3))(zod@3.24.3))(@google-cloud/storage@7.17.3)(@ibm-cloud/watsonx-ai@1.6.7)(@langchain/aws@0.1.11(@langchain/core@0.3.58(openai@4.104.0(ws@8.18.3)(zod@3.24.3))))(@langchain/core@0.3.58(openai@4.104.0(ws@8.18.3)(zod@3.24.3)))(@smithy/util-utf8@2.3.0)(@upstash/redis@1.35.8)(@vercel/kv@3.0.0)(axios@1.13.2)(cheerio@1.0.0)(fast-xml-parser@4.5.3)(firebase-admin@13.6.0)(google-auth-library@10.5.0)(handlebars@4.7.8)(ibm-cloud-sdk-core@5.4.0)(ignore@5.3.2)(jsdom@26.1.0)(jsonwebtoken@9.0.2)(lodash@4.17.21)(openai@4.104.0(ws@8.18.3)(zod@3.24.3))(playwright@1.53.0)(weaviate-client@3.6.2)(ws@8.18.3)
       '@langchain/core': 0.3.58(openai@5.3.0(ws@8.18.3)(zod@3.24.3))
       '@langchain/google-gauth': 0.1.8(@langchain/core@0.3.58(openai@4.104.0(ws@8.18.3)(zod@3.24.3)))(zod@3.24.3)
       '@langchain/langgraph-sdk': 0.0.70(@langchain/core@0.3.58(openai@4.104.0(ws@8.18.3)(zod@3.24.3)))(react@19.1.2)
@@ -10135,7 +10138,7 @@ snapshots:
     transitivePeerDependencies:
       - aws-crt
 
-  '@langchain/community@0.3.46(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-bedrock-agent-runtime@3.828.0)(@aws-sdk/client-bedrock-runtime@3.828.0)(@aws-sdk/client-kendra@3.828.0)(@aws-sdk/credential-provider-node@3.828.0)(@browserbasehq/sdk@2.6.0)(@browserbasehq/stagehand@1.14.0(@playwright/test@1.53.0)(deepmerge@4.3.1)(dotenv@16.6.1)(openai@5.3.0(ws@8.18.3)(zod@3.24.3))(zod@3.24.3))(@google-cloud/storage@7.17.3)(@ibm-cloud/watsonx-ai@1.6.7)(@langchain/aws@0.1.11(@langchain/core@0.3.58(openai@4.104.0(ws@8.18.3)(zod@3.24.3))))(@langchain/core@0.3.58(openai@4.104.0(ws@8.18.3)(zod@3.24.3)))(@smithy/util-utf8@2.3.0)(@upstash/redis@1.35.6)(@vercel/kv@3.0.0)(axios@1.13.2)(cheerio@1.0.0)(fast-xml-parser@4.5.3)(firebase-admin@13.6.0)(google-auth-library@10.5.0)(handlebars@4.7.8)(ibm-cloud-sdk-core@5.4.0)(ignore@5.3.2)(jsdom@26.1.0)(jsonwebtoken@9.0.2)(lodash@4.17.21)(openai@4.104.0(ws@8.18.3)(zod@3.24.3))(playwright@1.53.0)(weaviate-client@3.6.2)(ws@8.18.3)':
+  '@langchain/community@0.3.46(@aws-crypto/sha256-js@5.2.0)(@aws-sdk/client-bedrock-agent-runtime@3.828.0)(@aws-sdk/client-bedrock-runtime@3.828.0)(@aws-sdk/client-kendra@3.828.0)(@aws-sdk/credential-provider-node@3.828.0)(@browserbasehq/sdk@2.6.0)(@browserbasehq/stagehand@1.14.0(@playwright/test@1.53.0)(deepmerge@4.3.1)(dotenv@16.6.1)(openai@5.3.0(ws@8.18.3)(zod@3.24.3))(zod@3.24.3))(@google-cloud/storage@7.17.3)(@ibm-cloud/watsonx-ai@1.6.7)(@langchain/aws@0.1.11(@langchain/core@0.3.58(openai@4.104.0(ws@8.18.3)(zod@3.24.3))))(@langchain/core@0.3.58(openai@4.104.0(ws@8.18.3)(zod@3.24.3)))(@smithy/util-utf8@2.3.0)(@upstash/redis@1.35.8)(@vercel/kv@3.0.0)(axios@1.13.2)(cheerio@1.0.0)(fast-xml-parser@4.5.3)(firebase-admin@13.6.0)(google-auth-library@10.5.0)(handlebars@4.7.8)(ibm-cloud-sdk-core@5.4.0)(ignore@5.3.2)(jsdom@26.1.0)(jsonwebtoken@9.0.2)(lodash@4.17.21)(openai@4.104.0(ws@8.18.3)(zod@3.24.3))(playwright@1.53.0)(weaviate-client@3.6.2)(ws@8.18.3)':
     dependencies:
       '@browserbasehq/stagehand': 1.14.0(@playwright/test@1.53.0)(deepmerge@4.3.1)(dotenv@16.6.1)(openai@5.3.0(ws@8.18.3)(zod@3.24.3))(zod@3.24.3)
       '@ibm-cloud/watsonx-ai': 1.6.7
@@ -10161,7 +10164,7 @@ snapshots:
       '@browserbasehq/sdk': 2.6.0
       '@google-cloud/storage': 7.17.3
       '@smithy/util-utf8': 2.3.0
-      '@upstash/redis': 1.35.6
+      '@upstash/redis': 1.35.8
       '@vercel/kv': 3.0.0
       cheerio: 1.0.0
       fast-xml-parser: 4.5.3
@@ -12212,14 +12215,14 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.11.1':
     optional: true
 
-  '@upstash/realtime@0.3.0(@upstash/redis@1.35.6)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(zod@3.24.3)':
+  '@upstash/realtime@0.3.0(@upstash/redis@1.35.8)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(zod@3.24.3)':
     dependencies:
-      '@upstash/redis': 1.35.6
+      '@upstash/redis': 1.35.8
       react: 19.1.2
       react-dom: 19.1.2(react@19.1.2)
       zod: 3.24.3
 
-  '@upstash/redis@1.35.6':
+  '@upstash/redis@1.35.8':
     dependencies:
       uncrypto: 0.1.3
 
@@ -12232,7 +12235,7 @@ snapshots:
 
   '@vercel/kv@3.0.0':
     dependencies:
-      '@upstash/redis': 1.35.6
+      '@upstash/redis': 1.35.8
 
   '@vitest/expect@2.1.9':
     dependencies:

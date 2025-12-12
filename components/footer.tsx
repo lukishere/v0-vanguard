@@ -15,8 +15,8 @@ export function Footer() {
 
   const contactInfo = [
     { icon: Mail, text: "contacto@vanguard-ia.tech", href: "mailto:contacto@vanguard-ia.tech" },
-    { icon: Phone, text: "+34 644 059 040", href: "tel:+34644059040" },
-    { icon: MapPin, text: "Barcelona, España", href: "#" },
+    { icon: Phone, text: "Whatsapp Chat", href: "#" },
+    { icon: MapPin, text: "Castelldefels, España", href: "#" },
     {
       icon: Linkedin,
       text: t("contact.linkedin.title") + "!",
@@ -55,19 +55,24 @@ export function Footer() {
             </h3>
             <div className="vanguard-divider"></div>
             <ul className="space-y-3">
-              {contactInfo.map((item, index) => (
-                <li key={index} className="flex items-start group">
-                  <div className="bg-gray-100 p-2 rounded-full mr-2 transition-all duration-300 group-hover:bg-vanguard-blue/10">
-                    <item.icon className="h-5 w-5 text-vanguard-blue transition-all duration-300 group-hover:scale-110" />
-                  </div>
-                  <a
-                    href={item.href}
-                    className="text-gray-600 hover:text-vanguard-blue transition-all duration-300 vanguard-button-hover mt-1"
-                  >
-                    {item.text}
-                  </a>
-                </li>
-              ))}
+              {contactInfo.map((item, index) => {
+                const isNonClickable = item.href === "#" && item.text === "Whatsapp Chat"
+                const Component = isNonClickable ? "div" : "a"
+                const props = isNonClickable
+                  ? { className: "text-gray-600 mt-1" }
+                  : { href: item.href, className: "text-gray-600 hover:text-vanguard-blue transition-all duration-300 vanguard-button-hover mt-1" }
+
+                return (
+                  <li key={index} className="flex items-start group">
+                    <div className="bg-gray-100 p-2 rounded-full mr-2 transition-all duration-300 group-hover:bg-vanguard-blue/10">
+                      <item.icon className="h-5 w-5 text-vanguard-blue transition-all duration-300 group-hover:scale-110" />
+                    </div>
+                    <Component {...props}>
+                      {item.text}
+                    </Component>
+                  </li>
+                )
+              })}
             </ul>
           </div>
 

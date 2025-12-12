@@ -8,9 +8,8 @@ export type ContactInfo = {
 
 export const contactInfo: ContactInfo = {
   email: "contacto@vanguard-ia.tech",
-  phone: "+34 644 059 040",
-  address: "Barcelona",
-  city: "Barcelona",
+  phone: "Whatsapp Chat",
+  address: "Castelldefels",
+  city: "Castelldefels",
   country: "Spain",
 }
-
