@@ -2,11 +2,32 @@ import { ArrowUpRight } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { CTAArrow } from "@/components/cta-arrow"
 import SpotlightCard from "@/components/SpotlightCard"
+import Link from "next/link"
 
 interface ServiceCardProps {
   title: string
   description: string
   benefit?: string
+}
+
+function processDescription(description: string) {
+  const parts = description.split(/(EXIN\.com)/g)
+  return parts.map((part, index) => {
+    if (part === "EXIN.com") {
+      return (
+        <Link
+          key={index}
+          href="https://www.exin.com/about-exin/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-vanguard-blue hover:text-vanguard-blue/80 underline transition-colors"
+        >
+          {part}
+        </Link>
+      )
+    }
+    return part
+  })
 }
 
 export function ServiceCard({ title, description, benefit }: ServiceCardProps) {
@@ -21,7 +42,7 @@ export function ServiceCard({ title, description, benefit }: ServiceCardProps) {
           <div className="mt-3 h-1 w-12 bg-vanguard-red transition-all duration-300 group-hover:w-16" />
         </CardHeader>
         <CardContent className="flex flex-1 flex-col">
-          <CardDescription className="mb-4 text-slate-300">{description}</CardDescription>
+          <CardDescription className="mb-4 text-slate-300">{processDescription(description)}</CardDescription>
           {benefit && (
             <div className="mb-6 rounded-md border-l-2 border-vanguard-gold/50 bg-slate-900/50 p-3">
               <p className="text-sm font-medium text-vanguard-gold/90">{benefit}</p>

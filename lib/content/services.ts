@@ -64,6 +64,19 @@ export const servicesContent: Record<"en" | "es", ServicesContent> = {
           "Cost Reduction Solutions",
         ],
       },
+      {
+        title: "Specialized Training",
+        description:
+          "Certified by EXIN.com to guide in Regulation (EU) 2024/1689 of the European Parliament on Artificial Intelligence and ISO 42001.",
+        benefit: "Stay compliant with the latest AI regulations.",
+        features: [
+          "EU AI Act (2024/1689) Training",
+          "ISO 42001 Certification Guidance",
+          "EXIN Certified Training",
+          "Regulatory Compliance Consulting",
+          "AI Governance Best Practices",
+        ],
+      },
     ],
   },
   es: {
@@ -112,6 +125,19 @@ export const servicesContent: Record<"en" | "es", ServicesContent> = {
           "Desarrollo de Agentes de IA",
           "Optimización de Procesos",
           "Soluciones de Reducción de Costos",
+        ],
+      },
+      {
+        title: "Capacitaciones especializadas",
+        description:
+          "Capacitados por EXIN.com para orientar en Reglamento (UE) 2024/1689 del Parlamento Europeo sobre Inteligencia Artificial e ISO 42001.",
+        benefit: "Auditores en Gobernanza de IA.",
+        features: [
+          "Capacitación en Ley de IA de la UE (2024/1689)",
+          "Orientación en Certificación ISO 42001",
+          "Capacitación Certificada por EXIN",
+          "Consultoría en Cumplimiento Normativo",
+          "Mejores Prácticas de Gobernanza de IA",
         ],
       },
     ],

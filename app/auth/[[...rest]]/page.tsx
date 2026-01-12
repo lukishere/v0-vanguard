@@ -40,7 +40,7 @@ export default function AuthPage() {
                   "bg-white/10 border border-white/20 text-white placeholder:text-white/50 focus:border-vanguard-blue focus:ring-vanguard-blue/40",
                 formFieldLabel: "text-white/70",
                 footerActionLink: "text-vanguard-blue hover:text-vanguard-blue/80",
-                footer: "text-white/60",
+                footer: "text-white/60 bg-slate-700/50 rounded-lg p-3 mt-4",
               },
             }}
           />
@@ -60,7 +60,7 @@ export default function AuthPage() {
                   "bg-white/10 border border-white/20 text-white placeholder:text-white/50 focus:border-vanguard-blue focus:ring-vanguard-blue/40",
                 formFieldLabel: "text-white/70",
                 footerActionLink: "text-vanguard-blue hover:text-vanguard-blue/80",
-                footer: "text-white/60",
+                footer: "text-white/60 bg-slate-700/50 rounded-lg p-3 mt-4",
               },
             }}
           />

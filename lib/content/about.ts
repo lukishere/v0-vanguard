@@ -78,10 +78,6 @@ export const aboutContent: Record<"en" | "es", AboutContent> = {
           imageUrl:
             "https://mma.prnewswire.com/media/1971015/IESF_Logo.jpg?p=facebook",
         },
-        {
-          name: "Additional Partner",
-          imageUrl: "/images/logos/additional-logo.png",
-        },
       ],
     },
     team: {
@@ -90,7 +86,7 @@ export const aboutContent: Record<"en" | "es", AboutContent> = {
         "Our team consists of experienced professionals with diverse backgrounds in technology, business strategy, and industry-specific expertise. We bring together the best talent to deliver comprehensive solutions for our clients.",
       members: [
         {
-          name: "Lucas Ballestero Lunghini",
+          name: "Lucas Ballestero",
           position: "Founder & General Director",
           linkedinUrl: "https://www.linkedin.com/in/luballest/",
           imageUrl: "/images/team/lucas-ballestero.jpg",
@@ -106,12 +102,6 @@ export const aboutContent: Record<"en" | "es", AboutContent> = {
           position: "Sales Manager",
           linkedinUrl: "https://www.linkedin.com/in/example",
           imageUrl: "/images/team/member3.jpg",
-        },
-        {
-          name: "Javier García",
-          position: "Financial Advisor",
-          linkedinUrl: "https://www.linkedin.com/in/example",
-          imageUrl: "/images/team/member4.jpg",
         },
         {
           name: "Gerardo Fernández",
@@ -207,10 +197,6 @@ export const aboutContent: Record<"en" | "es", AboutContent> = {
           imageUrl:
             "https://mma.prnewswire.com/media/1971015/IESF_Logo.jpg?p=facebook",
         },
-        {
-          name: "Additional Partner",
-          imageUrl: "/images/logos/additional-logo.png",
-        },
       ],
     },
     team: {
@@ -219,7 +205,7 @@ export const aboutContent: Record<"en" | "es", AboutContent> = {
         "Nuestro equipo está formado por profesionales experimentados con diversos antecedentes en tecnología, estrategia empresarial y experiencia específica de la industria. Reunimos al mejor talento para ofrecer soluciones integrales para nuestros clientes.",
       members: [
         {
-          name: "Lucas Ballestero Lunghini",
+          name: "Lucas Ballestero",
           position: "Fundador & Director General",
           linkedinUrl: "https://www.linkedin.com/in/luballest/",
           imageUrl: "/images/team/lucas-ballestero.jpg",
@@ -235,12 +221,6 @@ export const aboutContent: Record<"en" | "es", AboutContent> = {
           position: "Gerente de Ventas",
           linkedinUrl: "https://www.linkedin.com/in/example",
           imageUrl: "/images/team/member3.jpg",
-        },
-        {
-          name: "Javier García",
-          position: "Asesor Financiero",
-          linkedinUrl: "https://www.linkedin.com/in/example",
-          imageUrl: "/images/team/member4.jpg",
         },
         {
           name: "Gerardo Fernández",

@@ -5,7 +5,7 @@ import { Suspense } from "react"
 
 import { useLanguage } from "@/contexts/language-context"
 import { useSearchParams } from "next/navigation"
-import { useEffect, useState, useCallback } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -14,25 +14,13 @@ import { Textarea } from "@/components/ui/textarea"
 import { Mail, Phone, MapPin, Linkedin, ShieldCheck } from "lucide-react"
 import { SectionTitle } from "@/components/section-title"
 import { contactInfo as defaultContactInfo } from "@/lib/content/contact"
-
-declare global {
-  interface Window {
-    grecaptcha: {
-      ready: (callback: () => void) => void
-      execute: (siteKey: string, options: { action: string }) => Promise<string>
-      enterprise: {
-        ready: (callback: () => void) => void
-        execute: (siteKey: string, options: { action: string }) => Promise<string>
-      }
-    }
-  }
-}
+import Turnstile from "react-turnstile"
 
 function ContactPageContent() {
   const { t, language } = useLanguage()
   const searchParams = useSearchParams()
   const isQuote = searchParams.get("quote") === "true"
-  const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? ""
+  const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? ""
 
   const [formState, setFormState] = useState({
     name: "",
@@ -43,155 +31,8 @@ function ContactPageContent() {
     honeypot: "",
     lastSubmittedAt: 0,
   })
-  const [recaptchaLoaded, setRecaptchaLoaded] = useState(false)
+  const [turnstileToken, setTurnstileToken] = useState<string>("")
 
-  // Debug: Log site key status (only in development)
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('reCAPTCHA Site Key:', recaptchaSiteKey ? `${recaptchaSiteKey.substring(0, 10)}...` : 'NOT CONFIGURED')
-      console.log('reCAPTCHA Loaded:', recaptchaLoaded)
-      console.log('reCAPTCHA Available:', typeof window !== 'undefined' && window.grecaptcha?.enterprise ? 'YES' : 'NO')
-    }
-  }, [recaptchaSiteKey, recaptchaLoaded])
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-
-    if (!recaptchaSiteKey) {
-      console.warn('reCAPTCHA Site Key not configured - form will work without captcha')
-      setRecaptchaLoaded(true) // Allow form to work without captcha
-      return
-    }
-
-    // Check if script already exists
-    const existingScript = document.querySelector(`script[src*="recaptcha"]`)
-    if (existingScript) {
-      // Script already loaded, check if enterprise is available
-      if (window.grecaptcha?.enterprise) {
-        window.grecaptcha.enterprise.ready(() => {
-          setRecaptchaLoaded(true)
-        })
-      } else {
-        // Wait a bit for script to fully load
-        setTimeout(() => {
-          if (window.grecaptcha?.enterprise) {
-            window.grecaptcha.enterprise.ready(() => {
-              setRecaptchaLoaded(true)
-            })
-          } else {
-            console.warn('reCAPTCHA Enterprise not available - form will work without captcha')
-            setRecaptchaLoaded(true)
-          }
-        }, 1000)
-      }
-      return
-    }
-
-    const script = document.createElement("script")
-    const scriptUrl = `https://www.google.com/recaptcha/enterprise.js?render=${recaptchaSiteKey}`
-    script.src = scriptUrl
-    script.async = true
-    script.defer = true
-
-    script.onload = () => {
-      console.log('reCAPTCHA script loaded, checking Enterprise API...')
-      // Wait a bit for the API to be available
-      setTimeout(() => {
-        if (window.grecaptcha?.enterprise) {
-          window.grecaptcha.enterprise.ready(() => {
-            console.log('reCAPTCHA Enterprise loaded successfully')
-            setRecaptchaLoaded(true)
-          })
-        } else {
-          console.warn('reCAPTCHA Enterprise API not available after script load')
-          console.warn('This might be because:')
-          console.warn('1. Domain not authorized in Google reCAPTCHA console')
-          console.warn('2. Site key is incorrect')
-          console.warn('3. Network/CORS issues')
-          console.warn('Form will work without captcha verification')
-          setRecaptchaLoaded(true) // Allow form submission
-        }
-      }, 500)
-    }
-
-    script.onerror = (error) => {
-      console.error('Failed to load reCAPTCHA Enterprise script:', error)
-      console.error('Script URL:', scriptUrl)
-      console.warn('Possible causes:')
-      console.warn('1. Domain (localhost) not authorized in Google reCAPTCHA console')
-      console.warn('2. Network connectivity issues')
-      console.warn('3. CORS or security policy blocking the script')
-      console.warn('Form will work without captcha verification')
-      setRecaptchaLoaded(true) // Allow form submission even if script fails
-    }
-
-    document.body.appendChild(script)
-
-    return () => {
-      const scriptToRemove = document.querySelector(`script[src*="recaptcha"]`)
-      if (scriptToRemove && scriptToRemove === script) {
-        document.body.removeChild(scriptToRemove)
-      }
-    }
-  }, [recaptchaSiteKey])
-
-  // Callback function for reCAPTCHA Enterprise
-  const onSubmit = useCallback(async (token: string) => {
-    if (formState.honeypot.trim() !== "") {
-      return
-    }
-
-    const now = Date.now()
-    if (now - formState.lastSubmittedAt < 15000) {
-      alert("Please wait a few seconds before submitting again.")
-      return
-    }
-
-    setFormState(prev => ({ ...prev, loading: true }))
-
-    try {
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: formState.name,
-          email: formState.email,
-          message: formState.message,
-          honeypot: formState.honeypot,
-          captchaToken: token,
-        }),
-      })
-      if (response.ok) {
-        setFormState({
-          name: "",
-          email: "",
-          message: "",
-          submitted: true,
-          loading: false,
-          honeypot: "",
-          lastSubmittedAt: now,
-        })
-      } else {
-        setFormState(prev => ({ ...prev, loading: false }))
-        alert("There was an error sending your message. Please try again later.")
-      }
-    } catch {
-      setFormState(prev => ({ ...prev, loading: false }))
-      alert("There was an error sending your message. Please try again later.")
-    }
-  }, [formState])
-
-  // Expose onSubmit to window for reCAPTCHA callback
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      (window as any).onSubmit = onSubmit
-    }
-    return () => {
-      if (typeof window !== 'undefined') {
-        delete (window as any).onSubmit
-      }
-    }
-  }, [onSubmit])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -206,27 +47,14 @@ function ContactPageContent() {
       return
     }
 
-    setFormState(prev => ({ ...prev, loading: true }))
-
-    // Try to get reCAPTCHA token if available
-    let captchaToken = ""
-
-    if (recaptchaSiteKey && window.grecaptcha?.enterprise) {
-      try {
-        captchaToken = await window.grecaptcha.enterprise.execute(recaptchaSiteKey, {
-          action: "submit_contact_form",
-        })
-        console.log('reCAPTCHA token obtained successfully')
-      } catch (captchaError) {
-        console.warn('reCAPTCHA execution error, submitting without token:', captchaError)
-        // Continue without token
-      }
-    } else {
-      console.warn('reCAPTCHA not available, submitting without token')
-      // Continue without token - form will still work
+    // Verify Turnstile token is present (in production)
+    if (process.env.NODE_ENV === 'production' && turnstileSiteKey && !turnstileToken) {
+      alert("Please complete the security verification.")
+      return
     }
 
-    // Submit form with or without token
+    setFormState(prev => ({ ...prev, loading: true }))
+
     try {
       const response = await fetch("/api/contact", {
         method: "POST",
@@ -236,7 +64,7 @@ function ContactPageContent() {
           email: formState.email,
           message: formState.message,
           honeypot: formState.honeypot,
-          captchaToken: captchaToken,
+          captchaToken: turnstileToken,
         }),
       })
 
@@ -250,14 +78,17 @@ function ContactPageContent() {
           honeypot: "",
           lastSubmittedAt: now,
         })
+        setTurnstileToken("")
       } else {
         const errorData = await response.json().catch(() => ({}))
         setFormState(prev => ({ ...prev, loading: false }))
+        setTurnstileToken("")
         alert(errorData.message || "There was an error sending your message. Please try again later.")
       }
     } catch (error) {
       console.error('Form submission error:', error)
       setFormState(prev => ({ ...prev, loading: false }))
+      setTurnstileToken("")
       alert("There was an error sending your message. Please try again later.")
     }
   }
@@ -383,20 +214,21 @@ function ContactPageContent() {
                               className="rounded-2xl border-white/15 bg-slate-900/70 text-white placeholder:text-slate-500 transition-all duration-300 focus:border-vanguard-blue focus:ring-2 focus:ring-vanguard-blue/60"
                             />
                           </div>
-                          {!recaptchaSiteKey && (
-                            <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 p-4 text-sm text-amber-200">
-                              {t("contact.form.captchaUnavailable")}
+                          {turnstileSiteKey && (
+                            <div className="flex justify-center">
+                              <Turnstile
+                                siteKey={turnstileSiteKey}
+                                onSuccess={(token) => setTurnstileToken(token)}
+                                onError={() => setTurnstileToken("")}
+                                onExpire={() => setTurnstileToken("")}
+                                theme="dark"
+                              />
                             </div>
                           )}
                           <Button
                             type="submit"
-                            className={`g-recaptcha group w-full h-12 rounded-xl bg-gradient-to-r from-vanguard-blue via-sky-500 to-cyan-500 text-sm font-semibold uppercase tracking-[0.3em] text-white shadow-[0_20px_40px_rgba(56,189,248,0.35)] transition-all duration-300 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70`}
+                            className="group w-full h-12 rounded-xl bg-gradient-to-r from-vanguard-blue via-sky-500 to-cyan-500 text-sm font-semibold uppercase tracking-[0.3em] text-white shadow-[0_20px_40px_rgba(56,189,248,0.35)] transition-all duration-300 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
                             disabled={formState.loading}
-                            {...(recaptchaSiteKey && {
-                              'data-sitekey': recaptchaSiteKey,
-                              'data-callback': 'onSubmit',
-                              'data-action': 'submit_contact_form'
-                            })}
                           >
                             <span className="inline-flex items-center gap-2">
                               {formState.loading ? t("contact.form.sending") : t("contact.form.submit")}

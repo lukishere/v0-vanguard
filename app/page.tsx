@@ -210,7 +210,7 @@ export default function Home() {
             />
             <div className="vanguard-divider mx-auto"></div>
           </div>
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 lg:gap-12 items-stretch">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-12 items-stretch max-w-4xl mx-auto">
             {services.map((service, index) => (
               <ServiceCard
                 key={index}

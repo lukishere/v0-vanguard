@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
-import { RecaptchaEnterpriseServiceClient } from '@google-cloud/recaptcha-enterprise';
 import {
   AppError,
   ValidationError,
@@ -61,10 +60,8 @@ const RATE_LIMIT_WINDOW = 15 * 60 * 1000; // 15 minutes
 const RATE_LIMIT_MAX_REQUESTS = 5;
 const RATE_LIMIT_BLOCK_DURATION = 60 * 60 * 1000; // 1 hour block after exceeding
 
-// reCAPTCHA Enterprise configuration
-const RECAPTCHA_PROJECT_ID = process.env.RECAPTCHA_PROJECT_ID || process.env.GOOGLE_CLOUD_PROJECT_ID;
-const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
-const RECAPTCHA_ACTION = 'submit_contact_form';
+// Cloudflare Turnstile configuration
+const TURNSTILE_SECRET_KEY = process.env.TURNSTILE_SECRET_KEY;
 
 // Enhanced HTML sanitization
 function sanitizeInput(input: string): string {
@@ -129,8 +126,7 @@ function validateEnvironment(): void {
     'SMTP_PORT',
     'SMTP_USER',
     'SMTP_PASS',
-    'CONTACT_EMAIL',
-    'RECAPTCHA_SECRET_KEY'
+    'CONTACT_EMAIL'
   ];
 
   const missing = requiredVars.filter(varName => !process.env[varName]);
@@ -195,116 +191,34 @@ Message: ${sanitizeInput(message)}
   }
 }
 
-type RecaptchaVerificationResponse = {
+type TurnstileVerificationResponse = {
   success: boolean;
   challenge_ts?: string;
   hostname?: string;
   'error-codes'?: string[];
-  score?: number;
-  action?: string;
 };
 
 /**
- * Create an assessment using Google Cloud reCAPTCHA Enterprise SDK
- * This provides better integration and more detailed risk analysis
+ * Verify Cloudflare Turnstile token
  */
-async function verifyRecaptchaToken(token: string, remoteIp?: string): Promise<RecaptchaVerificationResponse> {
-  // Try SDK method first if PROJECT_ID is configured
-  if (RECAPTCHA_PROJECT_ID && RECAPTCHA_SITE_KEY) {
-    try {
-      // Create the reCAPTCHA Enterprise client
-      const client = new RecaptchaEnterpriseServiceClient();
-      const projectPath = client.projectPath(RECAPTCHA_PROJECT_ID);
-
-      // Build the assessment request
-      const request = {
-        assessment: {
-          event: {
-            token: token,
-            siteKey: RECAPTCHA_SITE_KEY,
-          },
-        },
-        parent: projectPath,
-      };
-
-      const [response] = await client.createAssessment(request);
-
-      // Check if the token is valid
-      if (!response.tokenProperties?.valid) {
-        const invalidReason = response.tokenProperties?.invalidReason || 'UNKNOWN';
-        logger.warn('reCAPTCHA token invalid', LogCategory.API, {}, {
-          invalidReason,
-          token: token.substring(0, 20) + '...'
-        });
-
-        return {
-          success: false,
-          'error-codes': [invalidReason],
-          score: 0,
-        };
-      }
-
-      // Check if the expected action was executed
-      if (response.tokenProperties.action !== RECAPTCHA_ACTION) {
-        logger.warn('reCAPTCHA action mismatch', LogCategory.API, {}, {
-          expected: RECAPTCHA_ACTION,
-          received: response.tokenProperties.action
-        });
-
-        return {
-          success: false,
-          'error-codes': ['ACTION_MISMATCH'],
-          score: 0,
-        };
-      }
-
-      // Get the risk score
-      const score = response.riskAnalysis?.score ?? 0;
-      const reasons = response.riskAnalysis?.reasons || [];
-
-      if (reasons.length > 0) {
-        logger.info('reCAPTCHA risk analysis reasons', LogCategory.API, {}, {
-          score,
-          reasons: reasons.map(r => r.toString())
-        });
-      }
-
-      return {
-        success: true,
-        score,
-        action: response.tokenProperties.action,
-      };
-    } catch (error) {
-      logger.warn('reCAPTCHA Enterprise SDK failed, falling back to HTTP', LogCategory.API, {}, {
-        error: error instanceof Error ? error.message : 'Unknown error'
-      });
-      // Fall through to HTTP method
+async function verifyTurnstileToken(token: string, remoteIp?: string): Promise<TurnstileVerificationResponse> {
+  if (!TURNSTILE_SECRET_KEY) {
+    // In development, allow submission without token if secret key is not configured
+    if (process.env.NODE_ENV === 'development') {
+      logger.warn('TURNSTILE_SECRET_KEY not configured - skipping verification in development', LogCategory.API);
+      return { success: true };
     }
-  }
-
-  // Fallback to HTTP method
-  return await verifyRecaptchaTokenHttp(token, remoteIp);
-}
-
-/**
- * Fallback HTTP method for reCAPTCHA verification
- * Used if SDK is not configured or fails
- */
-async function verifyRecaptchaTokenHttp(token: string, remoteIp?: string): Promise<RecaptchaVerificationResponse> {
-  const secretKey = process.env.RECAPTCHA_SECRET_KEY;
-
-  if (!secretKey) {
     throw new AppError(
       'ConfigurationError',
       ErrorCodes.INTERNAL_SERVER_ERROR,
       ErrorTypes.CONFIGURATION_ERROR,
-      'Missing RECAPTCHA_SECRET_KEY environment variable (fallback method)',
+      'Missing TURNSTILE_SECRET_KEY environment variable',
       false
     );
   }
 
   const formData = new URLSearchParams();
-  formData.append('secret', secretKey);
+  formData.append('secret', TURNSTILE_SECRET_KEY);
   formData.append('response', token);
   if (remoteIp) {
     formData.append('remoteip', remoteIp);
@@ -312,22 +226,22 @@ async function verifyRecaptchaTokenHttp(token: string, remoteIp?: string): Promi
 
   let response: Response;
   try {
-    response = await fetch(RECAPTCHA_VERIFY_URL, {
+    response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
       method: 'POST',
       body: formData
     });
   } catch (networkError) {
-    throw new ExternalServiceError(`Failed to contact captcha verification service: ${networkError instanceof Error ? networkError.message : 'Unknown error'}`);
+    throw new ExternalServiceError(`Failed to contact Turnstile verification service: ${networkError instanceof Error ? networkError.message : 'Unknown error'}`);
   }
 
   if (!response.ok) {
-    throw new ExternalServiceError(`Captcha verification service responded with status ${response.status}`);
+    throw new ExternalServiceError(`Turnstile verification service responded with status ${response.status}`);
   }
 
   try {
-    return await response.json() as RecaptchaVerificationResponse;
+    return await response.json() as TurnstileVerificationResponse;
   } catch {
-    throw new ExternalServiceError('Captcha verification service returned an invalid response');
+    throw new ExternalServiceError('Turnstile verification service returned an invalid response');
   }
 }
 
@@ -392,12 +306,12 @@ export async function POST(request: NextRequest) {
       throw new RateLimitError(`Rate limit exceeded. ${resetTime ? `Try again after ${resetTime}` : 'Please try again later.'}`);
     }
 
-    // Verify reCAPTCHA v3 token
+    // Verify Cloudflare Turnstile token
     // In development, allow submission without token if it's empty
     const isDevelopment = process.env.NODE_ENV === 'development';
 
-    if (!captchaToken && !isDevelopment) {
-      logger.warn('Captcha token missing in production', LogCategory.API, logContext);
+    if (!captchaToken && !isDevelopment && TURNSTILE_SECRET_KEY) {
+      logger.warn('Turnstile token missing in production', LogCategory.API, logContext);
       throw new ValidationError(
         'Captcha verification required',
         requestContext
@@ -406,9 +320,9 @@ export async function POST(request: NextRequest) {
 
     if (captchaToken) {
       const remoteIp = clientIP === 'unknown' ? undefined : clientIP;
-      const captchaVerification = await verifyRecaptchaToken(captchaToken, remoteIp);
+      const captchaVerification = await verifyTurnstileToken(captchaToken, remoteIp);
       if (!captchaVerification.success) {
-        logger.warn('Captcha verification failed', LogCategory.API, logContext, {
+        logger.warn('Turnstile verification failed', LogCategory.API, logContext, {
           captchaErrors: captchaVerification['error-codes'] ?? []
         });
         throw new ValidationError(
@@ -416,23 +330,10 @@ export async function POST(request: NextRequest) {
           requestContext
         );
       }
-
-      // Verify score (reCAPTCHA v3 returns a score from 0.0 to 1.0)
-      // Lower scores indicate higher risk. Typically, scores below 0.5 are considered suspicious
-      const score = captchaVerification.score ?? 0;
-      if (score < 0.5) {
-        logger.warn('Captcha score too low', LogCategory.API, logContext, {
-          score,
-          action: captchaVerification.action
-        });
-        throw new ValidationError(
-          'Captcha verification failed: Low security score',
-          requestContext
-        );
-      }
+      logger.info('Turnstile verification successful', LogCategory.API, logContext);
     } else {
-      // Development mode: log warning but allow submission
-      logger.warn('Skipping captcha verification in development mode', LogCategory.API, logContext);
+      // Development mode or no secret key: log warning but allow submission
+      logger.warn('Skipping captcha verification (development mode or no secret key)', LogCategory.API, logContext);
     }
 
     // Send email with performance measurement

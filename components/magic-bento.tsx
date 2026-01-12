@@ -585,23 +585,29 @@ export const MagicBento = ({
             --purple-glow: rgba(132, 0, 255, 0.2);
             --purple-border: rgba(132, 0, 255, 0.8);
           }
-          
+
           .card-responsive {
             display: grid;
             gap: 1.5rem;
             padding: 0.75rem;
             width: 100%;
             margin: 0 auto;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
           }
-          
+
           @media (min-width: 1200px) {
             .card-responsive {
-              grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+              grid-template-columns: repeat(2, 1fr);
               max-width: 1100px;
             }
           }
-          
+
+          @media (max-width: 768px) {
+            .card-responsive {
+              grid-template-columns: 1fr;
+            }
+          }
+
           .card--border-glow::after {
             content: '';
             position: absolute;
@@ -620,15 +626,15 @@ export const MagicBento = ({
             transition: opacity 0.3s ease;
             z-index: 1;
           }
-          
+
           .card--border-glow:hover::after {
             opacity: 1;
           }
-          
+
           .card--border-glow:hover {
             box-shadow: 0 4px 20px rgba(46, 24, 78, 0.4), 0 0 30px rgba(${glowColor}, 0.2);
           }
-          
+
           .particle::before {
             content: '';
             position: absolute;
@@ -640,11 +646,11 @@ export const MagicBento = ({
             border-radius: 50%;
             z-index: -1;
           }
-          
+
           .particle-container:hover {
             box-shadow: 0 4px 20px rgba(46, 24, 78, 0.2), 0 0 30px rgba(${glowColor}, 0.2);
           }
-          
+
           .text-clamp-1 {
             display: -webkit-box;
             -webkit-box-orient: vertical;
@@ -653,7 +659,7 @@ export const MagicBento = ({
             overflow: hidden;
             text-overflow: ellipsis;
           }
-          
+
           .text-clamp-2 {
             display: -webkit-box;
             -webkit-box-orient: vertical;
@@ -662,7 +668,7 @@ export const MagicBento = ({
             overflow: hidden;
             text-overflow: ellipsis;
           }
-          
+
           .card-responsive .card {
             min-height: 300px;
           }
@@ -876,4 +882,3 @@ export const MagicBento = ({
     </div>
   )
 }
-

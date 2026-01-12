@@ -25,6 +25,10 @@ export const metadata: Metadata = {
   description:
     "Specialized consultancy in AI, IT, web branding, infrastructure, and security",
   generator: "v0.dev",
+  icons: {
+    icon: "/images/vanguard-logo.png",
+    apple: "/images/vanguard-logo.png",
+  },
 };
 
 export default function RootLayout({

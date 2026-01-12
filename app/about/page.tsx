@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import { CTAButton } from "@/components/cta-button";
 import { SectionTitle } from "@/components/section-title";
 import { useLanguage } from "@/contexts/language-context";
 import { aboutContent } from "@/lib/content/about";
+import Image from "next/image";
 
 function AboutPage() {
   const { language, t } = useLanguage();
@@ -47,7 +47,9 @@ function AboutPage() {
                 initialDelay={160}
               />
               <div className="mb-6 h-1 w-16 bg-vanguard-red"></div>
-              <p className="text-slate-300 leading-relaxed">{currentContent.origin.content}</p>
+              <p className="text-slate-300 leading-relaxed">
+                {currentContent.origin.content}
+              </p>
             </div>
             <div className="flex flex-col">
               <SectionTitle
@@ -57,7 +59,9 @@ function AboutPage() {
                 initialDelay={180}
               />
               <div className="mb-6 h-1 w-16 bg-vanguard-red"></div>
-              <p className="text-slate-300 leading-relaxed">{currentContent.mission.content}</p>
+              <p className="text-slate-300 leading-relaxed">
+                {currentContent.mission.content}
+              </p>
             </div>
             <div className="flex flex-col">
               <SectionTitle
@@ -67,7 +71,9 @@ function AboutPage() {
                 initialDelay={200}
               />
               <div className="mb-6 h-1 w-16 bg-vanguard-red"></div>
-              <p className="text-slate-300 leading-relaxed">{currentContent.vision.content}</p>
+              <p className="text-slate-300 leading-relaxed">
+                {currentContent.vision.content}
+              </p>
             </div>
           </div>
         </div>
@@ -139,7 +145,7 @@ function AboutPage() {
 
           {currentContent.team.members &&
             currentContent.team.members.length > 0 && (
-              <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-12 items-stretch max-w-4xl mx-auto">
                 {currentContent.team.members.map((member, index) => (
                   <a
                     key={index}
@@ -182,20 +188,22 @@ function AboutPage() {
           </div>
           <div className="mx-auto mb-12 h-1 w-20 bg-vanguard-red"></div>
 
-          <div className="space-y-8">
+          <div className="mx-auto max-w-4xl space-y-6">
             {currentContent.approach.steps.map((step, index) => (
               <div
                 key={index}
-                className="flex flex-col items-start gap-6 rounded-xl border border-slate-800/80 bg-slate-950/70 p-6 shadow-sm transition-shadow hover:border-slate-600 hover:shadow-lg md:flex-row"
+                className="flex min-h-[140px] flex-col items-start gap-6 rounded-xl border border-slate-800/80 bg-slate-950/70 p-6 shadow-sm transition-shadow hover:border-slate-600 hover:shadow-lg md:flex-row md:items-center"
               >
-                <div className="text-4xl font-bold text-slate-200">
+                <div className="flex-shrink-0 text-4xl font-bold text-slate-200 md:w-16">
                   {step.number}
                 </div>
-                <div>
+                <div className="flex-1">
                   <h3 className="mb-2 text-xl font-semibold text-slate-100">
                     {step.title}
                   </h3>
-                  <p className="text-slate-300">{step.description}</p>
+                  <p className="text-slate-300 leading-relaxed">
+                    {step.description}
+                  </p>
                 </div>
               </div>
             ))}

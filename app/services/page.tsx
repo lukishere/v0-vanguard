@@ -1,35 +1,44 @@
-"use client"
+"use client";
 
-import { useLanguage } from "@/contexts/language-context"
-import { Brain, Server, Globe, Database, Shield } from "lucide-react"
-import { useMemo } from "react"
-import { SectionTitle } from "@/components/section-title"
-import { servicesContent } from "@/lib/content/services"
-import { MagicBento } from "@/components/magic-bento"
+import { MagicBento } from "@/components/magic-bento";
+import { SectionTitle } from "@/components/section-title";
+import { useLanguage } from "@/contexts/language-context";
+import { servicesContent } from "@/lib/content/services";
+import {
+  Brain,
+  Database,
+  Globe,
+  GraduationCap,
+  Server,
+  Shield,
+} from "lucide-react";
+import { useMemo } from "react";
 
 export default function ServicesPage() {
-  const { language } = useLanguage()
+  const { language } = useLanguage();
 
-  const currentContent = useMemo(() => servicesContent[language], [language])
+  const currentContent = useMemo(() => servicesContent[language], [language]);
   const services = useMemo(
     () =>
       currentContent.services.map((service, index) => ({
         ...service,
-        icon: [Brain, Server, Globe, Globe, Database, Shield][index] ?? Brain,
+        icon:
+          [Brain, Server, Globe, GraduationCap, Database, Shield][index] ??
+          Brain,
       })),
     [currentContent.services]
-  )
+  );
   const bentoCards = useMemo(
     () =>
-      services.map(service => ({
+      services.map((service) => ({
         color: "#060010",
         title: service.title,
         description: service.description,
         icon: service.icon,
-        features: service.features
+        features: service.features,
       })),
     [language, services]
-  )
+  );
 
   return (
     <>
@@ -43,7 +52,7 @@ export default function ServicesPage() {
               currentContent.subtitle,
               language === "en"
                 ? "AI, IT, Web Development, Infrastructure, Security"
-                : "IA, TI, Desarrollo Web, Infraestructura, Seguridad"
+                : "IA, TI, Desarrollo Web, Infraestructura, Seguridad",
             ]}
             as="h1"
             className="mb-6 text-3xl text-white md:text-4xl"
@@ -91,28 +100,6 @@ export default function ServicesPage() {
           />
         </div>
       </section>
-
-      {/* Services Video Section */}
-      <section className="relative overflow-hidden bg-slate-950">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.18),_rgba(2,6,23,0.92))]" />
-        <div className="vanguard-container relative z-10 py-24">
-          <div className="mx-auto max-w-4xl">
-            <div className="aspect-video overflow-hidden rounded-lg bg-black shadow-xl">
-              <video
-                className="h-full w-full object-contain"
-                controls
-                preload="metadata"
-                aria-label={language === "en" ? "We invite you to watch our services video" : "Los invitamos a ver nuestro video de servicios"}
-              >
-                <source src="/videos/services-video.mp4" type="video/mp4" />
-                {language === "en"
-                  ? "Your browser does not support the video tag."
-                  : "Su navegador no admite la etiqueta de video."}
-              </video>
-            </div>
-          </div>
-        </div>
-      </section>
     </>
-  )
+  );
 }

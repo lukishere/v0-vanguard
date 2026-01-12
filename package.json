@@ -19,7 +19,6 @@
     "@copilotkit/react-textarea": "^1.9.0",
     "@copilotkit/react-ui": "^1.9.0",
     "@copilotkit/runtime": "^1.9.0",
-    "@google-cloud/recaptcha-enterprise": "^6.3.1",
     "@google/generative-ai": "^0.24.1",
     "@gsap/react": "^2.1.2",
     "@hookform/resolvers": "^3.9.1",

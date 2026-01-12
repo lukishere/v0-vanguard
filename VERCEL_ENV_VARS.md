@@ -43,8 +43,8 @@ SMTP_HOST = smtp.gmail.com
 SMTP_PORT = 587
 SMTP_USER = tu_email@gmail.com
 SMTP_PASS = tu_app_password
-NEXT_PUBLIC_RECAPTCHA_SITE_KEY = your_recaptcha_site_key_here
-RECAPTCHA_SECRET_KEY = your_recaptcha_secret_key_here
+NEXT_PUBLIC_TURNSTILE_SITE_KEY = your_turnstile_site_key_here
+TURNSTILE_SECRET_KEY = your_turnstile_secret_key_here
 GEMINI_API_KEY = your_gemini_api_key_here
 PERPLEXITY_API_KEY = your_perplexity_api_key_here
 ```
