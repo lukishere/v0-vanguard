@@ -69,19 +69,19 @@ const nextConfig = {
             value:
               "camera=(), microphone=(), geolocation=(), interest-cohort=()",
           },
-          // CSP para permitir iframes seguros de demos y Clerk
+          // CSP para permitir iframes seguros de demos y Clerk (incluyendo dominio personalizado)
           {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.com https://clerk.com https://*.clerk.accounts.dev https://vercel.live",
-              "style-src 'self' 'unsafe-inline' https://*.clerk.com https://clerk.com https://*.clerk.accounts.dev https://vercel.live https://fonts.googleapis.com",
-              "img-src 'self' data: https: https://*.clerk.com https://clerk.com https://*.clerk.accounts.dev https://vercel.live",
-              "font-src 'self' https://*.clerk.com https://clerk.com https://*.clerk.accounts.dev https://vercel.live https://fonts.gstatic.com",
-              "connect-src 'self' https://*.clerk.com https://clerk.com https://*.clerk.accounts.dev https://clerk-telemetry.com wss://*.clerk.com wss://clerk.com wss://*.clerk.accounts.dev https://vercel.live",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.com https://clerk.com https://*.clerk.accounts.dev https://*.vanguard-ia.tech https://clerk.vanguard-ia.tech https://vercel.live",
+              "style-src 'self' 'unsafe-inline' https://*.clerk.com https://clerk.com https://*.clerk.accounts.dev https://*.vanguard-ia.tech https://clerk.vanguard-ia.tech https://vercel.live https://fonts.googleapis.com",
+              "img-src 'self' data: https: https://*.clerk.com https://clerk.com https://*.clerk.accounts.dev https://*.vanguard-ia.tech https://clerk.vanguard-ia.tech https://vercel.live",
+              "font-src 'self' https://*.clerk.com https://clerk.com https://*.clerk.accounts.dev https://*.vanguard-ia.tech https://clerk.vanguard-ia.tech https://vercel.live https://fonts.gstatic.com",
+              "connect-src 'self' https://*.clerk.com https://clerk.com https://*.clerk.accounts.dev https://*.vanguard-ia.tech https://clerk.vanguard-ia.tech https://clerk-telemetry.com wss://*.clerk.com wss://clerk.com wss://*.clerk.accounts.dev wss://*.vanguard-ia.tech wss://clerk.vanguard-ia.tech https://vercel.live",
               "worker-src 'self' blob:",
               "frame-ancestors 'self'",
-              "frame-src 'self' https://vanguard-demos.vercel.app https://*.vercel.app https://*.web.app https://*.clerk.com https://clerk.com https://vercel.live",
+              "frame-src 'self' https://vanguard-demos.vercel.app https://*.vercel.app https://*.web.app https://*.clerk.com https://clerk.com https://*.vanguard-ia.tech https://clerk.vanguard-ia.tech https://vercel.live",
               "object-src 'none'",
               "base-uri 'self'",
             ].join("; "),
