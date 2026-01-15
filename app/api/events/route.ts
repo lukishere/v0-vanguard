@@ -1,27 +1,28 @@
 import { NextResponse } from "next/server"
-import { getActiveNews } from "@/app/actions/news"
+import { getActiveEvents } from "@/lib/content/events"
 
+/**
+ * API endpoint para obtener eventos
+ * 
+ * Carga eventos de manera estática desde lib/content/events.ts
+ * Cuando los eventos sean más recurrentes, se migrará a un sistema dinámico.
+ */
 export async function GET() {
   try {
-    // Get all active news items (public endpoint, no auth required)
-    const allNews = await getActiveNews()
+    // Cargar eventos estáticos
+    const events = getActiveEvents()
 
-    // Filter only events
-    const events = allNews.filter(item => item.type === "evento" && item.isActive)
-
-    // Log for debugging
-    console.log(`[Events API] Loaded ${allNews.length} active news items, ${events.length} active events`)
+    // Log para debugging
+    console.log(`[Events API] Loaded ${events.length} static events`)
 
     return NextResponse.json(events)
   } catch (error) {
-    // In production (Vercel), filesystem may be read-only or ephemeral
-    // Return empty array instead of error to prevent page crashes
+    // En caso de error, retornar array vacío para evitar que la página crashee
     console.error("❌ [Events API] Error al obtener eventos:", error)
     if (error instanceof Error) {
       console.error("   Error message:", error.message)
       console.error("   Stack:", error.stack)
     }
-    console.warn("⚠️ [Events API] Filesystem may not be available in production. Returning empty array.")
 
     // Return empty array instead of error to allow page to render
     return NextResponse.json([])
