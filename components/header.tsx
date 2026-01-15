@@ -15,6 +15,7 @@ export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [showButtonFallback, setShowButtonFallback] = useState(false);
   const pathname = usePathname();
   const { isSignedIn, isLoaded } = useUser();
 
@@ -26,6 +27,26 @@ export function Header() {
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  // Fallback: Si Clerk no carga después de 3 segundos, mostrar botón de todos modos
+  useEffect(() => {
+    if (isMounted && !isLoaded) {
+      const timeout = setTimeout(() => {
+        console.warn("[Header] Clerk no cargó después de 3 segundos, mostrando botón de fallback");
+        setShowButtonFallback(true);
+      }, 3000);
+
+      // Si Clerk carga antes del timeout, cancelar el fallback
+      if (isLoaded) {
+        clearTimeout(timeout);
+        setShowButtonFallback(false);
+      }
+
+      return () => clearTimeout(timeout);
+    } else if (isLoaded) {
+      setShowButtonFallback(false);
+    }
+  }, [isMounted, isLoaded]);
 
   // Handle scroll effect
   useEffect(() => {
@@ -79,9 +100,9 @@ export function Header() {
             ))}
             <LanguageSwitcher />
             {/* Authentication Status & CTA */}
-            {!isMounted || !isLoaded ? (
+            {!isMounted || (!isLoaded && !showButtonFallback) ? (
               <div className="h-10 w-32 bg-gray-100 animate-pulse rounded-md" />
-            ) : !isSignedIn ? (
+            ) : !isSignedIn || showButtonFallback ? (
               <Button
                 asChild
                 className="bg-vanguard-blue hover:bg-vanguard-blue/90 text-white transition-all duration-300 transform hover:-translate-y-0.5"
@@ -136,9 +157,9 @@ export function Header() {
                 </Link>
               ))}
               {/* Authentication Status & CTA - Mobile */}
-              {!isMounted || !isLoaded ? (
+              {!isMounted || (!isLoaded && !showButtonFallback) ? (
                 <div className="h-10 w-full bg-gray-100 animate-pulse rounded-md" />
-              ) : !isSignedIn ? (
+              ) : !isSignedIn || showButtonFallback ? (
                 <Button
                   asChild
                   className="bg-vanguard-blue hover:bg-vanguard-blue/90 text-white w-full transition-all duration-300 hover:-translate-y-0.5"
