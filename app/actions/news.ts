@@ -48,26 +48,40 @@ async function loadNews(): Promise<Map<string, NewsItem>> {
   // Try KV first (production)
   if (kv) {
     try {
+      console.log("[News] Attempting to load from KV...")
       const data = await kv.get<Record<string, NewsItem>>(KV_NEWS_KEY)
       if (data) {
+        const count = Object.keys(data).length
+        console.log(`[News] ✅ Loaded ${count} items from KV`)
         return new Map(Object.entries(data))
       }
+      console.log("[News] ⚠️ KV key 'news:all' exists but is empty")
       return new Map()
     } catch (error) {
       console.error("⚠️ [News] Error loading from KV:", error)
+      if (error instanceof Error) {
+        console.error("   Error message:", error.message)
+      }
       // Fall through to filesystem fallback
     }
+  } else {
+    console.log("[News] ⚠️ KV client not initialized - using filesystem fallback")
   }
 
   // Fallback to filesystem (development)
   try {
+    console.log("[News] Attempting to load from filesystem...")
     const data = await fs.readFile(NEWS_FILE, "utf-8")
     const obj = JSON.parse(data)
+    const count = Object.keys(obj).length
+    console.log(`[News] ✅ Loaded ${count} items from filesystem`)
     return new Map(Object.entries(obj))
   } catch (error) {
     // File doesn't exist or can't be read - return empty Map
     if (process.env.NODE_ENV === "development") {
       console.warn("⚠️ [News] Could not load news file:", error instanceof Error ? error.message : String(error))
+    } else {
+      console.warn("⚠️ [News] Filesystem not available in production")
     }
     return new Map()
   }

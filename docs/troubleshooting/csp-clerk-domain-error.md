@@ -1,7 +1,7 @@
 # Error: CSP bloquea dominio personalizado de Clerk
 
-**Fecha:** 2026-01-12  
-**Prioridad:** CRÍTICA  
+**Fecha:** 2026-01-12
+**Prioridad:** CRÍTICA
 **Estado:** ✅ SOLUCIONADO
 
 ---
@@ -10,8 +10,8 @@
 
 **Error en consola:**
 ```
-Loading the script `https://clerk.vanguard-ia.tech/npm/@clerk/clerk-js@5/dis...` 
-violates the following Content Security Policy directive: 
+Loading the script `https://clerk.vanguard-ia.tech/npm/@clerk/clerk-js@5/dis...`
+violates the following Content Security Policy directive:
 `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.com https://clerk.com https://*.clerk.accounts.dev https://vercel.live`
 ```
 

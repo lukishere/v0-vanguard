@@ -32,18 +32,35 @@ export default function EventsPage() {
 
   const fetchEvents = async () => {
     try {
-      const response = await fetch('/api/events')
+      console.log('[Events Page] Fetching events from /api/events...')
+      const response = await fetch('/api/events', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        cache: 'no-store', // Ensure fresh data on each request
+      })
+
+      console.log('[Events Page] Response status:', response.status, response.statusText)
+
       if (response.ok) {
         const data = await response.json()
+        console.log('[Events Page] Events fetched:', data.length, 'events')
+        console.log('[Events Page] Events data:', data)
         setEvents(data)
-        console.log('Events fetched:', data.length, 'events')
-        console.log('Showcase events:', data.filter((e: EventItem) => e.showInShowcase).length)
+        console.log('[Events Page] Showcase events:', data.filter((e: EventItem) => e.showInShowcase).length)
       } else {
         const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
-        console.error('Error fetching events:', response.status, errorData)
+        console.error('[Events Page] Error fetching events:', response.status, errorData)
+        setEvents([]) // Ensure empty array on error
       }
     } catch (error) {
-      console.error('Error fetching events:', error)
+      console.error('[Events Page] Error fetching events:', error)
+      if (error instanceof Error) {
+        console.error('[Events Page] Error message:', error.message)
+        console.error('[Events Page] Error stack:', error.stack)
+      }
+      setEvents([]) // Ensure empty array on error
     } finally {
       setLoading(false)
     }

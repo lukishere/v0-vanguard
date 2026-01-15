@@ -23,22 +23,27 @@ export function getKvClient() {
 
     // Check if at least URL and token are set
     if (!url || !token) {
+      console.warn("⚠️ [KV] Missing environment variables:", {
+        UPSTASH_REDIS_REST_URL: !!process.env.UPSTASH_REDIS_REST_URL,
+        KV_REST_API_URL: !!process.env.KV_REST_API_URL,
+        UPSTASH_REDIS_REST_TOKEN: !!process.env.UPSTASH_REDIS_REST_TOKEN,
+        KV_REST_API_TOKEN: !!process.env.KV_REST_API_TOKEN,
+      })
       return null
     }
 
-    // Map Vercel KV variables to Upstash format for Redis.fromEnv()
-    // This allows using Redis.fromEnv() which is cleaner
-    if (process.env.KV_REST_API_URL && !process.env.UPSTASH_REDIS_REST_URL) {
-      process.env.UPSTASH_REDIS_REST_URL = process.env.KV_REST_API_URL
-    }
-    if (process.env.KV_REST_API_TOKEN && !process.env.UPSTASH_REDIS_REST_TOKEN) {
-      process.env.UPSTASH_REDIS_REST_TOKEN = process.env.KV_REST_API_TOKEN
-    }
-
-    // Redis.fromEnv() automatically reads UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN
-    return Redis.fromEnv()
+    // Create Redis client directly with the variables we found
+    // Redis.fromEnv() only works if variables are named exactly UPSTASH_REDIS_REST_URL/TOKEN
+    // Since we support both naming conventions, we need to create the client manually
+    return new Redis({
+      url: url,
+      token: token,
+    })
   } catch (error) {
     console.warn("⚠️ [KV] Failed to initialize Redis client:", error)
+    if (error instanceof Error) {
+      console.warn("   Error message:", error.message)
+    }
     return null
   }
 }

@@ -20,9 +20,15 @@ async function sendAuditEmail(
   sector: string,
   message: string
 ): Promise<void> {
-  // Validate environment variables
-  if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
-    throw new Error('SMTP configuration is missing');
+  // Validate environment variables with specific messages
+  const missingVars: string[] = [];
+  if (!process.env.SMTP_HOST) missingVars.push('SMTP_HOST');
+  if (!process.env.SMTP_USER) missingVars.push('SMTP_USER');
+  if (!process.env.SMTP_PASS) missingVars.push('SMTP_PASS');
+
+  if (missingVars.length > 0) {
+    console.error('SMTP configuration missing:', missingVars.join(', '));
+    throw new Error(`SMTP configuration is missing: ${missingVars.join(', ')}`);
   }
 
   const transporter = nodemailer.createTransport({
@@ -39,16 +45,18 @@ async function sendAuditEmail(
     }
   });
 
-  // Verify transporter configuration
+  // Verify transporter configuration with detailed error
   try {
     await transporter.verify();
-  } catch {
-    throw new Error('SMTP server configuration is invalid');
+  } catch (verifyError) {
+    console.error('SMTP verification failed:', verifyError);
+    const errorMessage = verifyError instanceof Error ? verifyError.message : 'Unknown SMTP error';
+    throw new Error(`SMTP server configuration is invalid: ${errorMessage}`);
   }
 
   const mailOptions = {
     from: process.env.SMTP_USER,
-    to: 'lucas.ballestero@gmail.com',
+    to: 'contacto@vanguard-ia.tech',
     subject: `Technical Audit Request from ${sanitizeInput(name)}`,
     text: `
 Technical Audit Request
@@ -81,8 +89,21 @@ This request was submitted through the VANGUARD-IA website.
 
   try {
     await transporter.sendMail(mailOptions);
+    console.log('Audit request email sent successfully to:', mailOptions.to);
   } catch (emailError) {
-    throw new Error(`Failed to send email: ${emailError instanceof Error ? emailError.message : 'Unknown error'}`);
+    console.error('Failed to send audit request email:', emailError);
+    const errorMessage = emailError instanceof Error ? emailError.message : 'Unknown error';
+
+    // Provide more specific error messages based on common SMTP errors
+    if (errorMessage.includes('Invalid login')) {
+      throw new Error('SMTP authentication failed. Please check SMTP credentials.');
+    } else if (errorMessage.includes('ECONNREFUSED') || errorMessage.includes('ETIMEDOUT')) {
+      throw new Error('Cannot connect to SMTP server. Please check SMTP host and port.');
+    } else if (errorMessage.includes('certificate')) {
+      throw new Error('SMTP certificate verification failed.');
+    }
+
+    throw new Error(`Failed to send email: ${errorMessage}`);
   }
 }
 
@@ -130,8 +151,15 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     console.error('Error sending audit request email:', error);
+
+    // Extract error message
+    const errorMessage = error instanceof Error
+      ? error.message
+      : 'Failed to send email. Please try again later.';
+
+    // Return more specific error message to client
     return NextResponse.json(
-      { error: 'Failed to send email. Please try again later.' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

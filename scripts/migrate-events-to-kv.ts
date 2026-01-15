@@ -13,12 +13,37 @@ import { Redis } from "@upstash/redis"
 import fs from "fs/promises"
 import path from "path"
 
+// Load environment variables from .env.local
+async function loadEnvFile() {
+  try {
+    const envPath = path.join(process.cwd(), ".env.local")
+    const envContent = await fs.readFile(envPath, "utf-8")
+    const envLines = envContent.split("\n")
+
+    for (const line of envLines) {
+      const trimmedLine = line.trim()
+      if (trimmedLine && !trimmedLine.startsWith("#")) {
+        const [key, ...valueParts] = trimmedLine.split("=")
+        if (key && valueParts.length > 0) {
+          const value = valueParts.join("=").trim()
+          process.env[key.trim()] = value
+        }
+      }
+    }
+  } catch (error) {
+    // .env.local may not exist, that's ok
+  }
+}
+
 const DATA_DIR = path.join(process.cwd(), ".data")
 const NEWS_FILE = path.join(DATA_DIR, "news.json")
 const KV_NEWS_KEY = "news:all"
 
 async function migrateEvents() {
   try {
+    // Load environment variables first
+    await loadEnvFile()
+
     console.log("🚀 Starting migration to KV...\n")
 
     // 1. Leer datos locales
@@ -62,7 +87,12 @@ async function migrateEvents() {
 
     // 3. Conectar a KV
     console.log("🔌 Connecting to KV...")
-    const redis = Redis.fromEnv()
+    // Create Redis client directly with the variables we found
+    // This works with both KV_REST_API_URL and UPSTASH_REDIS_REST_URL naming conventions
+    const redis = new Redis({
+      url: url,
+      token: token,
+    })
 
     // 4. Verificar conexión
     await redis.ping()

@@ -1,7 +1,7 @@
 # Fallback: Botón Visible Aunque Clerk No Cargue
 
-**Fecha:** 2026-01-12  
-**Prioridad:** ALTA  
+**Fecha:** 2026-01-12
+**Prioridad:** ALTA
 **Estado:** ✅ IMPLEMENTADO
 
 ---

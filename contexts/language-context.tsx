@@ -66,7 +66,8 @@ const translations = {
     "contact.address": "Location",
     "contact.phone": "Support",
     "contact.email": "Email",
-    "footer.rights": "A brand of VANGUARD LB CONSULTING S.L.U. All rights reserved.",
+    "footer.rights":
+      "A brand of VANGUARD LB CONSULTING S.L.U. All rights reserved.",
     "events.title": "Latest Events",
     "events.subtitle":
       "Stay updated with our latest events and company updates",
@@ -82,12 +83,12 @@ const translations = {
     "cta.getStarted": "Ready to get started?",
     "cta.discuss":
       "Contact us today to discuss your project and how our services can help you achieve your business goals.",
-    "contact.info": "Contact Information",
+    "contact.info": "Your connection with us matters",
     "contact.hours": "Office Hours",
     "contact.form.secureForm": "Secure Form",
     "contact.form.quote": "Request a Quote",
     "contact.form.fill":
-      "Fill out the form below and we'll get back to you as soon as possible.",
+      "To learn more about our services and products, audits or demos:",
     "contact.form.thanks": "Thank you!",
     "contact.form.sent":
       "Your message has been sent successfully. We'll get back to you shortly.",
@@ -158,6 +159,10 @@ const translations = {
     "audit.modal.sending": "Sending...",
     "audit.modal.success": "Thank you! We'll contact you soon.",
     "audit.modal.error": "There was an error. Please try again.",
+    "audit.modal.validation.nameRequired": "Name is required",
+    "audit.modal.validation.emailRequired": "Email is required",
+    "audit.modal.validation.emailInvalid": "Please enter a valid email address",
+    "audit.modal.validation.phoneRequired": "Phone number is required",
     // QUAN Partnership
     "quan.title": "Digital Experience & Branding",
     "quan.poweredBy": "Powered by QUAN LLC",
@@ -176,7 +181,7 @@ const translations = {
     "cta.getQuote": "Acceso Clientes",
     "hero.title": "Innovación y creatividad para transformar tu negocio",
     "hero.subtitle":
-      "Diseñamos ecosistemas de IA soberanos con infraestructura de alto rendimiento donde flujos de trabajo automatizados conviven. Especialistas en la soberanía y resguardo de tus datos.",
+      "Especialistas en implementaciones tecnológicas potenciadas por la inteligencia artificial donde flujos de trabajo automatizados conviven.",
     "services.title": "Nuestros Servicios",
     "services.ai.title": "Desarrollo de IA",
     "services.ai.description":
@@ -205,7 +210,8 @@ const translations = {
     "contact.address": "Ubicación",
     "contact.phone": "Soporte",
     "contact.email": "Correo electrónico",
-    "footer.rights": "Una marca de VANGUARD LB CONSULTING S.L.U. Todos los derechos reservados.",
+    "footer.rights":
+      "Una marca de VANGUARD LB CONSULTING S.L.U. Todos los derechos reservados.",
     "events.title": "Últimos Eventos",
     "events.subtitle": "Comparte una experiencia única con nosotros",
     "about.team": "Nuestro Equipo",
@@ -220,12 +226,12 @@ const translations = {
     "cta.getStarted": "¿Listo para comenzar?",
     "cta.discuss":
       "Contáctanos hoy para discutir tu proyecto y cómo nuestros servicios pueden ayudarte a alcanzar tus objetivos empresariales.",
-    "contact.info": "Información de Contacto",
+    "contact.info": "Tu conexión con nosotros importa",
     "contact.hours": "Horario de Oficina",
     "contact.form.secureForm": "Formulario Seguro",
     "contact.form.quote": "Solicitar un Presupuesto",
     "contact.form.fill":
-      "Completa el formulario a continuación y nos pondremos en contacto contigo lo antes posible.",
+      "Para saber más de nuestros servicios y productos, auditorías o demos:",
     "contact.form.thanks": "¡Gracias!",
     "contact.form.sent":
       "Tu mensaje ha sido enviado con éxito. Nos pondremos en contacto contigo en breve.",
@@ -298,6 +304,12 @@ const translations = {
     "audit.modal.success":
       "¡Gracias! Nos pondremos en contacto contigo pronto.",
     "audit.modal.error": "Hubo un error. Por favor, inténtalo de nuevo.",
+    "audit.modal.validation.nameRequired": "El nombre es obligatorio",
+    "audit.modal.validation.emailRequired":
+      "El correo electrónico es obligatorio",
+    "audit.modal.validation.emailInvalid":
+      "Por favor, ingresa un correo electrónico válido",
+    "audit.modal.validation.phoneRequired": "El teléfono es obligatorio",
     // Asociación QUAN
     "quan.title": "Experiencia Digital & Branding",
     "quan.poweredBy": "Powered by QUAN LLC",

@@ -32,15 +32,45 @@ export function AuditModal({ open, onOpenChange }: AuditModalProps) {
     loading: false,
     submitted: false,
   })
+  const [errors, setErrors] = useState<{
+    name?: string
+    email?: string
+    phone?: string
+    general?: string
+  }>({})
+
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setErrors({})
 
-    if (!formState.name.trim() || !formState.email.trim() || !formState.phone.trim()) {
+    const newErrors: typeof errors = {}
+
+    if (!formState.name.trim()) {
+      newErrors.name = t("audit.modal.validation.nameRequired")
+    }
+
+    if (!formState.email.trim()) {
+      newErrors.email = t("audit.modal.validation.emailRequired")
+    } else if (!validateEmail(formState.email)) {
+      newErrors.email = t("audit.modal.validation.emailInvalid")
+    }
+
+    if (!formState.phone.trim()) {
+      newErrors.phone = t("audit.modal.validation.phoneRequired")
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
       return
     }
 
     setFormState({ ...formState, loading: true })
+    setErrors({})
 
     try {
       const response = await fetch("/api/audit-request", {
@@ -69,6 +99,7 @@ export function AuditModal({ open, onOpenChange }: AuditModalProps) {
           loading: false,
           submitted: true,
         })
+        setErrors({})
         setTimeout(() => {
           onOpenChange(false)
           setFormState({
@@ -84,17 +115,40 @@ export function AuditModal({ open, onOpenChange }: AuditModalProps) {
           })
         }, 2000)
       } else {
+        const errorData = await response.json().catch(() => ({}))
+        const errorMessage =
+          errorData.error || t("audit.modal.error")
+        setErrors({ general: errorMessage })
         setFormState({ ...formState, loading: false })
-        alert(t("audit.modal.error"))
       }
-    } catch {
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : t("audit.modal.error")
+      setErrors({ general: errorMessage })
       setFormState({ ...formState, loading: false })
-      alert(t("audit.modal.error"))
     }
   }
 
+  const handleOpenChange = (isOpen: boolean) => {
+    if (!isOpen) {
+      setErrors({})
+      setFormState({
+        name: "",
+        email: "",
+        phone: "",
+        position: "",
+        company: "",
+        sector: "",
+        message: "",
+        loading: false,
+        submitted: false,
+      })
+    }
+    onOpenChange(isOpen)
+  }
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl text-vanguard-blue">
@@ -113,6 +167,12 @@ export function AuditModal({ open, onOpenChange }: AuditModalProps) {
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
+            {errors.general && (
+              <div className="rounded-md bg-red-50 p-3 text-sm text-red-800 dark:bg-red-900/20 dark:text-red-200">
+                {errors.general}
+              </div>
+            )}
+
             <div className="space-y-2">
               <Label htmlFor="audit-name">{t("audit.modal.name")}</Label>
               <Input
@@ -120,12 +180,20 @@ export function AuditModal({ open, onOpenChange }: AuditModalProps) {
                 type="text"
                 required
                 value={formState.name}
-                onChange={(e) =>
+                onChange={(e) => {
                   setFormState({ ...formState, name: e.target.value })
-                }
+                  if (errors.name) {
+                    setErrors({ ...errors, name: undefined })
+                  }
+                }}
                 disabled={formState.loading}
-                className="w-full"
+                className={`w-full ${errors.name ? "border-red-500" : ""}`}
               />
+              {errors.name && (
+                <p className="text-sm text-red-600 dark:text-red-400">
+                  {errors.name}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -135,12 +203,20 @@ export function AuditModal({ open, onOpenChange }: AuditModalProps) {
                 type="email"
                 required
                 value={formState.email}
-                onChange={(e) =>
+                onChange={(e) => {
                   setFormState({ ...formState, email: e.target.value })
-                }
+                  if (errors.email) {
+                    setErrors({ ...errors, email: undefined })
+                  }
+                }}
                 disabled={formState.loading}
-                className="w-full"
+                className={`w-full ${errors.email ? "border-red-500" : ""}`}
               />
+              {errors.email && (
+                <p className="text-sm text-red-600 dark:text-red-400">
+                  {errors.email}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -150,13 +226,21 @@ export function AuditModal({ open, onOpenChange }: AuditModalProps) {
                 type="tel"
                 required
                 value={formState.phone}
-                onChange={(e) =>
+                onChange={(e) => {
                   setFormState({ ...formState, phone: e.target.value })
-                }
+                  if (errors.phone) {
+                    setErrors({ ...errors, phone: undefined })
+                  }
+                }}
                 disabled={formState.loading}
-                className="w-full"
+                className={`w-full ${errors.phone ? "border-red-500" : ""}`}
                 placeholder="+34 123 456 789"
               />
+              {errors.phone && (
+                <p className="text-sm text-red-600 dark:text-red-400">
+                  {errors.phone}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">

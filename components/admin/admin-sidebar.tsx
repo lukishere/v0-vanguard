@@ -3,7 +3,7 @@
 import { useState, type ComponentType } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Users, Boxes, BookOpen, BarChart3, Settings, Bell, Briefcase, ShieldAlert } from "lucide-react"
+import { LayoutDashboard, Users, Boxes, BookOpen, BarChart3, Settings, Bell, Briefcase, ShieldAlert, Newspaper } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 type NavItem = {
@@ -21,6 +21,7 @@ const navItems: NavItem[] = [
   { href: "/admin/solicitudes", label: "Solicitudes", icon: Bell },
   { href: "/admin/servicios", label: "Servicios", icon: Briefcase },
   { href: "/admin/recursos", label: "Recursos", icon: BookOpen },
+  { href: "/admin/noticias", label: "Noticias y Eventos", icon: Newspaper },
   { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/admin/configuracion", label: "Configuración", icon: Settings, disabled: true },
 ]
