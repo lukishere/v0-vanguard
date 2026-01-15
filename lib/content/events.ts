@@ -1,6 +1,6 @@
 /**
  * Eventos estáticos de Vanguard-IA
- * 
+ *
  * Este archivo contiene los eventos que se muestran en la página de eventos.
  * Cuando los eventos sean más recurrentes, se migrará a un sistema dinámico.
  */
@@ -35,7 +35,7 @@ export interface StaticEvent {
 
 /**
  * Lista de eventos estáticos
- * 
+ *
  * Para agregar un nuevo evento, simplemente agrega un objeto a este array.
  * Los eventos se mostrarán automáticamente en la página de eventos.
  */
@@ -121,11 +121,65 @@ export const staticEvents: StaticEvent[] = [
       nanoseconds: 25000000,
     },
   },
+  {
+    id: "event_talent_arena_2026",
+    type: "evento",
+    title: "Talent Arena 2026 • Barcelona, España",
+    content: "Evento dedicado al talento digital organizado por Mobile World Capital Barcelona",
+    author: "Vanguard-IA Team",
+    eventDate: "2–4 de marzo de 2026",
+    eventLocation: "Pabellón 8, Fira de Montjuïc, Barcelona",
+    eventLink: "https://mobileworldcapital.com/",
+    eventImage: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+    eventSummary: "Descubre el futuro del talento digital en Barcelona. Talent Arena celebra su segunda edición coincidiendo con MWC26 y 4YFN.",
+    eventDetails: "El evento reunirá a referentes tecnológicos como Tim Berners-Lee, Kate Darling, Tim Serewicz, Steve Aoki y otros líderes del ecosistema digital para explorar las últimas tendencias en talento digital, formación y desarrollo profesional.",
+    showInShowcase: true,
+    isActive: true,
+    publishedAt: {
+      seconds: Math.floor(Date.now() / 1000),
+      nanoseconds: 0,
+    },
+    createdAt: {
+      seconds: Math.floor(Date.now() / 1000),
+      nanoseconds: 0,
+    },
+    updatedAt: {
+      seconds: Math.floor(Date.now() / 1000),
+      nanoseconds: 0,
+    },
+  },
+  {
+    id: "event_oracle_ai_world_tour_2026",
+    type: "evento",
+    title: "Oracle AI World Tour Madrid 2026",
+    content: "Evento sobre inteligencia artificial organizado por Oracle",
+    author: "Vanguard-IA Team",
+    eventDate: "10 de febrero de 2026",
+    eventLocation: "IFEMA MADRID",
+    eventLink: "https://www.oracle.com/es/ai-world-tour/",
+    eventImage: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+    eventSummary: "Aprende, conecta y descubre innovaciones de IA para resolver tus desafíos empresariales más complejos.",
+    eventDetails: "Explora los últimos avances en IA diseñados para resolver desafíos únicos de tu empresa. Descubre cómo las nuevas capacidades de IA de Oracle están transformando la forma de hacer negocios en todos los sectores. Conecta con expertos de Oracle, descubre estrategias de empresas de tu área y haz networking con otros profesionales.",
+    showInShowcase: true,
+    isActive: true,
+    publishedAt: {
+      seconds: Math.floor(Date.now() / 1000),
+      nanoseconds: 0,
+    },
+    createdAt: {
+      seconds: Math.floor(Date.now() / 1000),
+      nanoseconds: 0,
+    },
+    updatedAt: {
+      seconds: Math.floor(Date.now() / 1000),
+      nanoseconds: 0,
+    },
+  },
 ];
 
 /**
  * Obtiene todos los eventos activos
- * 
+ *
  * @returns Array de eventos activos
  */
 export function getActiveEvents(): StaticEvent[] {
@@ -134,7 +188,7 @@ export function getActiveEvents(): StaticEvent[] {
 
 /**
  * Obtiene eventos para el showcase
- * 
+ *
  * @returns Array de eventos marcados para showcase
  */
 export function getShowcaseEvents(): StaticEvent[] {

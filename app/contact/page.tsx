@@ -4,8 +4,8 @@ import type React from "react"
 import { Suspense } from "react"
 
 import { useLanguage } from "@/contexts/language-context"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Mail, Phone, MapPin, Linkedin, ShieldCheck } from "lucide-react"
+import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card"
+import { Mail, Phone, MapPin, Linkedin } from "lucide-react"
 import { SectionTitle } from "@/components/section-title"
 import { contactInfo as defaultContactInfo } from "@/lib/content/contact"
 
@@ -71,13 +71,9 @@ function ContactPageContent() {
                 <div className="rounded-[26px] border border-white/10 bg-slate-950/80">
                   <Card className="h-full border-0 bg-transparent text-slate-100">
                     <CardHeader className="space-y-4 border-b border-white/10 bg-gradient-to-br from-slate-900/60 via-slate-950/40 to-slate-950/80">
-                      <div className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-1 text-xs uppercase tracking-[0.4em] text-slate-300">
-                        <ShieldCheck className="h-4 w-4 text-vanguard-blue" />
-                        <span>{t("contact.info")}</span>
-                      </div>
-                      <CardTitle className="text-2xl font-semibold text-white md:text-3xl">
+                      <h2 className="text-2xl font-semibold text-white md:text-3xl">
                         {t("contact.info")}
-                      </CardTitle>
+                      </h2>
                       <CardDescription className="max-w-2xl text-sm leading-relaxed text-slate-300">
                         {t("contact.form.fill")}
                       </CardDescription>

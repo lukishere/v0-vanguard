@@ -3,7 +3,7 @@ import { getActiveEvents } from "@/lib/content/events"
 
 /**
  * API endpoint para obtener eventos
- * 
+ *
  * Carga eventos de manera estática desde lib/content/events.ts
  * Cuando los eventos sean más recurrentes, se migrará a un sistema dinámico.
  */
